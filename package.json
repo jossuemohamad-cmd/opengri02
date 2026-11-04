@@ -1,0 +1,31 @@
+{
+  "name": "lecasu-gridops",
+  "version": "1.0.0",
+  "description": "Plataforma de gestão técnica, comercial e operacional para mini-redes de eletrificação rural em Moçambique - LECASU, Lda",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node --watch server/server.js",
+    "migrate": "node scripts/migrate.js",
+    "test": "node scripts/test_server.js"
+  },
+  "keywords": [
+    "mini-redes",
+    "eletrificacao-rural",
+    "mocambique",
+    "lecasu",
+    "gridops",
+    "smart-meters",
+    "vanilla-js"
+  ],
+  "author": "LECASU, Lda",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.13.3"
+  }
+}
