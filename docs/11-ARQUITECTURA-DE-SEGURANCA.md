@@ -95,3 +95,4 @@ O **LECASU GridOps** rege-se pelos padrões da norma **ISO/IEC 27001** e pelas d
 * **RPO (*Recovery Point Objective*):** $\le 15\text{ minutos}$ (máxima perda aceitável de transações em caso de desastre catastrófico no servidor principal, assegurada pelo arquivamento contínuo de logs WAL).
 * **RTO (*Recovery Time Objective*):** $\le 2\text{ horas}$ para restabelecimento completo do serviço em infraestrutura de contingência.
 * **Testes Periódicos de Restauração:** Simulação de restauração completa realizada trimestralmente em ambiente isolado de *Staging* para validação da integridade das cópias de segurança.
+

@@ -284,3 +284,4 @@ Trilha cronológica imutável (*Append-Only*) de eventos e mutações de dados.
 | `user_agent` | VARCHAR(255) | — | Sim | — | Navegador ou dispositivo de origem. |
 | `performed_at` | TIMESTAMPTZ | — | Não | `NOW()` | Carimbo temporal UTC imutável. |
 * **Restrição de Segurança:** Proibido qualquer comando `UPDATE` ou `DELETE` nesta tabela via permissões de base de dados (regra *Revoke Update/Delete* aplicada no PostgreSQL).
+

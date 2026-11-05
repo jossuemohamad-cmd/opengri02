@@ -315,3 +315,4 @@ erDiagram
    * Em regime pré-pago, o pagamento direto dispara a geração de registo na entidade `STS_TOKENS`, que registra de forma auditável os 20 dígitos gerados e o rateio financeiro (energia vs amortização de dívida).
 5. **Auditoria Geral Imutável (`AUDIT_LOGS`):**
    * Tabela em modo *append-only*. Não admite comandos `UPDATE` ou `DELETE`. Todas as mutações em clientes, contratos, faturas, pagamentos e utilizadores disparam triggers relacionais que inserem uma nova linha nesta tabela com o payload anterior e atual.
+

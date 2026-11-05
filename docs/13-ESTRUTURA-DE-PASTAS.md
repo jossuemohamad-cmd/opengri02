@@ -184,3 +184,4 @@ lecasu-gridops/
   - `refactor(modulo): melhoria interna de código sem alteração funcional`
   - `test(modulo): adição ou ajuste de cenários de teste`
 * **Integridade da Ramo Principal:** A ramo `main` é mantida sempre em estado funcional e compilável, com sincronização regular com o repositório oficial da organização.
+

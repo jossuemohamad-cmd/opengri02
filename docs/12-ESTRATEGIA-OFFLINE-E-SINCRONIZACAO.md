@@ -128,3 +128,4 @@ Para que o técnico e o agente tenham confiança absoluta no estado dos seus reg
 * **Ícone Amarelo com Contador ("X Pendentes"):** Modo offline ou online com registos locais a aguardar sincronização. Clicar no indicador abre a lista detalhada dos itens em fila.
 * **Ícone Azul com Animação ("A Sincronizar..."):** Pacote em transmissão ativa para o servidor com barra de progresso percentual.
 * **Ícone Vermelho com Alerta ("Falha na Ligação"):** Erro de rede durante a transmissão; o sistema mantém os dados seguros no IndexedDB e retenta automaticamente em 60 segundos com *exponential backoff*.
+

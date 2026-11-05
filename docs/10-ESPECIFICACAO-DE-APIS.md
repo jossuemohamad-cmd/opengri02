@@ -303,3 +303,4 @@ Recebimento do pacote de eventos acumulados em campo sem sinal GSM.
     ]
   }
   ```
+

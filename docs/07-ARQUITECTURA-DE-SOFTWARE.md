@@ -129,3 +129,4 @@ Todas as respostas da API seguem um formato previsível e padronizado:
 | **Frontend** | **Vanilla JS (ES6+) PWA** | Zero tempo de compilação em runtime, carregamento imediato, consumo mínimo de bateria em smartphones Android rurais, sem quebras por dependências depreciadas. | React/Next.js (bundle pesado, hidratação lenta em redes 2G/3G e complexidade de manutenção offline). |
 | **Cartografia SIG** | **Leaflet GIS** | Biblioteca aberta, leve (apenas ~40 KB), suporta camadas offline pré-carregadas e marcadores interativos com excelente desempenho móvel. | Google Maps API (custos elevados por chamada e dependência de conexão contínua). |
 | **Segurança / Auth** | **JWT + bcrypt** | Autenticação stateless ideal para ambientes com conexões intermitentes, com assinaturas HMAC-SHA256 e senhas com hashing de alto custo. | Sessões baseadas em cookies de servidor (dificuldade de manutenção em clientes móveis offline). |
+
