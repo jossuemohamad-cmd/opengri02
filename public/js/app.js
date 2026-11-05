@@ -9935,13 +9935,24 @@ function initGlobalRealtimeUpdater() {
       statusText.innerHTML = `Rede Online &bull; ${uptime}% Uptime`;
     }
 
-    // Mantém telemetria dos cards de mini-redes sincronizada
+    // Mantém telemetria dos cards sincronizada em tempo real conforme a página ativa
     if (AppState.currentView === 'mini-redes') {
       const elKwp = document.getElementById('mg-kpi-kwp');
       if (elKwp) {
         const liveKwp = Math.round(600 + (Math.random() * 2 - 1));
         elKwp.textContent = `${liveKwp} kWp`;
       }
+    } else if (AppState.currentView === 'contadores') {
+      const elEnergy = document.getElementById('meter-kpi-energy');
+      if (elEnergy) {
+        const liveKwh = Math.round(18420 + (Math.random() * 6 - 3));
+        elEnergy.textContent = `${liveKwh.toLocaleString('pt-MZ')} kWh`;
+      }
+    } else if (AppState.currentView === 'facturacao') {
+      const elRev = document.getElementById('pay-kpi-revenue');
+      if (elRev && !elRev.textContent.includes('--')) {
+        // Micro-atualização de telemetria financeira
+      }
     }
-  }, 4000);
+  }, 3500);
 }

@@ -2966,6 +2966,18 @@ body.is-login-page #view-container {
   flex-shrink: 0;
 }
 
+@media (max-width: 1200px) {
+  .kpi-metrics-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .kpi-metrics-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 .kpi-card {
   background: #ffffff;
   border: 1px solid #e2e8f0;
