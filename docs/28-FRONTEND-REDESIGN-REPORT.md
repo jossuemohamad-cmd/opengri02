@@ -1,9 +1,9 @@
-# RELATÓRIO DE REDESIGN GLOBAL DO FRONTEND — LECASU GRIDOPS
+# RELATÓRIO DE RECONSTRUÇÃO DO FRONTEND COM FRAMEWORK — LECASU GRIDOPS
 
-**Documento:** 28 — Relatório de Redesign Global do Frontend  
+**Documento:** 28 — Relatório de Reconstrução do Frontend com Framework  
 **Produto:** LECASU GridOps — Plataforma de Gestão de Mini-Redes Fotovoltaicas  
 **Empresa:** LECASU, Lda.  
-**Versão:** 1.0.0  
+**Versão:** 2.0.0 (Bootstrap 5.3 Framework Edition)  
 **Data:** 5 de Novembro de 2026  
 **Classificação:** Confidencial / Operações Técnicas  
 
@@ -11,106 +11,49 @@
 
 ## 1. Sumário Executivo
 
-O presente documento consolida a execução integral da **Missão de Redesign Global do Frontend do LECASU GridOps**, realizada com base nas diretrizes do `AGENTS.md`, `docs/PRD.md`, `docs/01-DISCOVERY-REPORT.md` e na auditoria prévia `docs/02-FRONTEND-UI-AUDIT.md`.
+Em resposta à diretriz explícita de reformulação estrutural ("elimina esse layout e faz um novo, zerar e aplica um novo, com frameworks, nada de darkmode"), o frontend do LECASU GridOps foi completamente reinicializado e reconstruído com base no framework industrial **Bootstrap 5.3.3** e na biblioteca **Bootstrap Icons 1.11.3**, operando em **100% Light Mode**.
 
-A reformulação unificou a linguagem visual da plataforma, eliminando incoerências de protótipos anteriores e consolidando uma interface corporativa moderna, de padrão internacional SaaS (Software as a Service), especificamente projetada para a gestão e telemetria de mini-redes solares rurais em Moçambique.
-
----
-
-## 2. Padrões do Design System Consolidado
-
-### 2.1. Identidade Cromática Oficial
-- **Laranja Energia LECASU (Cor Primária Institucional):** `#FF7A00`
-- **Laranja Interativo (Hover / Destaque):** `#EA580C`
-- **Laranja Sutil (Superfícies de Foco e Destaque):** `#FFF7ED`
-- **Borda Primária Alinhada:** `#FED7AA`
-- **Brilho / Anel de Foco Operacional:** `rgba(255, 122, 0, 0.20)`
-
-### 2.2. Escala Neutra Fria (Ardósia / Slate Corporativo)
-- **Slate 900 (`#0F172A`):** Títulos, métricas numéricas principais e textos de alto impacto.
-- **Slate 800 (`#1E293B`):** Cabeçalhos secundários e elementos estruturais.
-- **Slate 700 (`#334155`):** Textos do corpo principal e rótulos de dados.
-- **Slate 600 (`#475569`):** Subtítulos e itens de navegação inativos.
-- **Slate 500 (`#64748B`):** Metadados secundários e unidades de medida.
-- **Slate 400 (`#94A3B8`):** Placeholders e ícones secundários.
-- **Slate 300 (`#CBD5E1`):** Bordas de botões interativos e divisores de tabelas.
-- **Slate 200 (`#E2E8F0`):** Bordas de cartões e linhas de tabelas.
-- **Slate 100 (`#F1F5F9`):** Cabeçalhos de tabelas e fundos secundários.
-- **Slate 50 (`#F8FAFC`):** Fundo da área de trabalho e faixas alternadas.
-- **Surface (`#FFFFFF`):** Fundo limpo de cartões, formulários e modais.
-
-### 2.3. Semântica de Estados Operacionais
-- **Operação Normal / Ativa (Verde):** `#16A34A` / Fundo: `#DCFCE7` / Borda: `#BBF7D0`
-- **Alerta / Instalação / Montagem (Âmbar):** `#D97706` / Fundo: `#FEF3C7` / Borda: `#FDE68A`
-- **Crítico / Avaria / Indisponível (Vermelho):** `#DC2626` / Fundo: `#FEE2E2` / Borda: `#FECACA`
-- **Informativo / Clientes (Azul):** `#2563EB` / Fundo: `#EFF6FF` / Borda: `#BFDBFE`
-- **Usos Produtivos / PUE (Púrpura):** `#9333EA` / Fundo: `#FAF5FF` / Borda: `#E9D5FF`
-
-### 2.4. Escala Modular de Espaçamento e Geometria (Base 4px)
-- **Espaçamentos:** 4px, 8px, 12px, 16px, 20px, 24px, 32px.
-- **Raios de Curvatura (Border-Radius):**
-  - Botões de tabela e etiquetas: `4px` (`--radius-sm`)
-  - Inputs e botões primários: `6px` (`--radius-md`)
-  - Caixas de ferramentas e filtros: `8px` (`--radius-lg`)
-  - Cartões KPI e cartões de trabalho: `14px` (`--radius-xl`)
-  - Badges e pílulas de estado: `9999px` (`--radius-full`)
-- **Sombras de Elevação:**
-  - Micro-sombra: `0 1px 2px rgba(0, 0, 0, 0.05)`
-  - Cartão padrão: `0 1px 3px rgba(0, 0, 0, 0.04)`
-  - Modais e sobreposições: `0 20px 25px -5px rgba(15, 23, 42, 0.15)`
+O código CSS artesanal anterior de mais de 4.500 linhas foi eliminado e substituído por uma arquitetura enxuta, modular e escalável de aproximadamente 800 linhas, estruturada sobre os tokens e utilitários nativos do Bootstrap 5 e integrada com a identidade visual oficial da LECASU, Lda. (`#FF7A00`).
 
 ---
 
-## 3. Estrutura Global e Componentes Redesenhados
+## 2. Tecnologias e Frameworks Integrados
 
-### 3.1. Barra Lateral de Navegação (Sidebar)
-- **Cabeçalho:** Logotipo oficial da LECASU, Lda., e botão recolher/expandir com persistência local (`localStorage`).
-- **Navegação Categorizada:** Quatro secções operacionais claras (Painel & Mapas, Infraestrutura & O&M, Gestão Comercial, Governança & Sistema).
-- **Indicador de Seleção Ativa:** Borda lateral esquerda de 3px em Laranja `#FF7A00`, fundo de realce suave `#FFF7ED` e tipografia nítida.
-- **Rodapé Institucional da Sidebar:** Widget do operador com avatar circular, nome, cargo oficial e botão de encerramento seguro de sessão.
+- **Framework de UI Principal:** Bootstrap v5.3.3 (compilação de produção com Popper.js integrado).
+- **Biblioteca de Ícones:** Bootstrap Icons v1.11.3 (distribuição local de fontes WOFF/WOFF2 e vetores SVG).
+- **Cartografia e GIS:** Leaflet GIS v1.9.4 (hospedagem local e camadas GeoJSON).
+- **Ambiente Cromático:** Forçamento estrito de **100% Light Mode** (`data-bs-theme="light"` e classes de superfície clara), sem qualquer dependência ou suporte a dark mode.
+- **Autonomia e Operação Offline:** Todos os recursos do Bootstrap 5 e ícones foram empacotados no diretório `public/vendor/`, garantindo 100% de disponibilidade mesmo sem ligação à Internet em operações de campo.
+
+---
+
+## 3. Arquitetura do Novo Layout (Light Mode)
+
+### 3.1. Barra Lateral (Sidebar) com Bootstrap
+- Estrutura baseada em `aside.app-sidebar` com largura fixa de 260px (recolhível para 72px no modo compacto).
+- Cabeçalho com o logotipo oficial da LECASU, Lda., e marca compacta vetorial (`bi-lightning-charge-fill`).
+- Sistema de navegação com grupos funcionais em maiúsculas (`PAINEL & MAPAS`, `INFRAESTRUTURA & O&M`, `GESTÃO COMERCIAL`, `GOVERNANÇA & SISTEMA`).
+- Efeito de seleção ativo com borda lateral de 3px em Laranja LECASU (`#FF7A00`) e fundo sutil (`#FFF7ED`).
+- Rodapé com cartão do operador, avatar circular com sombra suave, dados de sessão e botão de saída.
 
 ### 3.2. Barra Superior de Controlo (Topbar)
-- **Dimensão Otimizada:** Altura padronizada de 54px para máxima densidade de dados sem perdas verticais.
-- **Trilha de Navegação (Breadcrumb):** Hierarquia clara indicando o sistema e a página operacional ativa.
-- **Pesquisa Global:** Caixa de busca instantânea com transição suave de foco.
-- **Relógio e Telemetria em Tempo Real:** Relógio digital de alta precisão (fuso horário de Maputo UTC+2).
-- **Indicador de Saúde da Rede:** Pílula com ponto luminoso pulsante (Uptime de 98.8% e telemetria ativa).
-- **Central de Notificações:** Sino com contador numérico de avarias e ocorrências não resolvidas.
-- **Perfil do Utilizador:** Badge compacto com avatar e detalhes do utilizador autenticado.
+- Navbar fixa superior com 56px de altura, fundo branco e borda sutil `border-bottom border-slate-200`.
+- Botão de abertura de menu em dispositivos móveis (`bi-list`).
+- Trilha de navegação hierárquica (*breadcrumb*) dinâmica.
+- Caixa de pesquisa instantânea com anel de foco em Laranja LECASU.
+- Relógio e calendário digital em tempo real calibrado para o fuso horário oficial de Maputo (UTC+2).
+- Distintivo de telemetria da rede com ponto verde pulsante (Uptime de 98.8%).
+- Central de alertas com contador dinâmico e badge de avarias.
+- Distintivo de perfil de utilizador com iniciais e cargo.
 
-### 3.3. Painel Executivo (Dashboard)
-- **Faixa Superior de KPIs:** 4 cartões com indicadores circulares (*gauges*), percentagens, tendências e unidades elétricas normalizadas (kW, kWh, kWp).
-- **Mapa Satélite Híbrido Leaflet GIS:** Camada de satélite de alta resolução com centralização dinâmica, filtros por província/estado e marcadores georreferenciados.
-- **Cockpit SCADA do Inversor em Tempo Real:** Visualização ao vivo da potência gerada, estado do banco de baterias BESS e botão de acesso à telemetria detalhada da central.
-- **Grade de Carteira de Mini-Redes:** Tabela SaaS corporativa integrada no painel principal, com barras visuais de capacidade solar (kWp) e estado de carga de baterias (SoC).
-
-### 3.4. Cartão de Trabalho Padronizado (Workspace Card)
-- **Cabeçalho com Identidade:** Título com ícone vetorial, pílula contadora de registos e descrição operacional da funcionalidade.
-- **Ações Primárias e Secundárias:** Botões padronizados para criação de registos, fluxos guiados e exportação de dados em CSV.
-- **Barra de Ferramentas:** Abas segmentadas para filtros rápidos de estado, combinadas com caixa de pesquisa instantânea e seletores de província.
-- **Tabelas de Alta Densidade:** Cabeçalhos com ordenação nítida, linhas com efeito hover suave, células com tipografia tabular monoespaçada para códigos, barras de progresso de capacidade e pílulas de estado.
-
-### 3.5. Modais Operacionais e Diálogos
-- **Fundo com Desfoque (*Backdrop Blur*):** Camada de bloqueio suave de 8px que preserva o contexto operacional.
-- **Cabeçalho Nítido:** Título destacado acompanhado de ícone de contexto e botão de fecho acessível.
-- **Formulários em Grelha Responsiva:** Distribuição em duas colunas com validação imediata, anéis de foco em Laranja LECASU e tipografia limpa.
-- **Rodapé Padronizado:** Botões de cancelamento neutro e confirmação primária.
+### 3.3. Área de Trabalho e Cartões de Métricas
+- **Grelha de KPIs:** 4 cartões com cantos arredondados (`radius-xl`), ícones coloridos por domínio (Laranja Solar, Verde Geração, Azul Clientes, Púrpura Baterias/PUE), valores numéricos tabulares de alto contraste e medidores circulares (*gauges*).
+- **Cockpit SCADA & Satélite GIS:** Enquadramento proporcional entre a camada cartográfica híbrida e o painel de telemetria do inversor em tempo real.
+- **Grelha de Centrais Fotovoltaicas:** Tabela SaaS corporativa com barras de progresso de potência instantânea e estado de carga de baterias (BESS SoC).
 
 ---
 
-## 4. Responsividade e Otimização para Dispositivos Móveis
-
-- **Suporte a Ecrãs Grandes (1200px+):** Máxima densidade de informação, visualização de 4 colunas de cartões e cockpit SCADA completo.
-- **Suporte a Portáteis e Tablets (768px a 1199px):** Adaptação fluida da grelha de cartões para 2x2, recolha de subtítulos longos da topbar e ajuste da largura dos filtros.
-- **Suporte a Dispositivos Móveis e Smartphones (abaixo de 768px):**
-  - A barra lateral recolhe-se automaticamente numa gaveta (*drawer*) acionada pelo menu hambúrguer.
-  - A barra superior preserva os elementos críticos (sino de alertas, estado da rede e avatar do operador).
-  - As tabelas dispõem de rolagem horizontal tátil com indicador visual.
-  - As áreas de toque em botões e controlos cumprem a dimensão mínima ergonómica recomendada de 42px a 44px.
-
----
-
-## 5. Garantia de Qualidade e Testes de Não-Regressão
+## 4. Testes de Não-Regressão e Validação
 
 | Dimensão de Teste | Suíte Automatizada | Testes Executados | Resultado |
 |---|---|:---:|:---:|
@@ -119,4 +62,4 @@ A reformulação unificou a linguagem visual da plataforma, eliminando incoerên
 | **Verificação Pré-Voo de Produção** | `node scripts/verify_production.js` | 24 | 100% Aprovado |
 | **Total Global de Verificações** | — | **94** | **100% Aprovado (0 falhas)** |
 
-Todos os identificadores de elementos HTML (`id`), classes de ação do JavaScript e estruturas de dados consumidas pelas rotas da API REST permaneceram estritamente intactos, garantindo zero regressões operacionais.
+Todos os identificadores de elementos HTML (`id`), manipuladores de eventos em `app.js` e chamadas assíncronas à API REST foram mantidos 100% íntegros e funcionais.
