@@ -839,6 +839,44 @@ async function renderDashboardView(container) {
           </div>
         </div>
       </div>
+
+      <!-- 3. Tabela de Centrais e Mini-Redes Monitoradas (SaaS Grid) -->
+      <div class="saas-card" style="margin-top:1.25rem;">
+        <div class="saas-card-header">
+          <div class="saas-card-title-group">
+            <div class="saas-card-title-row">
+              <span class="saas-card-title">${Icons.solar(18)} Centrais Fotovoltaicas &amp; Mini-Redes Monitoradas</span>
+              <span class="saas-card-badge" style="background:#fff7ed; color:#ea580c; border:1px solid #fed7aa;">
+                ${(AppState.miniGridsCache && AppState.miniGridsCache.length) ? AppState.miniGridsCache.length : 8} Centrais
+              </span>
+            </div>
+            <span class="saas-card-subtitle">Telemetria em tempo real, capacidade instalada (kWp) e estado dos bancos de baterias (BESS)</span>
+          </div>
+          <div class="saas-card-actions">
+            <button type="button" class="btn btn-sm btn-outline" onclick="window.location.hash='#mini-redes'" style="height:32px; font-weight:600; font-size:0.82rem;">
+              ${Icons.externalLink(13)} Ver Todas as Fichas
+            </button>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="saas-table">
+            <thead>
+              <tr>
+                <th style="width:40px; text-align:center;"><input type="checkbox" checked disabled></th>
+                <th>Central Fotovoltaica / Localização</th>
+                <th style="min-width:180px;">Potência em Tempo Real</th>
+                <th style="min-width:170px;">Bateria BESS (SoC)</th>
+                <th>Província / Distrito</th>
+                <th style="width:130px;">Estado</th>
+                <th style="width:110px; text-align:center;">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="saas-plants-tbody">
+              <!-- Renderizado dinamicamente via renderSaaSTablePlants() -->
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   `;
 
