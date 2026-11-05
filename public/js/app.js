@@ -642,7 +642,7 @@ async function renderDashboardView(container) {
           <div class="saas-kpi-label">Potência Solar Ativa</div>
           <div class="saas-kpi-bottom-row">
             <span class="saas-kpi-subtext">Capacidade: <strong id="solarman-power-inst">600 kWp</strong></span>
-            <div class="kpi-mini-gauge" style="--gauge-pct: 77%;">
+            <div class="kpi-mini-gauge" style="--gauge-pct: 77%; --gauge-color: #ff7a00;">
               <span class="kpi-mini-gauge-text" id="gauge-percent-display">77%</span>
             </div>
           </div>
@@ -662,7 +662,7 @@ async function renderDashboardView(container) {
           <div class="saas-kpi-label">Produção Solar Diária</div>
           <div class="saas-kpi-bottom-row">
             <span class="saas-kpi-subtext">Mensal: <strong id="prod-val-monthly">75.380 kWh</strong></span>
-            <div class="kpi-mini-gauge" style="--gauge-pct: 92%;">
+            <div class="kpi-mini-gauge" style="--gauge-pct: 92%; --gauge-color: #16a34a;">
               <span class="kpi-mini-gauge-text" style="color:#16a34a;">92%</span>
             </div>
           </div>
@@ -682,7 +682,7 @@ async function renderDashboardView(container) {
           <div class="saas-kpi-label">Clientes & Ligações</div>
           <div class="saas-kpi-bottom-row">
             <span class="saas-kpi-subtext">Produtivos: <strong>42 PUE</strong></span>
-            <div class="kpi-mini-gauge" style="--gauge-pct: 85%;">
+            <div class="kpi-mini-gauge" style="--gauge-pct: 85%; --gauge-color: #9333ea;">
               <span class="kpi-mini-gauge-text" style="color:#9333ea;">85%</span>
             </div>
           </div>
@@ -702,7 +702,7 @@ async function renderDashboardView(container) {
           <div class="saas-kpi-label">Disponibilidade da Rede</div>
           <div class="saas-kpi-bottom-row">
             <span class="saas-kpi-subtext">BESS SoC: <strong>88% Médio</strong></span>
-            <div class="kpi-mini-gauge" style="--gauge-pct: 99%;">
+            <div class="kpi-mini-gauge" style="--gauge-pct: 99%; --gauge-color: #ea580c;">
               <span class="kpi-mini-gauge-text" style="color:#ea580c;">99%</span>
             </div>
           </div>
@@ -916,12 +916,12 @@ async function loadDashboardKPIs() {
     // Medidor Circular
     const gaugePercent = 77;
     const elGaugePercent = document.getElementById('gauge-percent-display');
-    if (elGaugePercent) elGaugePercent.textContent = `${gaugePercent}%`;
-    const elGaugeCircle = document.getElementById('gauge-progress-circle');
-    if (elGaugeCircle) {
-      const circumference = 264;
-      const offset = circumference - (circumference * gaugePercent / 100);
-      elGaugeCircle.style.strokeDashoffset = offset;
+    if (elGaugePercent) {
+      elGaugePercent.textContent = `${gaugePercent}%`;
+      const parentGauge = elGaugePercent.closest('.kpi-mini-gauge');
+      if (parentGauge) {
+        parentGauge.style.setProperty('--gauge-pct', `${gaugePercent}%`);
+      }
     }
 
     // Faixas de Produção Diária, Mensal, Anual, Total
@@ -1645,11 +1645,7 @@ async function renderMiniGridsView(container) {
           <div class="kpi-label">Centrais Fotovoltaicas</div>
           <div class="kpi-bottom-row">
             <span class="kpi-bottom-text">Uptime Médio: 98.8%</span>
-            <div class="kpi-mini-gauge">
-              <svg viewBox="0 0 36 36">
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f0f2f5" stroke-width="4"/>
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--color-primary)" stroke-dasharray="98, 100" stroke-width="4" stroke-linecap="round"/>
-              </svg>
+            <div class="kpi-mini-gauge" style="--gauge-pct: 98%; --gauge-color: var(--color-primary);">
               <span class="kpi-mini-gauge-text">98%</span>
             </div>
           </div>
@@ -1666,11 +1662,7 @@ async function renderMiniGridsView(container) {
           <div class="kpi-label">Capacidade Solar Total</div>
           <div class="kpi-bottom-row">
             <span class="kpi-bottom-text">Fator Capacidade</span>
-            <div class="kpi-mini-gauge">
-              <svg viewBox="0 0 36 36">
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f0f2f5" stroke-width="4"/>
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#ea580c" stroke-dasharray="77, 100" stroke-width="4" stroke-linecap="round"/>
-              </svg>
+            <div class="kpi-mini-gauge" style="--gauge-pct: 77%; --gauge-color: #ea580c;">
               <span class="kpi-mini-gauge-text">77%</span>
             </div>
           </div>
@@ -1687,11 +1679,7 @@ async function renderMiniGridsView(container) {
           <div class="kpi-label">Armazenamento BESS</div>
           <div class="kpi-bottom-row">
             <span class="kpi-bottom-text">Autonomia Média: 16.4h</span>
-            <div class="kpi-mini-gauge">
-              <svg viewBox="0 0 36 36">
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f0f2f5" stroke-width="4"/>
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#2563eb" stroke-dasharray="86, 100" stroke-width="4" stroke-linecap="round"/>
-              </svg>
+            <div class="kpi-mini-gauge" style="--gauge-pct: 86%; --gauge-color: #2563eb;">
               <span class="kpi-mini-gauge-text">86%</span>
             </div>
           </div>
@@ -1708,11 +1696,7 @@ async function renderMiniGridsView(container) {
           <div class="kpi-label">Ligações & Beneficiários</div>
           <div class="kpi-bottom-row">
             <span class="kpi-bottom-text">12 Usos Produtivos (PUE)</span>
-            <div class="kpi-mini-gauge">
-              <svg viewBox="0 0 36 36">
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f0f2f5" stroke-width="4"/>
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#059669" stroke-dasharray="94, 100" stroke-width="4" stroke-linecap="round"/>
-              </svg>
+            <div class="kpi-mini-gauge" style="--gauge-pct: 94%; --gauge-color: #059669;">
               <span class="kpi-mini-gauge-text">94%</span>
             </div>
           </div>
@@ -2228,11 +2212,7 @@ async function renderClientsView(container) {
           <div class="kpi-label">Total de Consumidores</div>
           <div class="kpi-bottom-row">
             <span class="kpi-bottom-text">Taxa de Adesão Comunitária</span>
-            <div class="kpi-mini-gauge">
-              <svg viewBox="0 0 36 36">
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f0f2f5" stroke-width="4"/>
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#2563eb" stroke-dasharray="96, 100" stroke-width="4" stroke-linecap="round"/>
-              </svg>
+            <div class="kpi-mini-gauge" style="--gauge-pct: 96%; --gauge-color: #2563eb;">
               <span class="kpi-mini-gauge-text">96%</span>
             </div>
           </div>
@@ -2249,11 +2229,7 @@ async function renderClientsView(container) {
           <div class="kpi-label">Ligações Activas</div>
           <div class="kpi-bottom-row">
             <span class="kpi-bottom-text">Continuidade de Serviço</span>
-            <div class="kpi-mini-gauge">
-              <svg viewBox="0 0 36 36">
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f0f2f5" stroke-width="4"/>
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#059669" stroke-dasharray="87, 100" stroke-width="4" stroke-linecap="round"/>
-              </svg>
+            <div class="kpi-mini-gauge" style="--gauge-pct: 87%; --gauge-color: #059669;">
               <span class="kpi-mini-gauge-text">87%</span>
             </div>
           </div>
@@ -2270,11 +2246,7 @@ async function renderClientsView(container) {
           <div class="kpi-label">Usos Produtivos (PUE)</div>
           <div class="kpi-bottom-row">
             <span class="kpi-bottom-text">Geração Local de Rendimento</span>
-            <div class="kpi-mini-gauge">
-              <svg viewBox="0 0 36 36">
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f0f2f5" stroke-width="4"/>
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#ea580c" stroke-dasharray="40, 100" stroke-width="4" stroke-linecap="round"/>
-              </svg>
+            <div class="kpi-mini-gauge" style="--gauge-pct: 40%; --gauge-color: #ea580c;">
               <span class="kpi-mini-gauge-text">40%</span>
             </div>
           </div>
@@ -2291,11 +2263,7 @@ async function renderClientsView(container) {
           <div class="kpi-label">Taxa de Cobrança STS</div>
           <div class="kpi-bottom-row">
             <span class="kpi-bottom-text">Reconciliação e Pagamentos</span>
-            <div class="kpi-mini-gauge">
-              <svg viewBox="0 0 36 36">
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f0f2f5" stroke-width="4"/>
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#059669" stroke-dasharray="94, 100" stroke-width="4" stroke-linecap="round"/>
-              </svg>
+            <div class="kpi-mini-gauge" style="--gauge-pct: 94%; --gauge-color: #059669;">
               <span class="kpi-mini-gauge-text">94%</span>
             </div>
           </div>
@@ -3559,11 +3527,7 @@ async function renderMetersView(container) {
           <div class="kpi-label">Parque de Contadores Total</div>
           <div class="kpi-bottom-row">
             <span class="kpi-bottom-text">Taxa de Cobertura de Medição</span>
-            <div class="kpi-mini-gauge">
-              <svg viewBox="0 0 36 36">
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f0f2f5" stroke-width="4"/>
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#2563eb" stroke-dasharray="100, 100" stroke-width="4" stroke-linecap="round"/>
-              </svg>
+            <div class="kpi-mini-gauge" style="--gauge-pct: 100%; --gauge-color: #2563eb;">
               <span class="kpi-mini-gauge-text">100%</span>
             </div>
           </div>
@@ -3580,11 +3544,7 @@ async function renderMetersView(container) {
           <div class="kpi-label">Contadores Activos em Campo</div>
           <div class="kpi-bottom-row">
             <span class="kpi-bottom-text">Tecnologia STS Pré-Pago</span>
-            <div class="kpi-mini-gauge">
-              <svg viewBox="0 0 36 36">
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f0f2f5" stroke-width="4"/>
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#059669" stroke-dasharray="87, 100" stroke-width="4" stroke-linecap="round"/>
-              </svg>
+            <div class="kpi-mini-gauge" style="--gauge-pct: 87%; --gauge-color: #059669;">
               <span class="kpi-mini-gauge-text">87%</span>
             </div>
           </div>
@@ -3601,11 +3561,7 @@ async function renderMetersView(container) {
           <div class="kpi-label">Alertas de Consumo Anormal</div>
           <div class="kpi-bottom-row">
             <span class="kpi-bottom-text">Conformidade e Integridade</span>
-            <div class="kpi-mini-gauge">
-              <svg viewBox="0 0 36 36">
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f0f2f5" stroke-width="4"/>
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#ea580c" stroke-dasharray="93, 100" stroke-width="4" stroke-linecap="round"/>
-              </svg>
+            <div class="kpi-mini-gauge" style="--gauge-pct: 93%; --gauge-color: #ea580c;">
               <span class="kpi-mini-gauge-text">93%</span>
             </div>
           </div>
@@ -3622,11 +3578,7 @@ async function renderMetersView(container) {
           <div class="kpi-label">Consumo Mensal Registado</div>
           <div class="kpi-bottom-row">
             <span class="kpi-bottom-text">Leituras no Mês Corrente</span>
-            <div class="kpi-mini-gauge">
-              <svg viewBox="0 0 36 36">
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f0f2f5" stroke-width="4"/>
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#059669" stroke-dasharray="77, 100" stroke-width="4" stroke-linecap="round"/>
-              </svg>
+            <div class="kpi-mini-gauge" style="--gauge-pct: 77%; --gauge-color: #059669;">
               <span class="kpi-mini-gauge-text">77%</span>
             </div>
           </div>
@@ -4102,11 +4054,7 @@ async function renderPaymentsView(container) {
           <div class="kpi-label">Receita Operacional Coletada</div>
           <div class="kpi-bottom-row">
             <span class="kpi-bottom-text">Cumprimento Orçamental</span>
-            <div class="kpi-mini-gauge">
-              <svg viewBox="0 0 36 36">
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f0f2f5" stroke-width="4"/>
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#059669" stroke-dasharray="94, 100" stroke-width="4" stroke-linecap="round"/>
-              </svg>
+            <div class="kpi-mini-gauge" style="--gauge-pct: 94%; --gauge-color: #059669;">
               <span class="kpi-mini-gauge-text">94%</span>
             </div>
           </div>
@@ -4123,11 +4071,7 @@ async function renderPaymentsView(container) {
           <div class="kpi-label">Recibos &amp; Tokens STS Emitidos</div>
           <div class="kpi-bottom-row">
             <span class="kpi-bottom-text">Volume de Transações</span>
-            <div class="kpi-mini-gauge">
-              <svg viewBox="0 0 36 36">
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f0f2f5" stroke-width="4"/>
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#ea580c" stroke-dasharray="98, 100" stroke-width="4" stroke-linecap="round"/>
-              </svg>
+            <div class="kpi-mini-gauge" style="--gauge-pct: 98%; --gauge-color: #ea580c;">
               <span class="kpi-mini-gauge-text">98%</span>
             </div>
           </div>
@@ -4144,11 +4088,7 @@ async function renderPaymentsView(container) {
           <div class="kpi-label">Adesão a Pagamento Móvel</div>
           <div class="kpi-bottom-row">
             <span class="kpi-bottom-text">Reconciliação Automática</span>
-            <div class="kpi-mini-gauge">
-              <svg viewBox="0 0 36 36">
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f0f2f5" stroke-width="4"/>
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#2563eb" stroke-dasharray="92, 100" stroke-width="4" stroke-linecap="round"/>
-              </svg>
+            <div class="kpi-mini-gauge" style="--gauge-pct: 92%; --gauge-color: #2563eb;">
               <span class="kpi-mini-gauge-text">92%</span>
             </div>
           </div>
@@ -4165,11 +4105,7 @@ async function renderPaymentsView(container) {
           <div class="kpi-label">Valores Pendentes / Em Cobrança</div>
           <div class="kpi-bottom-row">
             <span class="kpi-bottom-text">Índice de Inadimplência</span>
-            <div class="kpi-mini-gauge">
-              <svg viewBox="0 0 36 36">
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f0f2f5" stroke-width="4"/>
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#ea580c" stroke-dasharray="88, 100" stroke-width="4" stroke-linecap="round"/>
-              </svg>
+            <div class="kpi-mini-gauge" style="--gauge-pct: 88%; --gauge-color: #ea580c;">
               <span class="kpi-mini-gauge-text">88%</span>
             </div>
           </div>
