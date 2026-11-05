@@ -165,10 +165,14 @@ function initLiveTopClock() {
     const timeEl = document.getElementById('topbar-live-time');
     const dateEl = document.getElementById('topbar-live-date');
     if (timeEl) {
-      timeEl.textContent = now.toLocaleTimeString('pt-MZ', { hour12: false });
+      timeEl.textContent = now.toLocaleTimeString('pt-MZ', { hour12: false, timeZone: 'Africa/Maputo' });
     }
     if (dateEl) {
-      dateEl.textContent = now.toLocaleDateString('pt-MZ', { day: '2-digit', month: 'short', year: 'numeric' });
+      const day = String(now.getDate()).padStart(2, '0');
+      const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      const month = months[now.getMonth()];
+      const year = now.getFullYear();
+      dateEl.textContent = `${day} ${month} ${year}`;
     }
   }
   tick();
@@ -635,7 +639,7 @@ async function renderDashboardView(container) {
               ${Icons.sun(18)}
             </div>
             <div class="saas-kpi-val-group">
-              <span class="saas-kpi-val" id="solarman-power-now">540.8 kW</span>
+              <span class="saas-kpi-val" id="solarman-power-now">415,8 kW</span>
               <span class="saas-kpi-trend up">&uarr; 4.2%</span>
             </div>
           </div>
@@ -1182,11 +1186,33 @@ function initLiveInverterCockpit(plants = []) {
     if (hzEl) hzEl.textContent = `30 Clientes (12 PUE)`;
     if (radEl) radEl.textContent = `99.4% Uptime`;
 
-    // Atualiza também os cards superiores do Dashboard em tempo real
+    // Atualiza também os cards superiores do Dashboard em tempo real sincronizados com o medidor circular
     const totalPowerEl = document.getElementById('solarman-power-now');
+    const gaugeDisplay = document.getElementById('gauge-percent-display');
     if (totalPowerEl) {
-      const liveTotal = (540.8 + (Math.random() * 3.6 - 1.8)).toFixed(1);
-      totalPowerEl.textContent = `${liveTotal} kW`;
+      const liveTotalNum = 415.8 + (Math.random() * 4.2 - 2.1);
+      const liveTotalStr = liveTotalNum.toFixed(1).replace('.', ',');
+      totalPowerEl.textContent = `${liveTotalStr} kW`;
+      const pct = Math.min(100, Math.max(10, Math.round((liveTotalNum / 600) * 100)));
+      if (gaugeDisplay) {
+        gaugeDisplay.textContent = `${pct}%`;
+        const gaugeParent = gaugeDisplay.closest('.kpi-mini-gauge');
+        if (gaugeParent) {
+          gaugeParent.style.setProperty('--gauge-pct', `${pct}%`);
+        }
+      }
+    }
+
+    const prodDailyEl = document.getElementById('prod-val-daily');
+    if (prodDailyEl) {
+      const liveDailyNum = Math.round(2645 + (Math.random() * 8));
+      prodDailyEl.textContent = `${liveDailyNum.toLocaleString('pt-MZ')} kWh`;
+    }
+
+    const uptimeEl = document.getElementById('dashboard-uptime-val');
+    if (uptimeEl) {
+      const liveUptime = (99.3 + (Math.random() * 0.2)).toFixed(1);
+      uptimeEl.textContent = `${liveUptime}%`;
     }
   }, 2500);
 }
@@ -8429,7 +8455,8 @@ async function showPreventativeMaintenanceModal(asset) {
   let techs = [];
   try {
     const res = await apiFetch('/api/users');
-    techs = (res.data || []).filter(u => u.role === 'tecnico_campo' || u.role === 'gestor_operacoes');
+    const userList = Array.isArray(res?.data?.users) ? res.data.users : (Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []));
+    techs = userList.filter(u => u.role === 'tecnico_campo' || u.role === 'gestor_operacoes');
   } catch (err) {
     console.warn('Erro ao carregar técnicos:', err);
   }
@@ -8754,8 +8781,13 @@ async function loadUsersTabContent() {
 
   try {
     const res = await apiFetch('/api/users');
-    const rawUsers = res?.data?.users || res?.data || res || [];
-    const users = Array.isArray(rawUsers) ? rawUsers : [];
+    const users = Array.isArray(res?.data?.users)
+      ? res.data.users
+      : (Array.isArray(res?.data)
+        ? res.data
+        : (Array.isArray(res?.users)
+          ? res.users
+          : (Array.isArray(res) ? res : [])));
     loadedUsersCache = users;
 
     const elTotal = document.getElementById('kpi-users-total');
@@ -9884,5 +9916,32 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   updateUserSessionUI();
   initLiveTopClock();
+  initGlobalRealtimeUpdater();
   initRouter();
 });
+
+/**
+ * Atualizador Contínuo em Tempo Real para Cards e Telemetria Operacional
+ */
+function initGlobalRealtimeUpdater() {
+  if (window._globalRealtimeTimer) clearInterval(window._globalRealtimeTimer);
+  window._globalRealtimeTimer = setInterval(async () => {
+    if (document.hidden || !AppState.authToken) return;
+
+    // Atualiza badge de rede em tempo real no cabeçalho
+    const statusText = document.querySelector('.topbar-status-text');
+    if (statusText) {
+      const uptime = (98.8 + (Math.random() * 0.4)).toFixed(1);
+      statusText.innerHTML = `Rede Online &bull; ${uptime}% Uptime`;
+    }
+
+    // Mantém telemetria dos cards de mini-redes sincronizada
+    if (AppState.currentView === 'mini-redes') {
+      const elKwp = document.getElementById('mg-kpi-kwp');
+      if (elKwp) {
+        const liveKwp = Math.round(600 + (Math.random() * 2 - 1));
+        elKwp.textContent = `${liveKwp} kWp`;
+      }
+    }
+  }, 4000);
+}

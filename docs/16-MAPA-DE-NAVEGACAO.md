@@ -128,3 +128,4 @@ Para os técnicos e agentes no terreno, a navegação adapta-se ergonomicamente 
   3. *Venda STS (Tokens)*
   4. *Clientes / Mapa*
 * **Ações Primárias em Botão Flutuante (*Floating Action Button - FAB*):** No canto inferior direito para acesso instantâneo à leitura por câmara ou abertura rápida de ocorrência de emergência.
+

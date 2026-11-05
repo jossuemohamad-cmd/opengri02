@@ -111,3 +111,4 @@
 ### 2.7 Estados de Carregamento (*Loading & Feedback*)
 * Indicadores de progresso visual discretos sem bloquear desnecessariamente a área de trabalho.
 * Utilização de barras de esqueleto animadas (*skeleton loaders*) nas células das tabelas enquanto a API responde, evitando saltos bruscos de layout (*Cumulative Layout Shift - CLS = 0*).
+

@@ -95,3 +95,4 @@ Para simular o comportamento da aplicação no telemóvel de um técnico de camp
    - Os cartões de métricas organizam-se de forma fluida sem transbordamento horizontal.
    - Os botões de ação passam a ter altura mínima de 44px para facilitar o toque com os dedos.
    - A tabela permite navegação com scroll horizontal suave mantendo os cabeçalhos alinhados.
+

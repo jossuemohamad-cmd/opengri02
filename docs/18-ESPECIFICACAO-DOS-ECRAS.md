@@ -155,3 +155,4 @@ Este documento descreve detalhadamente os **13 ecrãs prioritários** do LECASU 
   - *Separador 1: Estrutura Tarifária:* Tabela com as faixas de consumo em kWh e preços por escalão homologados pela ARENE.
   - *Separador 2: Parâmetros Comerciais:* Taxa de religação, percentagem padrão de amortização de dívida e limites de caixa para agentes comunitários.
   - *Separador 3: Trilha de Auditoria (Audit Logs):* Tabela cronológica em modo estritamente de leitura exibindo: Carimbo Temporal (UTC+2), Operador, Ação Realizada, Entidade Modificada, IP de Origem e botão para inspecionar os valores anteriores e novos em formato JSON limpo.
+

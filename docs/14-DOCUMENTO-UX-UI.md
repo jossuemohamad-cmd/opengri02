@@ -65,3 +65,4 @@ A experiência de utilização divide-se em dois grandes contextos físicos e op
 * **Rácio de Contraste Cromático:** Todos os textos de leitura têm contraste superior a $4.5:1$ em relação ao fundo (o texto oficial `#0F172A` sobre fundo `#FFFFFF` atinge rácio superior a $15:1$).
 * **Navegação por Teclado:** Foco visual nítido (`outline: 2px solid var(--color-primary)`) em todos os campos de formulário, botões e links navegáveis através da tecla `Tab`.
 * **Sem Dependência Exclusiva de Cor:** Todo e qualquer estado (ex: *Ativo*, *Pendente*, *Em Dívida*, *Avaria*) combina a cor do badge com um ícone representativo e um texto explícito, garantindo plena acessibilidade a operadores com daltonismo.
+
