@@ -7019,11 +7019,11 @@ async function renderGeneralMapView(container) {
   }
 
   container.innerHTML = `
-    <div class="card map-workspace-card" style="display: flex; flex-direction: column; height: 100%; flex: 1; min-height: 0; overflow: hidden;">
+    <div class="card map-workspace-card" style="display: flex; flex-direction: column; height: calc(100vh - 140px); min-height: 600px; width: 100%; overflow: hidden;">
       <div class="map-workspace-header" style="flex-shrink: 0;">
         <div class="map-title-group">
           <h2>${Icons.map(18)} Mapa de Activos, Rede e Clientes</h2>
-          <span style="font-size:0.88rem; color: var(--color-text-muted);">
+          <span style="font-size:0.84rem; color: var(--color-text-muted);">
             Cartografia GIS com visualização de satélite real da infraestrutura e unidades consumidoras
           </span>
         </div>
@@ -7039,8 +7039,8 @@ async function renderGeneralMapView(container) {
         </div>
       </div>
 
-      <div class="map-frame-wrapper" style="flex: 1; height: 100%; min-height: 0; position: relative;">
-        <div id="general-gis-map-canvas" style="width: 100%; height: 100%;"></div>
+      <div class="map-frame-wrapper" style="flex: 1; height: 100%; min-height: 520px; position: relative;">
+        <div id="general-gis-map-canvas" style="width: 100%; height: 100%; min-height: 520px;"></div>
 
         <!-- Legenda Flutuante do Mapa -->
         <div class="map-floating-legend">
@@ -7098,7 +7098,9 @@ async function initGeneralGISMap() {
     "Mapa de Ruas (OSM)": osmLayer
   }, null, { position: 'topright' }).addTo(map);
 
-  setTimeout(() => map.invalidateSize(), 150);
+  setTimeout(() => map.invalidateSize(), 100);
+  setTimeout(() => map.invalidateSize(), 300);
+  setTimeout(() => map.invalidateSize(), 600);
 
   const solarLayer = L.layerGroup().addTo(map);
   const pueLayer = L.layerGroup().addTo(map);
