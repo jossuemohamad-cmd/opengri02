@@ -12,6 +12,12 @@ logs/
 *.log
 npm-debug.log*
 
+# Backups
+backups/*.json
+backups/*.dump
+backups/*.sql
+!backups/.gitkeep
+
 # OS and Editor files
 .DS_Store
 Thumbs.db

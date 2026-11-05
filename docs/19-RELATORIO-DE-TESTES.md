@@ -140,3 +140,4 @@ O sistema **LECASU GridOps** obteve uma taxa de aprovação de **100% (70/70 tes
 O sistema é classificado como:
 ### **APROVADO COM OBSERVAÇÕES OPERACIONAIS**
 *Pronto para homologação e entrada na Etapa 07 (Piloto de Campo).*
+

@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: lecasu-gridops-db
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME:-lecasu_gridops}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASS:-lecasu2026seguro}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - gridops-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-lecasu_gridops}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lecasu-gridops-app
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-lecasu_gridops}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASS: ${DB_PASS:-lecasu2026seguro}
+      JWT_SECRET: ${JWT_SECRET:-lecasu_gridops_producao_chave_mestra_super_segura_2026}
+      JWT_EXPIRES_IN: 8h
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - gridops-net
+
+volumes:
+  pgdata:
+    driver: local
+
+networks:
+  gridops-net:
+    driver: bridge

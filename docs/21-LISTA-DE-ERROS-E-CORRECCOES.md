@@ -125,3 +125,4 @@ Para cada ocorrência, é descrita a gravidade, a causa-raiz identificada, os fi
 ## 4. Conclusão da Gestão de Qualidade
 
 Todas as 8 anomalias identificadas foram devidamente diagnosticadas na sua causa-raiz, corrigidas a nível de código-fonte e validadas através de testes automatizados e inspeção visual no navegador. Não restam defeitos impeditivos ou de alta severidade na plataforma LECASU GridOps.
+

@@ -113,3 +113,4 @@ A arquitectura do **LECASU GridOps** demonstra elevada robustez, rigor no cumpri
 - **Observação 1:** Em implantação de produção sobre HTTPS (TLS 1.3), ativar o cabeçalho `Strict-Transport-Security` (HSTS).
 - **Observação 2:** Configurar política de rotação de chaves JWT a cada 180 dias.
 - **Observação 3:** Estabelecer rotina diária de backup (`pg_dump`) automático com retenção de 30 dias.
+
