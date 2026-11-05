@@ -147,3 +147,4 @@ No menu **Relatórios**:
 - Desempenho de arrecadação de receita mensal por mini-rede.
 - Estimativa ambiental de poupança de combustível diesel e emissões evitadas de CO₂.
 - **Exportação CSV:** Todos os relatórios podem ser descarregados em formato de folha de cálculo CSV para análise no Excel.
+

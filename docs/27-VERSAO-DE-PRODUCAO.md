@@ -115,3 +115,4 @@ docker-compose up -d --build
 - **Cópias de Segurança Diárias:** Executadas automaticamente através do utilitário `scripts/backup_db.js`.
 - **Monitorização Contínua:** Verificação automática da saúde da API através do endpoint `GET /api/health`.
 - **Rotação de Registos (Logs):** Gestão centralizada de logs através do PM2 na pasta `logs/` com rotação periódica.
+

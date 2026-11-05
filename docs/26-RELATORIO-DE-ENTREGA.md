@@ -114,3 +114,4 @@ Conforme os critérios de aceitação do PRD:
 ## 6. Termo de Homologação Final
 
 Declara-se que a plataforma **LECASU GridOps v1.0.0** cumpriu todos os requisitos estipulados no PRD, demonstrou ausência de erros impeditivos, possui suíte de testes 100% aprovada, documentação completa e encontra-se pronta para entrar em operação comercial e técnica pela **LECASU, Lda.**
+

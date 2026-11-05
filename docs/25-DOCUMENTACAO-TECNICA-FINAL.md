@@ -308,3 +308,4 @@ node scripts/verify_production.js
 # 5. Recarregar o cluster PM2 sem perda de conexões
 pm2 reload lecasu-gridops
 ```
+
