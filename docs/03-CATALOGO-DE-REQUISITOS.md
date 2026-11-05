@@ -195,3 +195,4 @@ Cada requisito funcional possui:
 * **Para que:** A LECASU cumpra rigorosamente os deveres de reporte e conformidade exigidos pelas entidades reguladoras em Moçambique.
 * **Prioridade:** **Must Have (M)**.
 * **Critérios de Aceitação:** Cálculo automatizado de SAIDI/SAIFI e balanço de perdas; formatação fiel às tabelas exigidas pela ARENE; dados imutáveis baseados em registos auditados.
+

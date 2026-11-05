@@ -112,3 +112,4 @@ Para salvaguardar o património da LECASU e a integridade perante os clientes, v
 3. **Política de Autenticação e Sessão:**
    * Os utilizadores de campo utilizam autenticação por PIN seguro de 6 dígitos ou palavra-passe com token JWT associado ao dispositivo PWA.
    * Em caso de perda ou roubo de telemóvel de um agente ou técnico, o `ADMIN` pode revogar a sessão remotamente com efeito imediato, bloqueando a sincronização offline pendente até apuramento de auditoria.
+

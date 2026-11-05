@@ -182,3 +182,4 @@ Para assegurar que o desenvolvimento posterior seja 100% verificável, auditáve
 | **RF-M06-001 / RF-M06-004** | CA-11 (Fecho de OT com Fotos) e CA-12 (Bloqueio sem Evidências) | Teste de Regras de O&M e Evidências |
 | **RF-M06-007 / RF-M06-008** | CA-13 (Corte por Dívida) e CA-14 (Religação Prioritária) | Teste de Ciclo Comercial e Cobrança |
 | **RNF-OFFLINE-001 a 004** | CA-15 (PWA Offline e Sincronização Idempotente) | Teste de Resiliência de Rede e Cache |
+

@@ -206,3 +206,4 @@ Para estrito cumprimento do princípio de fidelidade ao PRD e de não inventar r
 | **03** | **Tolerância Regulatória de Corte** | Prazo exato entre vencimento de fatura e emissão da OT de corte. | **Opção A:** 30 dias após vencimento + aviso de 48h.<br>**Opção B:** 15 dias para clientes comerciais / PUE. | Confirmar prazos contratuais de interrupção de fornecimento. |
 | **04** | **Fluxo de Aprovação de Estornos** | Risco de fraude em anulação de pagamentos por operadores locais. | **Opção A:** Aprovação única pelo Gestor Comercial.<br>**Opção B:** Dupla aprovação obrigatória (Comercial + Financeiro). | Aprovar a política de segregação de funções e alçadas. |
 | **05** | **Fornecedor do Vending STS** | Integração criptográfica dos tokens de 20 dígitos no piloto. | **Opção A:** Módulo de software proprietário via API de gateway STS.<br>**Opção B:** Algoritmo open-source IEC 62055-41 com chaves locais. | Definir o parceiro/equipamentos fornecedores de chaves STS. |
+

@@ -212,3 +212,4 @@ Conforme a diretriz de não assumir regras de negócio não confirmadas pela adm
 3. **Prazo de Tolerância de Desligação:** Confirmação se o prazo legal de corte por falta de pagamento é de 30 dias após vencimento com aviso prévio de 48 horas ou regime específico de concessão.
 4. **Governação de Estornos e Reversões:** Aprovação da política de dupla assinatura obrigatória (`COMMERCIAL_MANAGER` solicita e `FINANCE` autoriza) para reversão de qualquer pagamento ou anulação de fatura.
 5. **Especificação do Módulo Gerador STS:** Confirmação do fornecedor do gerador STS (software/hardware vending key management) e fabricantes dos contadores piloto (e.g., Hexing, Inhemeter, Landis+Gyr) para alinhamento dos algoritmos de encriptação de token.
+
