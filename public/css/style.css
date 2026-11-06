@@ -3065,70 +3065,84 @@ body.is-login-page #view-container {
 }
 
 /* ==============================================================================
- * 13. Design System Corporativo Moderno (KPIs Superiores, Toolbar & Tabelas Ricas)
- * Inspirado na referência corporativa oficial com paleta LECASU Laranja (#FF7A00)
+ * 13. DESIGN SYSTEM CORPORATIVO MODERNO — LECASU GRIDOPS (REDESIGN COMPLETO 2.0)
+ * Padrão Visual Unificado, Limpo e de Alto Nível para Todos os Módulos do Sistema
+ * 100% Light Mode • Bootstrap 5.3 + Lucide SVG Icons • Identidade LECASU (#FF7A00)
  * ============================================================================== */
 
+/* Forçar Tipografia Inter Tabular em Toda a Interface Corporativa */
+body, table, th, td, input, select, button, textarea, .form-control, .form-select {
+  font-family: var(--font-family) !important;
+}
+
+/* ------------------------------------------------------------------------------
+ * A. WORKSPACE CONTAINER (Estrutura de Cada Módulo no Ecrã)
+ * ------------------------------------------------------------------------------ */
 .lecasu-page-workspace {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
-  flex: 1;
-  min-height: 0;
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding-right: 4px;
+  gap: 1.15rem;
+  width: 100%;
 }
 
-/* Faixa de 4 Cartões KPI Superiores (Compactos, Organizados e Sem Quebras de Linha) */
-.kpi-metrics-row {
+/* ------------------------------------------------------------------------------
+ * B. FAIXA SUPERIOR DE 4 CARTÕES KPIS (Clean SaaS Metric Cards)
+ * ------------------------------------------------------------------------------ */
+.kpi-metrics-row,
+.saas-kpi-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.75rem;
+  gap: 1rem;
+  width: 100%;
   flex-shrink: 0;
 }
 
 @media (max-width: 1200px) {
-  .kpi-metrics-row {
+  .kpi-metrics-row,
+  .saas-kpi-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 680px) {
-  .kpi-metrics-row {
+@media (max-width: 640px) {
+  .kpi-metrics-row,
+  .saas-kpi-grid {
     grid-template-columns: 1fr;
   }
 }
 
-.kpi-card {
+.kpi-card,
+.saas-kpi-card {
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  padding: 1.05rem 1.25rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border-radius: 12px;
+  padding: 1.15rem 1.25rem;
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.02);
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  justify-content: space-between;
+  gap: 0.65rem;
   min-width: 0;
-  transition: none !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.kpi-card:hover {
-  transform: none !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+.kpi-card:hover,
+.saas-kpi-card:hover {
   border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
 }
 
-.kpi-card-top {
+.kpi-card-top,
+.saas-kpi-top-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-width: 0;
   width: 100%;
+  min-width: 0;
 }
 
-.kpi-icon-box {
+.kpi-icon-box,
+.saas-kpi-icon-box {
   width: 38px;
   height: 38px;
   border-radius: 10px;
@@ -3136,597 +3150,555 @@ body.is-login-page #view-container {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  font-size: 1.1rem;
 }
 
-.kpi-icon-box.orange {
-  background-color: #fff7ed;
-  color: #ff7a00;
-  border: 1px solid #ffedd5;
-}
-
-.kpi-icon-box.green {
-  background-color: #ecfdf5;
-  color: #059669;
-  border: 1px solid #a7f3d0;
-}
-
-.kpi-icon-box.blue {
+.kpi-icon-box.blue,
+.saas-kpi-icon-box.blue {
   background-color: #eff6ff;
   color: #2563eb;
-  border: 1px solid #bfdbfe;
+  border: 1px solid #dbeafe;
 }
 
-.kpi-icon-box.purple {
-  background-color: #faf5ff;
-  color: #7c3aed;
-  border: 1px solid #e9d5ff;
+.kpi-icon-box.green,
+.saas-kpi-icon-box.green {
+  background-color: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #dcfce7;
 }
 
-.kpi-values-box {
-  display: flex;
-  align-items: baseline;
-  gap: 0.45rem;
-  min-width: 0;
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-
-.kpi-number {
-  font-size: 1.45rem;
-  font-weight: 800;
-  color: #0f172a;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-}
-
-.kpi-trend-pill {
-  font-size: 0.76rem;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 9999px;
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  line-height: 1.2;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.kpi-trend-pill.positive {
-  background-color: #dcfce7;
-  color: #15803d;
-}
-
-.kpi-trend-pill.neutral {
-  background-color: #f1f5f9;
-  color: #475569;
-}
-
-.kpi-trend-pill.warning {
-  background-color: #fff7ed;
-  color: #ea580c;
-}
-
-.kpi-label {
-  font-size: 0.88rem;
-  color: #475569;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-top: 0.20rem;
-}
-
-.kpi-bottom-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: auto;
-  padding-top: 0.50rem;
-  border-top: 1px dashed #e2e8f0;
-  min-width: 0;
-  width: 100%;
-}
-
-.kpi-gauge-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.4rem;
-  margin-top: auto;
-  padding-top: 0.50rem;
-  border-top: 1px dashed #e2e8f0;
-  min-width: 0;
-  width: 100%;
-}
-
-.kpi-bottom-text {
-  font-size: 0.82rem;
-  color: #64748b;
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.kpi-bottom-text strong {
-  color: #334155;
-  font-weight: 700;
-}
-
-/* Medidor Circular de Porcentagem Unificado (Nítido, Proporcional, Sem Deformações e Sem Sobreposição de Texto) */
-.kpi-mini-gauge {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  min-height: 44px;
-  border-radius: 50%;
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  box-sizing: border-box;
-  background: conic-gradient(
-    var(--gauge-color, var(--color-primary, #ff7a00)) var(--gauge-pct, 100%),
-    #e2e8f0 0%
-  );
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-.kpi-mini-gauge::before {
-  content: "";
-  position: absolute;
-  inset: 4px;
-  background: #ffffff;
-  border-radius: 50%;
-  z-index: 1;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03);
-}
-
-.kpi-mini-gauge:has(svg) {
-  background: transparent !important;
-  box-shadow: none !important;
-}
-
-.kpi-mini-gauge:has(svg)::before {
-  display: none !important;
-}
-
-.kpi-mini-gauge svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2;
-  display: block;
-}
-
-.kpi-mini-gauge svg path {
-  stroke-width: 3.5 !important;
-}
-
-.kpi-mini-gauge-text {
-  position: relative;
-  z-index: 3;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-  font-size: 0.74rem !important;
-  font-weight: 700 !important;
-  color: #0f172a !important;
-  line-height: 1 !important;
-  text-align: center;
-  letter-spacing: 0 !important;
-  font-variant-numeric: tabular-nums;
-  pointer-events: none;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-/* Cartão Principal da Área de Trabalho / Tabela */
-.workspace-card {
-  background: #ffffff;
-  border: 1px solid var(--color-slate-200);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sm);
-  display: flex;
-  flex-direction: column;
-  overflow: visible !important;
-  flex: none;
-  height: auto !important;
-  min-height: auto !important;
-  margin-bottom: 1.5rem;
-  transition: border-color 0.15s ease;
-}
-
-.workspace-header {
-  padding: 1.00rem 1.50rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid var(--color-slate-200);
-  background-color: #ffffff;
-  gap: 1rem;
-  flex-shrink: 0;
-  border-top-left-radius: var(--radius-xl);
-  border-top-right-radius: var(--radius-xl);
-}
-
-.workspace-title-box {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.workspace-title-line {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-}
-
-.workspace-title {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--color-slate-900);
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.workspace-count-badge {
-  background-color: var(--color-primary-subtle);
-  color: var(--color-primary);
-  border: 1px solid var(--color-primary-border);
-  border-radius: var(--radius-full);
-  padding: 2px 10px;
-  font-size: 0.78rem;
-  font-weight: 700;
-}
-
-.workspace-subtitle {
-  font-size: 0.84rem;
-  color: var(--color-slate-500);
-}
-
-.workspace-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.50rem;
-}
-
-.btn-outline {
-  background: #ffffff;
-  border: 1px solid var(--color-slate-300);
-  border-radius: var(--radius-md);
-  padding: 0.45rem 1.00rem;
-  font-size: 0.86rem;
-  font-weight: 600;
-  color: var(--color-slate-700);
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.40rem;
-  transition: all 0.15s ease-in-out;
-}
-
-.btn-outline:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-  background-color: var(--color-primary-subtle);
-}
-
-/* Barra de Ferramentas: Abas Segmentadas e Pesquisa */
-.workspace-toolbar {
-  padding: 0.65rem 1.50rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: var(--color-slate-50);
-  border-bottom: 1px solid var(--color-slate-200);
-  gap: 0.75rem;
-  flex-shrink: 0;
-  flex-wrap: wrap;
-}
-
-.segmented-filter-tabs {
-  display: inline-flex;
-  background: var(--color-slate-200);
-  padding: 3px;
-  border-radius: var(--radius-md);
-  gap: 3px;
-}
-
-.seg-tab {
-  border: none;
-  background: transparent;
-  padding: 0.35rem 0.85rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.84rem;
-  font-weight: 600;
-  color: var(--color-slate-600);
-  cursor: pointer;
-  transition: all 0.15s ease-in-out;
-  white-space: nowrap;
-}
-
-.seg-tab:hover {
-  color: var(--color-slate-900);
-}
-
-.seg-tab.active {
-  background: #ffffff;
-  color: var(--color-primary);
-  font-weight: 700;
-  box-shadow: var(--shadow-xs);
-}
-
-.toolbar-controls-right {
-  display: flex;
-  align-items: center;
-  gap: 0.50rem;
-}
-
-.search-box-pill {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  background: #ffffff;
-  border: 1px solid var(--color-slate-300);
-  border-radius: var(--radius-md);
-  padding: 0.25rem 0.75rem;
-  height: 34px;
-  width: 230px;
-  transition: all 0.15s ease-in-out;
-}
-
-.search-box-pill:focus-within {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-glow);
-  width: 270px;
-}
-
-.search-box-pill input {
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: 0.86rem;
-  width: 100%;
-  color: var(--color-slate-900);
-  font-family: var(--font-sans);
-}
-
-.search-box-pill input::placeholder {
-  color: var(--color-slate-400);
-}
-
-.btn-filter-dropdown {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.40rem;
-  height: 34px;
-  background: #ffffff;
-  border: 1px solid var(--color-slate-300);
-  border-radius: var(--radius-md);
-  padding: 0 0.85rem;
-  font-size: 0.84rem;
-  font-weight: 500;
-  color: var(--color-slate-700);
-  cursor: pointer;
-  transition: all 0.15s ease-in-out;
-}
-
-.btn-filter-dropdown:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-}
-
-/* Tabela Rica de Dados (Design Moderno Empresarial) */
-.table-scroll-frame {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: auto;
-  min-height: 0;
-}
-
-.rich-data-table, .data-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  font-size: 0.90rem;
-  text-align: left;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  background: #ffffff;
-}
-
-.rich-data-table thead th, .data-table thead th {
-  background-color: #f1f5f9;
-  color: #334155;
-  font-weight: 700;
-  font-size: 0.80rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 0.70rem 0.85rem;
-  border-bottom: 2px solid #94a3b8;
-  border-right: 1px solid #cbd5e1;
-  white-space: nowrap;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.rich-data-table thead th:last-child, .data-table thead th:last-child {
-  border-right: none;
-}
-
-.rich-data-table tbody td, .data-table tbody td {
-  padding: 0.65rem 0.85rem;
-  border-bottom: 1px solid #e2e8f0;
-  border-right: 1px solid #e2e8f0;
-  vertical-align: middle;
-  color: #0f172a;
-  white-space: nowrap;
-  font-size: 0.90rem;
-}
-
-.rich-data-table tbody td:last-child, .data-table tbody td:last-child {
-  border-right: none;
-}
-
-.rich-data-table tbody tr:nth-child(even) td, .data-table tbody tr:nth-child(even) td {
-  background-color: #f8fafc;
-}
-
-.rich-data-table tbody tr:hover td, .data-table tbody tr:hover td {
-  background-color: #edf2f7 !important;
-}
-
-.col-desc {
-  max-width: 320px;
-  white-space: normal !important;
-  word-break: normal;
-  overflow-wrap: break-word;
-  line-height: 1.35;
-}
-
-/* Componentes de Células da Tabela */
-.row-checkbox {
-  width: 15px;
-  height: 15px;
-  cursor: pointer;
-  accent-color: var(--color-primary);
-}
-
-.item-identity-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-}
-
-.item-avatar-box {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  background: #f0f2f5;
-  color: #595959;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 0.82rem;
-  flex-shrink: 0;
-  border: 1px solid #e8e8e8;
-}
-
-.item-avatar-box.solar {
-  background-color: #fff7ed;
-  color: #ff7a00;
-  border-color: #ffedd5;
-}
-
-.item-avatar-box.client {
-  background-color: #eff6ff;
-  color: #2563eb;
-  border-color: #bfdbfe;
-}
-
-.item-avatar-box.pue {
-  background-color: #fff7ed;
-  color: #ea580c;
-  border-color: #fed7aa;
-}
-
-.item-meta-titles {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  min-width: 0;
-}
-
-.item-name-bold {
-  font-weight: 600;
-  color: #262626;
-  font-size: 0.92rem;
-}
-
-.item-sub-code {
-  font-size: 0.80rem;
-  color: #8c8c8c;
-  font-family: var(--font-mono, monospace);
-}
-
-/* Célula de Métrica / Barra de Progresso Visual */
-.metric-progress-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 120px;
-}
-
-.metric-bar-track {
-  flex: 1;
-  height: 6px;
-  background-color: #f0f2f5;
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.metric-bar-fill {
-  height: 100%;
-  border-radius: 3px;
-  background: linear-gradient(90deg, #ff7a00, #ea580c);
-  transition: width 0.3s ease;
-}
-
-.metric-val-text {
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: #262626;
-  font-variant-numeric: tabular-nums;
-  min-width: 32px;
-  text-align: right;
-}
-
-/* Badge de Estado com Ponto Colorido */
-.status-dot-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.22rem 0.65rem;
-  border-radius: 12px;
-  font-size: 0.82rem;
-  font-weight: 600;
-}
-
-.status-dot-badge.active {
-  background-color: #ecfdf5;
-  color: #059669;
-  border: 1px solid #a7f3d0;
-}
-
-.status-dot-badge.warning {
+.kpi-icon-box.orange,
+.saas-kpi-icon-box.orange {
   background-color: #fff7ed;
   color: #ea580c;
   border: 1px solid #fed7aa;
 }
 
-.status-dot-badge.danger {
-  background-color: #fff1f0;
-  color: #cf1322;
-  border: 1px solid #ffa39e;
+.kpi-icon-box.purple,
+.saas-kpi-icon-box.purple {
+  background-color: #faf5ff;
+  color: #9333ea;
+  border: 1px solid #f3e8ff;
 }
 
-.status-dot-badge.neutral {
-  background-color: #f5f5f5;
-  color: #595959;
-  border: 1px solid #d9d9d9;
+.kpi-values-box,
+.saas-kpi-val-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.kpi-number,
+.saas-kpi-val {
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-family: var(--font-family) !important;
+}
+
+.kpi-trend-pill,
+.saas-kpi-trend {
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.kpi-trend-pill.positive,
+.saas-kpi-trend.positive {
+  background-color: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.kpi-trend-pill.warning,
+.saas-kpi-trend.warning {
+  background-color: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.kpi-trend-pill.negative,
+.saas-kpi-trend.negative {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.kpi-trend-pill.neutral,
+.saas-kpi-trend.neutral {
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+.kpi-label,
+.saas-kpi-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.kpi-bottom-row,
+.saas-kpi-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 0.55rem;
+  margin-top: 0.25rem;
+  width: 100%;
+}
+
+.kpi-bottom-text,
+.saas-kpi-subtext {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* Micro-badge de Porcentagem Unificado (Substituto Limpo dos Círculos SVG) */
+.kpi-mini-gauge {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  padding: 2px 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #334155;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.kpi-mini-gauge-text {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: inherit;
+  line-height: 1;
+}
+
+/* ------------------------------------------------------------------------------
+ * C. CARTÃO PRINCIPAL DA ÁREA DE TRABALHO (Workspace Card)
+ * ------------------------------------------------------------------------------ */
+.workspace-card,
+.saas-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  transition: border-color 0.15s ease;
+}
+
+.workspace-header,
+.saas-card-header {
+  padding: 1.15rem 1.50rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f1f5f9;
+  background-color: #ffffff;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.workspace-title-box,
+.saas-card-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.workspace-title,
+.saas-card-title {
+  font-size: 1.12rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.3;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.workspace-count-badge,
+.saas-card-badge {
+  background: #fff7ed;
+  color: #ea580c;
+  border: 1px solid #fed7aa;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 9999px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.workspace-subtitle,
+.saas-card-subtitle {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin: 2px 0 0 0;
+  line-height: 1.4;
+}
+
+.workspace-actions,
+.saas-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Botões Modernos do Workspace */
+.btn-primary,
+.btn-solarman-primary,
+button.btn-primary {
+  background: #ff7a00 !important;
+  border: 1px solid #ea580c !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  font-size: 0.84rem;
+  padding: 0.48rem 1rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(255, 122, 0, 0.25);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+
+.btn-primary:hover,
+.btn-solarman-primary:hover,
+button.btn-primary:hover {
+  background: #ea580c !important;
+  border-color: #c2410c !important;
+  color: #ffffff !important;
+}
+
+.btn-outline,
+.btn-secondary,
+button.btn-outline {
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #334155 !important;
+  font-weight: 600;
+  font-size: 0.84rem;
+  padding: 0.48rem 0.95rem;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+
+.btn-outline:hover,
+.btn-secondary:hover,
+button.btn-outline:hover {
+  background: #f8fafc !important;
+  border-color: #94a3b8 !important;
+  color: #0f172a !important;
+}
+
+/* ------------------------------------------------------------------------------
+ * D. BARRA DE FERRAMENTAS: ABAS SEGMENTADAS, BUSCA E FILTROS (Toolbar)
+ * ------------------------------------------------------------------------------ */
+.workspace-toolbar {
+  padding: 0.85rem 1.50rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  background-color: #fbfcfe;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.segmented-filter-tabs,
+.workspace-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background-color: #f1f5f9;
+  padding: 3px;
+  border-radius: 8px;
+}
+
+.seg-tab,
+.tab-pill {
+  padding: 5px 13px;
+  font-size: 0.80rem;
+  font-weight: 600;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.seg-tab:hover,
+.tab-pill:hover {
+  color: #0f172a;
+}
+
+.seg-tab.active,
+.tab-pill.active {
+  background-color: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+  font-weight: 700;
+}
+
+.toolbar-controls-right,
+.workspace-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.search-box-pill {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-box-pill svg,
+.search-box-pill i {
+  position: absolute;
+  left: 10px;
+  color: #94a3b8;
+  pointer-events: none;
+  width: 14px;
+  height: 14px;
+}
+
+.search-box-pill input,
+.saas-search-input {
+  padding: 0.45rem 0.75rem 0.45rem 2.05rem;
+  font-size: 0.84rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #0f172a;
+  min-width: 240px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.search-box-pill input:focus,
+.saas-search-input:focus {
+  border-color: #ff7a00;
+  box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.15);
+}
+
+.btn-filter-dropdown,
+.form-select.filter-select {
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #334155;
+  background-color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-filter-dropdown:hover {
+  background-color: #f8fafc;
+  border-color: #94a3b8;
+}
+
+/* ------------------------------------------------------------------------------
+ * E. TABELAS RICAS DE DADOS (Enterprise SaaS Tables — Limpas e Sem Grelhas)
+ * ------------------------------------------------------------------------------ */
+.table-scroll-frame,
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: none;
+  margin: 0;
+}
+
+.rich-data-table,
+.saas-table,
+.data-table {
+  width: 100%;
+  border-collapse: separate !important;
+  border-spacing: 0;
+  font-size: 0.86rem;
+  border: none !important;
+  margin: 0;
+}
+
+.rich-data-table th,
+.saas-table th,
+.data-table th {
+  background-color: #f8fafc !important;
+  color: #475569 !important;
+  font-size: 0.74rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  padding: 0.85rem 1rem !important;
+  border-top: none !important;
+  border-bottom: 2px solid #e2e8f0 !important;
+  border-left: none !important;
+  border-right: none !important;
+  white-space: nowrap !important;
+  text-align: left;
+}
+
+.rich-data-table td,
+.saas-table td,
+.data-table td {
+  padding: 0.90rem 1rem !important;
+  vertical-align: middle !important;
+  border-top: none !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  border-left: none !important;
+  border-right: none !important;
+  background-color: #ffffff;
+  color: #1e293b;
+  transition: background-color 0.12s ease;
+}
+
+.rich-data-table tbody tr:hover td,
+.saas-table tbody tr:hover td,
+.data-table tbody tr:hover td {
+  background-color: #f8fafc !important;
+}
+
+/* Célula de Identidade do Item (Nome Bold + Subtítulo Nítido Sem Monospace) */
+.item-identity-cell,
+.item-title-box {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.item-avatar-box {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background-color: #fff7ed;
+  color: #ea580c;
+  border: 1px solid #fed7aa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.95rem;
+}
+
+.item-name-bold {
+  font-weight: 600;
+  color: #0f172a;
+  font-size: 0.88rem;
+  line-height: 1.3;
+}
+
+.item-sub-code {
+  font-family: var(--font-family) !important;
+  font-size: 0.78rem;
+  color: #64748b;
+  font-weight: 400;
+  line-height: 1.35;
+  margin-top: 2px;
+}
+
+/* ------------------------------------------------------------------------------
+ * F. BOTÕES DE ACÇÃO NAS LINHAS (Zero Sobreposição & Largura Automática)
+ * ------------------------------------------------------------------------------ */
+.table-row-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+}
+
+.btn-row-action,
+.btn-action-table {
+  min-width: 32px;
+  width: auto !important;
+  height: 30px;
+  padding: 0 10px !important;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  color: #475569;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: var(--font-family) !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  text-decoration: none;
+  white-space: nowrap !important;
+}
+
+.btn-row-action:hover,
+.btn-action-table:hover {
+  border-color: #ff7a00;
+  color: #ea580c;
+  background-color: #fff7ed;
+  box-shadow: 0 1px 2px rgba(255, 122, 0, 0.15);
+}
+
+.btn-row-action svg,
+.btn-action-table svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+/* ------------------------------------------------------------------------------
+ * G. BADGES, STATUS PILLS & BARRAS DE PROGRESSO
+ * ------------------------------------------------------------------------------ */
+.status-dot-badge,
+.saas-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  white-space: nowrap;
+  line-height: 1.2;
 }
 
 .status-dot {
@@ -3734,163 +3706,241 @@ body.is-login-page #view-container {
   height: 7px;
   border-radius: 50%;
   display: inline-block;
+  flex-shrink: 0;
 }
 
-.status-dot-badge.active .status-dot { background-color: #10b981; }
-.status-dot-badge.warning .status-dot { background-color: #f59e0b; }
-.status-dot-badge.danger .status-dot { background-color: #ef4444; }
-.status-dot-badge.neutral .status-dot { background-color: #8c8c8c; }
+.status-dot-badge.active,
+.saas-status-pill.active {
+  background-color: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+.status-dot-badge.active .status-dot {
+  background-color: #16a34a;
+}
 
-/* Tag Pills */
+.status-dot-badge.warning,
+.saas-status-pill.warning {
+  background-color: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+.status-dot-badge.warning .status-dot {
+  background-color: #d97706;
+}
+
+.status-dot-badge.danger,
+.saas-status-pill.danger {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+.status-dot-badge.danger .status-dot {
+  background-color: #dc2626;
+}
+
+.badge-prio {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.badge-prio.critica {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.badge-prio.alta {
+  background-color: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.badge-prio.media {
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.badge-prio.baixa {
+  background-color: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
 .tag-pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.16rem 0.50rem;
-  border-radius: 4px;
-  font-size: 0.78rem;
-  font-weight: 500;
-  background: #f0f2f5;
-  color: #595959;
-  border: 1px solid #e8e8e8;
-  margin-right: 2px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.tag-pill.tech {
+  background-color: #eff6ff;
+  color: #1d4ed8;
+  border-color: #dbeafe;
 }
 
 .tag-pill.pue {
   background-color: #fff7ed;
   color: #ea580c;
   border-color: #fed7aa;
+}
+
+.metric-progress-cell,
+.saas-table-bar-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 110px;
+}
+
+.metric-bar-track,
+.saas-table-bar-track {
+  flex: 1;
+  height: 6px;
+  background-color: #e2e8f0;
+  border-radius: 9999px;
+  overflow: hidden;
+  min-width: 70px;
+  max-width: 120px;
+}
+
+.metric-bar-fill,
+.saas-table-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #ff7a00, #ea580c);
+  transition: width 0.3s ease;
+}
+
+.metric-val-text {
+  font-size: 0.78rem;
   font-weight: 600;
+  color: #334155;
+  white-space: nowrap;
 }
 
-.tag-pill.tech {
-  background-color: #eff6ff;
-  color: #2563eb;
-  border-color: #bfdbfe;
-}
-
-/* Botões de Ação na Linha */
-.table-row-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.btn-row-action {
-  width: 28px;
-  height: 28px;
-  border-radius: 4px;
-  border: 1px solid #e8e8e8;
-  background: #ffffff;
-  color: #595959;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.12s ease;
-}
-
-.btn-row-action:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-  background-color: #fff7ed;
-}
-
-/* Rodapé de Paginação do Cartão */
+/* ------------------------------------------------------------------------------
+ * H. RODAPÉ DE PAGINAÇÃO (Workspace Pagination)
+ * ------------------------------------------------------------------------------ */
 .workspace-pagination {
-  padding: 0.60rem 1.15rem;
+  padding: 0.85rem 1.50rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px solid #f0f0f0;
-  background: #ffffff;
-  font-size: 0.84rem;
-  color: #8c8c8c;
+  border-top: 1px solid #f1f5f9;
+  background-color: #ffffff;
+  font-size: 0.82rem;
+  color: #64748b;
   flex-shrink: 0;
 }
 
-.pagination-btns {
+.page-info-text {
+  font-size: 0.82rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.page-nav-btns {
   display: flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 6px;
 }
 
 .btn-page {
-  border: 1px solid #d9d9d9;
-  background: #ffffff;
-  border-radius: 3px;
-  padding: 0.22rem 0.60rem;
-  font-size: 0.82rem;
-  color: #595959;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  color: #475569;
+  font-size: 0.80rem;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.12s ease;
 }
 
-.btn-page:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
+.btn-page:hover:not(:disabled) {
+  border-color: #ff7a00;
+  color: #ea580c;
+  background-color: #fff7ed;
 }
 
-.btn-page.active {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: #ffffff;
-  font-weight: 600;
+.btn-page:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
-/* Modal e Gaveta de Ficha de Detalhes Corporativa */
-.ficha-dossier-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.85rem;
-  margin-bottom: 1rem;
-}
-
-.ficha-field-block {
+/* ------------------------------------------------------------------------------
+ * I. DASHBOARD EXECUTIVO, MAPA GIS & TELEMETRIA SCADA (Layout 2 Colunas)
+ * ------------------------------------------------------------------------------ */
+.saas-dashboard-container {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 1.25rem;
+  width: 100%;
 }
 
-.ficha-field-label {
-  font-size: 0.82rem;
-  color: #8c8c8c;
-  font-weight: 500;
+.saas-main-layout {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 1.25rem;
+  align-items: stretch;
+  width: 100%;
 }
 
-.ficha-field-val {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #262626;
+@media (max-width: 1100px) {
+  .saas-main-layout {
+    grid-template-columns: 1fr;
+  }
 }
 
-.ficha-tab-strip {
+.saas-left-column,
+.saas-right-column {
   display: flex;
-  gap: 0.5rem;
-  border-bottom: 1px solid #f0f0f0;
-  padding-bottom: 0.4rem;
-  margin-bottom: 0.85rem;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-width: 0;
 }
 
-.ficha-tab-btn {
-  background: none;
-  border: none;
-  font-size: 0.86rem;
-  font-weight: 600;
-  color: #8c8c8c;
-  cursor: pointer;
-  padding: 0.25rem 0.55rem;
-  border-bottom: 2px solid transparent;
-  transition: all 0.15s ease;
+/* Moldura e Canvas do Mapa GIS */
+.map-workspace-card {
+  height: calc(100vh - 140px);
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
 }
 
-.ficha-tab-btn.active {
-  color: var(--color-primary);
-  border-bottom-color: var(--color-primary);
+.map-frame-wrapper {
+  position: relative;
+  flex: 1;
+  min-height: 520px;
+  width: 100%;
 }
 
-/* ==============================================================================
- * Telemetria de Inversor em Tempo Real & Galeria de Imagens Reais
- * ============================================================================== */
+#general-gis-map-canvas,
+#gis-map-canvas {
+  width: 100%;
+  height: 100%;
+  min-height: 480px;
+  border-radius: 0;
+}
 
 /* Marcador Pulsante com Satélite Real Google Maps */
 .map-pulse-marker {
@@ -3944,134 +3994,209 @@ body.is-login-page #view-container {
   transform: scale(1.15);
 }
 
-/* Badge de Telemetria ao Vivo do Inversor */
-.badge-live-inverter {
-  display: inline-flex;
+/* Legenda Cartográfica Flutuante de Alto Contraste */
+.map-floating-legend {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 10px;
+  padding: 12px 16px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  z-index: 1000;
+  min-width: 200px;
+}
+
+.map-floating-legend-title {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 4px;
+}
+
+.map-legend-row {
+  display: flex;
   align-items: center;
-  gap: 0.35rem;
-  background: #ecfdf5;
-  color: #059669;
-  border: 1px solid #a7f3d0;
-  border-radius: 12px;
-  padding: 2px 8px;
+  gap: 8px;
   font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 6px;
 }
 
-.badge-live-inverter .pulse-dot {
-  width: 7px;
-  height: 7px;
+.map-legend-row:last-child {
+  margin-bottom: 0;
+}
+
+.map-legend-indicator {
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35);
-  animation: liveDotPulse 1.2s infinite ease-in-out;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 2px #ffffff;
 }
 
-@keyframes liveDotPulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.75); }
-}
-
-/* Painel de Telemetria do Inversor (Estilo SCADA / Solarman Cockpit) */
-.inverter-cockpit {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-
-@media (max-width: 768px) {
-  .inverter-cockpit {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-.inverter-stat-box {
-  background: #f8fafc;
-  color: #0f172a;
-  border-radius: 8px;
-  padding: 0.85rem;
+/* Card do Inversor em Tempo Real (SCADA Telemetry) */
+.inverter-telemetry-card {
+  background: #ffffff;
   border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  position: relative;
-  overflow: hidden;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
-.inverter-stat-box::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--color-primary);
+.inverter-telemetry-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 0.75rem;
 }
 
-.inverter-stat-label {
-  font-size: 0.74rem;
-  color: #64748b;
-  text-transform: uppercase;
+.inverter-telemetry-title {
+  font-size: 1.05rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.35rem;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
 }
 
-.inverter-stat-val {
-  font-size: 1.40rem;
+.inverter-live-badge {
+  background-color: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.inverter-power-callout {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.inverter-power-val {
+  font-size: 2.2rem;
   font-weight: 800;
-  color: var(--color-info);
-  font-family: monospace;
-  letter-spacing: -0.03em;
-}
-
-.inverter-stat-val.primary {
   color: #ea580c;
+  line-height: 1;
+  letter-spacing: -0.02em;
 }
 
-.inverter-stat-val.green {
+.inverter-power-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #c2410c;
+  letter-spacing: 0.04em;
+}
+
+.inverter-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.inverter-stat-tile {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.inverter-stat-tile-label {
+  font-size: 0.72rem;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.inverter-stat-tile-val {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.inverter-stat-tile-val.green {
   color: #16a34a;
 }
 
-.inverter-stat-sub {
-  font-size: 0.76rem;
-  color: #64748b;
-  margin-top: 0.25rem;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
+.inverter-stat-tile-val.blue {
+  color: #2563eb;
 }
 
-/* Galeria de Fotos Reais de Instalações & Clientes */
-.real-photos-grid {
+.inverter-stat-tile-val.orange {
+  color: #ea580c;
+}
+
+.inverter-hardware-pill {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  color: #334155;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Cards das Centrais Fotovoltaicas Monitoradas (Galeria de Fotografias Reais) */
+.real-photo-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 0.85rem;
-  margin: 0.85rem 0;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  width: 100%;
 }
 
 .real-photo-card {
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
   display: flex;
   flex-direction: column;
-  transition: none !important;
 }
 
 .real-photo-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
   border-color: #cbd5e1;
-  transform: none !important;
 }
 
 .real-photo-wrapper {
   position: relative;
   width: 100%;
-  height: 140px;
-  background: #e2e8f0;
+  height: 160px;
+  background-color: #0f172a;
   overflow: hidden;
 }
 
@@ -4083,503 +4208,140 @@ body.is-login-page #view-container {
 
 .real-photo-badge {
   position: absolute;
-  top: 6px;
-  left: 6px;
-  background: rgba(15, 23, 42, 0.82);
-  color: #ffffff;
-  font-size: 0.74rem;
-  font-weight: 600;
-  padding: 2px 7px;
-  border-radius: 4px;
+  top: 8px;
+  right: 8px;
+  background: rgba(15, 23, 42, 0.85);
   backdrop-filter: blur(4px);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-.real-photo-caption {
-  padding: 0.55rem 0.65rem;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #334155;
-  border-top: 1px solid #f1f5f9;
+.real-photo-info {
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
 }
 
-.real-photo-subtext {
+.real-photo-name {
+  font-size: 0.90rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.real-photo-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   font-size: 0.78rem;
   color: #64748b;
-  font-weight: normal;
-  display: block;
-  margin-top: 2px;
 }
 
-/* ==============================================================================
-   LECASU GridOps - Modern SaaS UI Layout & Polish (Inspirado no Modelo de Referência)
-   ============================================================================== */
-
-.saas-dashboard-container {
+/* ------------------------------------------------------------------------------
+ * J. MODAIS, GAVETAS & DIÁLOGOS DE REGISTO (Corporate Drawers)
+ * ------------------------------------------------------------------------------ */
+.details-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 580px;
+  max-width: 90vw;
+  height: 100vh;
+  background-color: #ffffff;
+  box-shadow: -4px 0 24px rgba(15, 23, 42, 0.15);
+  z-index: 1050;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-  padding-bottom: 2rem;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 1. Grade Superior: 4 Cards de Métricas com Medidores Circulares (KPIs Compactos e Elegantes) */
-.saas-kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.85rem;
-}
-
-@media (max-width: 1200px) {
-  .saas-kpi-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 680px) {
-  .saas-kpi-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.saas-kpi-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  padding: 1.05rem 1.25rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  min-width: 0;
-  transition: none !important;
-}
-
-.saas-kpi-card:hover {
-  transform: none !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
-  border-color: #cbd5e1;
-}
-
-.saas-kpi-top-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-width: 0;
-  width: 100%;
-}
-
-.saas-kpi-icon-box {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.saas-kpi-icon-box.blue {
-  background: #eff6ff;
-  color: #2563eb;
-  border: 1px solid #dbeafe;
-}
-
-.saas-kpi-icon-box.green {
-  background: #ecfdf5;
-  color: #059669;
-  border: 1px solid #a7f3d0;
-}
-
-.saas-kpi-icon-box.purple {
-  background: #faf5ff;
-  color: #7c3aed;
-  border: 1px solid #e9d5ff;
-}
-
-.saas-kpi-icon-box.orange {
-  background: #fff7ed;
-  color: #ea580c;
-  border: 1px solid #fed7aa;
-}
-
-.saas-kpi-val-group {
-  display: flex;
-  align-items: baseline;
-  gap: 0.45rem;
-  min-width: 0;
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-
-.saas-kpi-val {
-  font-size: 1.45rem;
-  font-weight: 800;
-  color: #0f172a;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-}
-
-.saas-kpi-trend {
-  font-size: 0.76rem;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 9999px;
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  line-height: 1.2;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.saas-kpi-trend.up {
-  background: #dcfce7;
-  color: #15803d;
-}
-
-.saas-kpi-trend.neutral {
-  background: #f1f5f9;
-  color: #475569;
-}
-
-.saas-kpi-label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: #475569;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-top: 0.20rem;
-}
-
-.saas-kpi-bottom-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-top: auto;
-  padding-top: 0.50rem;
-  border-top: 1px dashed #e2e8f0;
-  min-width: 0;
-  width: 100%;
-}
-
-.saas-kpi-subtext {
-  font-size: 0.82rem;
-  color: #64748b;
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.saas-kpi-subtext strong {
-  color: #334155;
-  font-weight: 700;
-}
-
-/* Medidor Circular Compacto */
-.saas-gauge-box {
-  position: relative;
-  width: 50px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.saas-gauge-box svg {
-  transform: rotate(-90deg);
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-.saas-gauge-bg {
-  fill: none;
-  stroke: #f1f5f9;
-  stroke-width: 8;
-}
-
-.saas-gauge-fill {
-  fill: none;
-  stroke-width: 8;
-  stroke-linecap: round;
-  transition: stroke-dashoffset 0.8s ease-in-out;
-}
-
-.saas-gauge-text {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.78rem !important;
-  font-weight: 800 !important;
-  color: #0f172a;
-  line-height: 1;
-  text-align: center;
+.details-drawer.hidden {
+  transform: translateX(100%);
   pointer-events: none;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-/* 2. Layout Principal Dividido: Esquerda (Mapa Satélite Real) e Direita (Cockpit SCADA do Inversor) */
-.saas-main-layout {
-  display: grid;
-  grid-template-columns: 1.65fr 1fr;
-  gap: 1.15rem;
-  align-items: stretch;
-}
-
-@media (max-width: 1100px) {
-  .saas-main-layout {
-    grid-template-columns: 1fr;
-  }
-}
-
-.saas-left-column {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.saas-right-column {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-/* Cards Modernos do Layout SaaS */
-.saas-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.saas-card-header {
-  padding: 1.15rem 1.35rem;
+.drawer-header {
+  padding: 1.15rem 1.50rem;
+  border-bottom: 1px solid #f1f5f9;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #e2e8f0;
-  background: #ffffff;
+  background-color: #ffffff;
 }
 
-.saas-card-title-group {
+.drawer-title {
+  font-size: 1.10rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.drawer-body {
+  padding: 1.50rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.drawer-footer {
+  padding: 1rem 1.50rem;
+  border-top: 1px solid #f1f5f9;
+  background-color: #fbfcfe;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.ficha-dossier-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.ficha-field-block {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
 }
 
-.saas-card-title-row {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-}
-
-.saas-card-title {
-  font-size: 1.12rem;
-  font-weight: 700;
-  color: #0f172a;
-  letter-spacing: -0.01em;
-}
-
-.saas-card-badge {
-  font-size: 0.78rem;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 9999px;
-  background: #f1f5f9;
-  color: #475569;
-}
-
-.saas-card-subtitle {
-  font-size: 0.85rem;
+.ficha-field-label {
+  font-size: 0.82rem;
   color: #64748b;
+  font-weight: 500;
 }
 
-.saas-card-actions {
+.ficha-field-val {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.ficha-tab-strip {
   display: flex;
-  align-items: center;
-  gap: 0.65rem;
+  gap: 0.5rem;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 0.4rem;
+  margin-bottom: 0.85rem;
 }
 
-/* Barra de Filtros e Pesquisa */
-.saas-toolbar {
-  padding: 0.85rem 1.35rem;
-  background: #fafafa;
-  border-bottom: 1px solid #e2e8f0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.saas-tabs {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-
-.saas-tab-btn {
-  background: transparent;
-  border: 1px solid transparent;
-  padding: 0.4rem 0.85rem;
-  border-radius: 6px;
-  font-size: 0.88rem;
+.ficha-tab-btn {
+  background: none;
+  border: none;
+  font-size: 0.86rem;
   font-weight: 600;
   color: #64748b;
   cursor: pointer;
+  padding: 0.25rem 0.55rem;
+  border-bottom: 2px solid transparent;
   transition: all 0.15s ease;
 }
 
-.saas-tab-btn:hover {
-  background: #f1f5f9;
-  color: #0f172a;
-}
-
-.saas-tab-btn.active {
-  background: #ffffff;
-  border-color: #e2e8f0;
-  color: #ff7a00;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-}
-
-.saas-search-box {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  position: relative;
-}
-
-.saas-search-input {
-  background: #ffffff;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  padding: 0.45rem 0.85rem 0.45rem 2.2rem;
-  font-size: 0.88rem;
-  color: #0f172a;
-  min-width: 240px;
-  outline: none;
-  transition: all 0.15s ease;
-}
-
-.saas-search-input:focus {
-  border-color: #ff7a00;
-  box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.12);
-}
-
-.saas-search-icon {
-  position: absolute;
-  left: 0.75rem;
-  color: #94a3b8;
-  pointer-events: none;
-}
-
-/* Tabela SaaS com Linhas Divisórias Altas e Nítidas */
-.saas-table {
-  width: 100%;
-  border-collapse: collapse !important;
-  font-size: 0.90rem;
-}
-
-.saas-table th {
-  background: #f8fafc;
-  color: #475569;
-  font-weight: 700;
-  font-size: 0.82rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 0.85rem 1rem;
-  border: 1px solid #e2e8f0 !important;
-  text-align: left;
-}
-
-.saas-table td {
-  padding: 0.95rem 1rem;
-  border: 1px solid #e2e8f0 !important;
-  color: #1e293b;
-  vertical-align: middle;
-  background: #ffffff;
-}
-
-.saas-table tbody tr:nth-child(even) td {
-  background: #fbfcfe;
-}
-
-.saas-table tbody tr:hover td {
-  background: #f1f5f9;
-}
-
-/* Barra de Progresso Interna da Tabela */
-.saas-table-bar-box {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-}
-
-.saas-table-bar-track {
-  width: 90px;
-  height: 6px;
-  background: #e2e8f0;
-  border-radius: 9999px;
-  overflow: hidden;
-}
-
-.saas-table-bar-fill {
-  height: 100%;
-  background: #ff7a00;
-  border-radius: 9999px;
-}
-
-/* Status Pill */
-.saas-status-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.82rem;
-  font-weight: 600;
-  padding: 3px 10px;
-  border-radius: 9999px;
-}
-
-.saas-status-pill.active {
-  background: #dcfce7;
-  color: #15803d;
-}
-
-.saas-status-pill.warning {
-  background: #fef3c7;
-  color: #b45309;
-}
-
-.saas-status-pill.alert {
-  background: #fee2e2;
-  color: #b91c1c;
-}
-
-/* Paginação SaaS */
-.saas-pagination {
-  padding: 0.85rem 1.35rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-top: 1px solid #e2e8f0;
-  background: #ffffff;
-  font-size: 0.86rem;
-  color: #64748b;
-}
-
-/* Forçamento de Altura Nítida do Mapa Satélite Leaflet */
-#leaflet-map-container {
-  height: 380px !important;
-  min-height: 380px !important;
-  width: 100% !important;
-  border-radius: 0 0 14px 14px;
+.ficha-tab-btn.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
 }
