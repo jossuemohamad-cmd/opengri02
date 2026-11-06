@@ -104,3 +104,4 @@ Todas as 10 áreas de ecrãs foram harmonizadas segundo os padrões acima:
 - **Auditoria Técnica Completa:** 35/35 aprovados (100%).
 - **Verificação de Produção:** 24/24 validações aprovadas com PostgreSQL 18.6 activo.
 - **Responsividade:** Validada para Desktop (1440px / 1920px), Portátil (1366px), Tablet (768px) e Mobile (390px).
+
