@@ -907,10 +907,6 @@ body.sidebar-collapsed .user-profile-box {
   flex-shrink: 0;
 }
 
-.metric-card:hover .metric-icon-pill {
-  /* sem transform no hover */
-}
-
 .metric-icon-pill svg {
   width: 18px;
   height: 18px;
@@ -2463,17 +2459,6 @@ body.is-login-page #view-container {
   justify-content: center;
   border: 2px solid #ffffff;
   line-height: 1;
-}
-  font-size: 0.72rem;
-  font-weight: 700;
-  min-width: 16px;
-  height: 16px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 3px;
-  box-shadow: 0 1px 3px rgba(245, 34, 45, 0.4);
 }
 
 /* ==============================================================================
@@ -4094,10 +4079,6 @@ body.is-login-page #view-container {
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-.real-photo-card:hover .real-photo-wrapper img {
-  /* sem transform */
 }
 
 .real-photo-badge {
