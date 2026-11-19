@@ -53,7 +53,8 @@ async function runProductionVerification() {
       'payments',
       'assets',
       'work_orders',
-      'audit_logs'
+      'audit_logs',
+      'inverter_telemetry'
     ];
 
     for (const tbl of requiredTables) {

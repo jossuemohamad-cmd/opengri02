@@ -12,6 +12,8 @@ const AppState = {
   currentUser: JSON.parse(localStorage.getItem('lecasu_user') || 'null'),
   leafletMap: null,
   miniGridsCache: [],
+  telemetryDevicesCache: [],
+  solarmanSummary: null,
   systemHealth: null
 };
 
@@ -62,7 +64,8 @@ const rawIcons = {
   eye: (s = 18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`,
   eyeOff: (s = 18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`,
   battery: (s = 18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="6" width="18" height="12" rx="2" ry="2"></rect><line x1="23" y1="13" x2="23" y2="11"></line></svg>`,
-  bell: (s = 18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>`
+  bell: (s = 18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>`,
+  externalLink: (s = 16) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>`
 };
 
 // Proxy de Segurança Total: Nunca gera TypeError se um ícone não existir
@@ -264,13 +267,15 @@ function initRouter() {
 
   if (toggleBtn && sidebar && overlay) {
     toggleBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('open');
-      overlay.classList.toggle('active');
+      const isOpen = sidebar.classList.toggle('open');
+      overlay.classList.toggle('active', isOpen);
+      document.body.classList.toggle('sidebar-open', isOpen);
     });
 
     overlay.addEventListener('click', () => {
       sidebar.classList.remove('open');
       overlay.classList.remove('active');
+      document.body.classList.remove('sidebar-open');
     });
   }
 
@@ -357,6 +362,7 @@ function navigateToView(viewName) {
   const overlay = document.getElementById('sidebar-overlay');
   if (sidebar) sidebar.classList.remove('open');
   if (overlay) overlay.classList.remove('active');
+  document.body.classList.remove('sidebar-open');
 
   renderCurrentView();
 }
@@ -802,7 +808,7 @@ async function renderDashboardView(container) {
                   </div>
                   <div style="text-align:right;">
                     <span style="font-size:0.74rem; color:#64748b; text-transform:uppercase; font-weight:600; display:block;">Estado Operacional:</span>
-                    <span style="background:#dcfce7; color:#15803d; border:1px solid #bbf7d0; font-size:0.76rem; font-weight:700; padding:3px 9px; border-radius:9999px;">● Activa / Em Operação</span>
+                    <span id="live-inverter-status" style="background:#dcfce7; color:#15803d; border:1px solid #bbf7d0; font-size:0.76rem; font-weight:700; padding:3px 9px; border-radius:9999px;">● Activa / Em Operação</span>
                   </div>
                 </div>
 
@@ -826,9 +832,9 @@ async function renderDashboardView(container) {
                   </div>
                 </div>
 
-                <div style="background:#f8fafc; padding:0.65rem 0.85rem; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center;">
+                <div style="background:#f8fafc; padding:0.65rem 0.85rem; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center; gap:0.5rem;">
                   <span style="font-size:0.76rem; color:#64748b; font-weight:600;">Inversor Instalado:</span>
-                  <strong style="color:#0f172a; font-size:0.86rem;">Huawei SUN2000-100KTL (Eficiência: 98.6%)</strong>
+                  <strong id="live-inverter-model" style="color:#0f172a; font-size:0.84rem; text-align:right;">Huawei SUN2000-100KTL (Eficiência: 98.6%)</strong>
                 </div>
               </div>
 
@@ -923,12 +929,13 @@ async function loadDashboardKPIs() {
   }
 
   try {
-    const [mgRes, cliRes, woRes, payRes, repRes] = await Promise.all([
+    const [mgRes, cliRes, woRes, payRes, repRes, telRes] = await Promise.all([
       apiFetch('/api/mini-grids').catch(() => null),
       apiFetch('/api/clients?limit=100').catch(() => null),
       apiFetch('/api/work-orders').catch(() => null),
       apiFetch('/api/payments').catch(() => null),
-      apiFetch('/api/reports/dashboard').catch(() => null)
+      apiFetch('/api/reports/dashboard').catch(() => null),
+      apiFetch('/api/telemetry/devices').catch(() => null)
     ]);
 
     const mgList = (Array.isArray(mgRes?.data) && mgRes.data.length > 0) 
@@ -936,11 +943,22 @@ async function loadDashboardKPIs() {
       : (mgRes?.data?.miniGrids || defaultInitialList);
     AppState.miniGridsCache = mgList;
 
-    // 1. Cálculos de Capacidade e Potência
-    const totalKwp = mgList.reduce((sum, mg) => sum + parseFloat(mg.capacidade_kwp || 0), 0) || 600;
+    const telDevices = telRes?.data?.devices || [];
+    const telSummary = telRes?.data?.solarmanSummary || null;
+    AppState.telemetryDevicesCache = telDevices;
+    AppState.solarmanSummary = telSummary;
+
+    const hasRealTelemetry = telSummary?.generationSummary && telSummary.generationSummary.installedCapacity > 0;
+
+    // 1. Cálculos de Capacidade e Potência (priorizando telemetria real persistida em PostgreSQL)
+    const totalKwp = hasRealTelemetry
+      ? telSummary.generationSummary.installedCapacity
+      : (mgList.reduce((sum, mg) => sum + parseFloat(mg.capacidade_kwp || 0), 0) || 600);
     const activeMgList = mgList.filter(m => m.estado_operacional === 'activa');
     const activeKwp = activeMgList.reduce((sum, mg) => sum + parseFloat(mg.capacidade_kwp || 0), 0) || 540;
-    const currentPowerKw = (activeKwp * 0.77).toFixed(1);
+    const currentPowerKw = hasRealTelemetry
+      ? Number(telSummary.generationSummary.generationPower).toFixed(1)
+      : (activeKwp * 0.77).toFixed(1);
 
     // Atualiza Card 1: Produção Total
     const elPowerNow = document.getElementById('solarman-power-now');
@@ -951,12 +969,14 @@ async function loadDashboardKPIs() {
 
     const elCardTime = document.getElementById('card-prod-total-time');
     if (elCardTime) {
-      const now = new Date();
-      elCardTime.textContent = `Atualizada: hoje às ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      const refDate = telSummary?.generationSummary?.lastUpdateTime ? new Date(telSummary.generationSummary.lastUpdateTime) : new Date();
+      elCardTime.textContent = `Atualizada: hoje às ${String(refDate.getHours()).padStart(2, '0')}:${String(refDate.getMinutes()).padStart(2, '0')}`;
     }
 
     // Medidor Circular
-    const gaugePercent = 77;
+    const gaugePercent = totalKwp > 0
+      ? Math.min(100, Math.max(0, Math.round((parseFloat(currentPowerKw) / totalKwp) * 100)))
+      : 77;
     const elGaugePercent = document.getElementById('gauge-percent-display');
     if (elGaugePercent) {
       elGaugePercent.textContent = `${gaugePercent}%`;
@@ -967,10 +987,10 @@ async function loadDashboardKPIs() {
     }
 
     // Faixas de Produção Diária, Mensal, Anual, Total
-    const dailyKwh = Math.round(activeKwp * 4.9);
-    const monthlyKwh = Math.round(dailyKwh * 28.5);
-    const annualKwh = Math.round(dailyKwh * 335);
-    const totalLifetimeKwh = Math.round(annualKwh * 2.1);
+    const dailyKwh = hasRealTelemetry ? Math.round(telSummary.generationSummary.generationDay) : Math.round(activeKwp * 4.9);
+    const monthlyKwh = hasRealTelemetry ? Math.round(telSummary.generationSummary.generationMonth) : Math.round(dailyKwh * 28.5);
+    const annualKwh = hasRealTelemetry ? Math.round(telSummary.generationSummary.generationYear) : Math.round(dailyKwh * 335);
+    const totalLifetimeKwh = hasRealTelemetry ? Math.round(telSummary.generationSummary.generationTotal) : Math.round(annualKwh * 2.1);
 
     const elDaily = document.getElementById('prod-val-daily');
     if (elDaily) elDaily.textContent = `${dailyKwh.toLocaleString('pt-MZ')} kWh`;
@@ -1046,15 +1066,25 @@ function renderSaaSTablePlants(plants = []) {
   ];
 
   const list = (plants && plants.length > 0) ? plants : defaultPlants;
+  const telDevices = AppState.telemetryDevicesCache || [];
 
   tbody.innerHTML = list.map((p, idx) => {
-    const kwp = parseFloat(p.capacidade_kwp || 60);
+    const tel = telDevices.find(d => String(d.mini_grid_id) === String(p.id) || d.mini_grid_codigo === p.codigo);
+    const kwp = parseFloat(tel?.potencia_nominal_kw || p.capacidade_kwp || 60);
     const bess = parseFloat(p.capacidade_bateria_kwh || 150);
-    const isAct = p.estado_operacional === 'activa';
-    const liveKw = isAct ? (kwp * 0.78).toFixed(1) : '0.0';
-    const kwPercent = Math.min(100, Math.round((parseFloat(liveKw) / kwp) * 100));
-    const socPercent = isAct ? Math.round(80 + (idx * 2) % 18) : 45;
-    const model = p.inversor_modelo || 'Huawei SUN2000-100KTL';
+    const isAct = tel ? tel.estado_comunicacao === 'online' : (p.estado_operacional === 'activa');
+    const isAlert = Boolean(tel?.alerta_activo || tel?.estado_comunicacao === 'alarme');
+    const liveKw = tel
+      ? parseFloat(tel.potencia_activa_kw || 0).toFixed(1)
+      : (isAct ? (kwp * 0.78).toFixed(1) : '0.0');
+    const kwPercent = Math.min(100, Math.round((parseFloat(liveKw) / (kwp || 1)) * 100));
+    const socPercent = tel
+      ? Math.round(parseFloat(tel.bateria_soc_pct || 0))
+      : (isAct ? Math.round(80 + (idx * 2) % 18) : 45);
+    const model = tel?.modelo_inversor || p.inversor_modelo || 'Huawei SUN2000-100KTL';
+    const snBadge = tel?.device_sn ? `<span class="code-pill">${tel.device_sn}</span>` : '';
+    const statusCls = isAlert ? 'danger' : (isAct ? 'active' : 'warning');
+    const statusTxt = isAlert ? 'Alarme IoT' : (isAct ? 'Em Operação' : 'Montagem');
 
     return `
       <tr>
@@ -1066,8 +1096,9 @@ function renderSaaSTablePlants(plants = []) {
             </div>
             <div>
               <div style="font-weight:700; color:#0f172a;">${p.nome}</div>
-              <div style="font-size:0.80rem; color:#64748b; display:flex; align-items:center; gap:0.35rem;">
+              <div style="font-size:0.80rem; color:#64748b; display:flex; align-items:center; gap:0.35rem; flex-wrap:wrap;">
                 <span class="code-pill">${p.codigo}</span>
+                ${snBadge}
                 <span>&bull; ${p.localidade || p.distrito}</span>
               </div>
             </div>
@@ -1091,11 +1122,11 @@ function renderSaaSTablePlants(plants = []) {
           <div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:3px;">
               <span style="font-weight:700; color:#0f172a;">${bess} kWh</span>
-              <span style="font-size:0.78rem; font-weight:700; color:#16a34a;">${socPercent}% SoC</span>
+              <span style="font-size:0.78rem; font-weight:700; color:${socPercent < 25 ? '#dc2626' : '#16a34a'};">${socPercent}% SoC</span>
             </div>
             <div class="saas-table-bar-box">
               <div class="saas-table-bar-track" style="width:100px;">
-                <div class="saas-table-bar-fill" style="width:${socPercent}%; background:#16a34a;"></div>
+                <div class="saas-table-bar-fill" style="width:${socPercent}%; background:${socPercent < 25 ? '#dc2626' : '#16a34a'};"></div>
               </div>
             </div>
           </div>
@@ -1105,9 +1136,9 @@ function renderSaaSTablePlants(plants = []) {
           <div style="font-size:0.80rem; color:#64748b;">${p.distrito || '--'}</div>
         </td>
         <td>
-          <span class="saas-status-pill ${isAct ? 'active' : 'warning'}">
+          <span class="saas-status-pill ${statusCls}">
             <span style="width:6px; height:6px; border-radius:50%; background:currentColor; display:inline-block;"></span>
-            ${isAct ? 'Em Operação' : 'Montagem'}
+            ${statusTxt}
           </span>
         </td>
         <td style="text-align:center;">
@@ -1146,7 +1177,7 @@ function renderSaaSTablePlants(plants = []) {
     btn.onclick = () => {
       const id = btn.getAttribute('data-id');
       const plant = list.find(p => String(p.id) === String(id)) || list[0];
-      showMiniGridTechnicalDossier(plant);
+      showMiniGridDossierModal(plant);
     };
   });
 }
@@ -1154,8 +1185,31 @@ function renderSaaSTablePlants(plants = []) {
 /**
  * Inicia o Cockpit do Inversor ao Vivo (SCADA) no painel lateral
  */
+function resolvePlantTelemetry(plant) {
+  const cache = AppState.telemetryDevicesCache || [];
+  if (!plant || !cache.length) return null;
+  return cache.find(d =>
+    (plant.id && String(d.mini_grid_id) === String(plant.id)) ||
+    (plant.codigo && d.mini_grid_codigo === plant.codigo)
+  ) || null;
+}
+
 function initLiveInverterCockpit(plants = []) {
-  let currentPlant = plants[0] || {
+  const selPlant = document.getElementById('select-live-inverter-plant');
+  if (selPlant && Array.isArray(plants) && plants.length > 0) {
+    const prevValue = selPlant.value;
+    selPlant.innerHTML = plants.map(pl => {
+      const kwp = parseFloat(pl.capacidade_kwp || 50).toFixed(0);
+      const prov = pl.provincia || pl.distrito || 'MZ';
+      return `<option value="${pl.codigo}">${pl.nome} (${prov} - ${kwp} kWp)</option>`;
+    }).join('');
+    if (prevValue && plants.some(pl => pl.codigo === prevValue)) {
+      selPlant.value = prevValue;
+    }
+  }
+
+  const selectedCode = selPlant ? selPlant.value : null;
+  let currentPlant = (selectedCode && plants.find(pl => pl.codigo === selectedCode)) || plants[0] || {
     id: '1',
     nome: 'Central Solar Fotovoltaica de Morrumbene',
     codigo: 'MR-INH-001',
@@ -1163,10 +1217,83 @@ function initLiveInverterCockpit(plants = []) {
     capacidade_bateria_kwh: 210
   };
 
-  const nameEl = document.getElementById('live-inverter-name');
-  if (nameEl) nameEl.textContent = currentPlant.nome;
+  function renderCockpitTelemetry() {
+    const tel = resolvePlantTelemetry(currentPlant);
+    const nameEl = document.getElementById('live-inverter-name');
+    const kwEl = document.getElementById('live-inverter-kw');
+    const vEl = document.getElementById('live-inverter-v');
+    const socEl = document.getElementById('live-inverter-soc');
+    const hzEl = document.getElementById('live-inverter-hz');
+    const radEl = document.getElementById('live-inverter-rad');
+    const modelEl = document.getElementById('live-inverter-model');
+    const statusEl = document.getElementById('live-inverter-status');
 
-  const selPlant = document.getElementById('select-live-inverter-plant');
+    if (nameEl) nameEl.textContent = currentPlant.nome || 'Central Solar';
+
+    const kwp = parseFloat(currentPlant.capacidade_kwp || tel?.potencia_nominal_kw || 85);
+    const bess = parseFloat(currentPlant.capacidade_bateria_kwh || 200);
+
+    if (tel) {
+      const activeKw = parseFloat(tel.potencia_activa_kw || 0);
+      const todayKwh = parseFloat(tel.energia_hoje_kwh || 0);
+      const soc = Math.min(100, Math.max(0, Math.round(parseFloat(tel.bateria_soc_pct || 0))));
+      const bessKwh = Math.round((bess * soc) / 100);
+      const hasAlert = Boolean(tel.alerta_activo) || ['alarme', 'alerta'].includes(tel.estado_comunicacao);
+      const isOffline = tel.estado_comunicacao === 'offline';
+
+      if (kwEl) kwEl.textContent = `${activeKw.toFixed(1)} kW`;
+      if (vEl) vEl.textContent = `${todayKwh.toFixed(1)} kWh`;
+      if (socEl) socEl.textContent = `${soc}% (${bessKwh} kWh)`;
+      if (hzEl) {
+        const cliCount = parseInt(currentPlant.total_clientes || 0, 10);
+        hzEl.textContent = cliCount > 0 ? `${cliCount} Ligacoes` : `${parseFloat(tel.tensao_ac_v || 230).toFixed(0)}V / ${parseFloat(tel.frequencia_hz || 50).toFixed(1)}Hz`;
+      }
+      if (radEl) {
+        radEl.textContent = hasAlert ? 'Alarme IoT' : (isOffline ? 'Offline' : `${(tel.provider || 'solarman').toUpperCase()} Live`);
+      }
+      if (modelEl) {
+        modelEl.textContent = `${tel.modelo_inversor || 'Inversor Híbrido'} • SN: ${tel.device_sn}`;
+      }
+      if (statusEl) {
+        if (hasAlert) {
+          statusEl.style.background = '#fee2e2';
+          statusEl.style.color = '#b91c1c';
+          statusEl.style.borderColor = '#fecaca';
+          statusEl.textContent = `● Alarme: ${(tel.alerta_descricao || tel.payload_bruto?.alerta_descricao || 'Verificar Inversor').slice(0, 26)}`;
+        } else if (isOffline) {
+          statusEl.style.background = '#f1f5f9';
+          statusEl.style.color = '#475569';
+          statusEl.style.borderColor = '#cbd5e1';
+          statusEl.textContent = '● Offline / Sem Sinal';
+        } else {
+          statusEl.style.background = '#dcfce7';
+          statusEl.style.color = '#15803d';
+          statusEl.style.borderColor = '#bbf7d0';
+          statusEl.textContent = '● Telemetria Real Ativa';
+        }
+      }
+      return;
+    }
+
+    const baseKw = kwp * 0.82;
+    const estDaily = kwp * 4.88;
+    const estSoc = 88;
+    if (kwEl) kwEl.textContent = `${baseKw.toFixed(1)} kW`;
+    if (vEl) vEl.textContent = `${estDaily.toFixed(1)} kWh`;
+    if (socEl) socEl.textContent = `${estSoc}% (${Math.round((bess * estSoc) / 100)} kWh)`;
+    if (hzEl) hzEl.textContent = `${parseInt(currentPlant.total_clientes || 30, 10)} Clientes`;
+    if (radEl) radEl.textContent = '99.4% Uptime';
+    if (modelEl) modelEl.textContent = 'Sem Datalogger Vinculado (Modo Base)';
+    if (statusEl) {
+      statusEl.style.background = '#dcfce7';
+      statusEl.style.color = '#15803d';
+      statusEl.style.borderColor = '#bbf7d0';
+      statusEl.textContent = '● Activa / Em Operação';
+    }
+  }
+
+  renderCockpitTelemetry();
+
   if (selPlant) {
     selPlant.onchange = (e) => {
       const code = e.target.value;
@@ -1182,19 +1309,15 @@ function initLiveInverterCockpit(plants = []) {
           capacidade_bateria_kwh: 200
         };
       }
-      if (nameEl) nameEl.textContent = currentPlant.nome;
-      const kwEl = document.getElementById('live-inverter-kw');
-      if (kwEl) {
-        const base = parseFloat(currentPlant.capacidade_kwp || 80) * 0.82;
-        kwEl.textContent = `${base.toFixed(1)} kW`;
-      }
+      renderCockpitTelemetry();
     };
   }
 
   const btnOpen = document.getElementById('btn-open-full-scada');
   if (btnOpen) {
     btnOpen.onclick = () => {
-      showInverterLiveModal(currentPlant);
+      const tel = resolvePlantTelemetry(currentPlant);
+      showInverterLiveModal(Object.assign({}, currentPlant, { _telemetry: tel }));
     };
   }
 
@@ -1202,57 +1325,51 @@ function initLiveInverterCockpit(plants = []) {
   if (window._dashInverterTimer) clearInterval(window._dashInverterTimer);
   window._dashInverterTimer = setInterval(() => {
     const kwEl = document.getElementById('live-inverter-kw');
-    const vEl = document.getElementById('live-inverter-v');
-    const hzEl = document.getElementById('live-inverter-hz');
-    const radEl = document.getElementById('live-inverter-rad');
-
     if (!kwEl) {
       clearInterval(window._dashInverterTimer);
       return;
     }
 
-    const baseKw = parseFloat(currentPlant.capacidade_kwp || 85) * 0.78;
-    const variation = (Math.random() * 1.8 - 0.9);
-    const liveKw = Math.max(10, (baseKw + variation)).toFixed(1);
-    const liveDailyKwh = (parseFloat(currentPlant.capacidade_kwp || 85) * 4.88 + (Math.random() * 2 - 1)).toFixed(1);
-    const liveSoc = Math.min(98, Math.max(75, Math.round(88 + (Math.random() * 2 - 1))));
+    const tel = resolvePlantTelemetry(currentPlant);
+    if (tel) {
+      renderCockpitTelemetry();
+    } else {
+      const vEl = document.getElementById('live-inverter-v');
+      const socEl = document.getElementById('live-inverter-soc');
+      const baseKw = parseFloat(currentPlant.capacidade_kwp || 85) * 0.78;
+      const variation = (Math.random() * 1.8 - 0.9);
+      const liveKw = Math.max(10, (baseKw + variation)).toFixed(1);
+      const liveDailyKwh = (parseFloat(currentPlant.capacidade_kwp || 85) * 4.88 + (Math.random() * 2 - 1)).toFixed(1);
+      const liveSoc = Math.min(98, Math.max(75, Math.round(88 + (Math.random() * 2 - 1))));
+      kwEl.textContent = `${liveKw} kW`;
+      if (vEl) vEl.textContent = `${liveDailyKwh} kWh`;
+      if (socEl) socEl.textContent = `${liveSoc}% (${Math.round(liveSoc * 2.1)} kWh)`;
+    }
 
-    kwEl.textContent = `${liveKw} kW`;
-    if (vEl) vEl.textContent = `${liveDailyKwh} kWh`;
-    const socEl = document.getElementById('live-inverter-soc');
-    if (socEl) socEl.textContent = `${liveSoc}% (${Math.round(liveSoc * 2.1)} kWh)`;
-    if (hzEl) hzEl.textContent = `30 Clientes (12 PUE)`;
-    if (radEl) radEl.textContent = `99.4% Uptime`;
-
-    // Atualiza também os cards superiores do Dashboard em tempo real sincronizados com o medidor circular
     const totalPowerEl = document.getElementById('solarman-power-now');
     const gaugeDisplay = document.getElementById('gauge-percent-display');
-    if (totalPowerEl) {
+    const genSummary = AppState.solarmanSummary?.generationSummary;
+    if (totalPowerEl && genSummary && parseFloat(genSummary.installedCapacity || 0) > 0) {
+      const totalGenKw = parseFloat(genSummary.generationPower || 0);
+      const instCap = parseFloat(genSummary.installedCapacity || 1);
+      const pct = Math.min(100, Math.max(0, Math.round((totalGenKw / instCap) * 100)));
+      totalPowerEl.textContent = `${totalGenKw.toFixed(1).replace('.', ',')} kW`;
+      if (gaugeDisplay) {
+        gaugeDisplay.textContent = `${pct}%`;
+        const gaugeParent = gaugeDisplay.closest('.kpi-mini-gauge');
+        if (gaugeParent) gaugeParent.style.setProperty('--gauge-pct', `${pct}%`);
+      }
+    } else if (totalPowerEl) {
       const liveTotalNum = 415.8 + (Math.random() * 4.2 - 2.1);
-      const liveTotalStr = liveTotalNum.toFixed(1).replace('.', ',');
-      totalPowerEl.textContent = `${liveTotalStr} kW`;
+      totalPowerEl.textContent = `${liveTotalNum.toFixed(1).replace('.', ',')} kW`;
       const pct = Math.min(100, Math.max(10, Math.round((liveTotalNum / 600) * 100)));
       if (gaugeDisplay) {
         gaugeDisplay.textContent = `${pct}%`;
         const gaugeParent = gaugeDisplay.closest('.kpi-mini-gauge');
-        if (gaugeParent) {
-          gaugeParent.style.setProperty('--gauge-pct', `${pct}%`);
-        }
+        if (gaugeParent) gaugeParent.style.setProperty('--gauge-pct', `${pct}%`);
       }
     }
-
-    const prodDailyEl = document.getElementById('prod-val-daily');
-    if (prodDailyEl) {
-      const liveDailyNum = Math.round(2645 + (Math.random() * 8));
-      prodDailyEl.textContent = `${liveDailyNum.toLocaleString('pt-MZ')} kWh`;
-    }
-
-    const uptimeEl = document.getElementById('dashboard-uptime-val');
-    if (uptimeEl) {
-      const liveUptime = (99.3 + (Math.random() * 0.2)).toFixed(1);
-      uptimeEl.textContent = `${liveUptime}%`;
-    }
-  }, 2500);
+  }, 5000);
 }
 
 /**
@@ -1422,6 +1539,55 @@ function renderDashboardRankings(miniGrids) {
 }
 
 /**
+ * Normaliza e sanitiza coordenadas no território de Moçambique.
+ * Moçambique localiza-se no Hemisfério Sul (Latitude: -27.5 a -10.0) e Hemisfério Oriental (Longitude: 30.0 a 41.5).
+ * Esta função corrige automaticamente:
+ *  - Formato [lon, lat] vs [lat, lon]
+ *  - Latitudes inseridas sem sinal negativo (ex: 25.4650 -> -25.4650)
+ *  - Longitudes com sinal negativo acidental (ex: -32.8550 -> 32.8550)
+ *  - Inversão completa entre latitude e longitude
+ * Retorna [lat, lon] para Leaflet ou null se inválido.
+ */
+function sanitizeMozCoordinates(c1, c2) {
+  if (c1 === null || c1 === undefined || c1 === '' || c2 === null || c2 === undefined || c2 === '') return null;
+  const n1 = parseFloat(c1);
+  const n2 = parseFloat(c2);
+  if (isNaN(n1) || isNaN(n2)) return null;
+
+  const abs1 = Math.abs(n1);
+  const abs2 = Math.abs(n2);
+
+  let lat = null;
+  let lon = null;
+
+  // Em Moçambique, a latitude em módulo varia entre 10.0° e 27.5° Sul,
+  // enquanto a longitude em módulo varia entre 30.0° e 42.0° Este.
+  if (abs1 >= 10.0 && abs1 <= 27.5 && abs2 >= 30.0 && abs2 <= 42.0) {
+    lat = -abs1;
+    lon = abs2;
+  } else if (abs2 >= 10.0 && abs2 <= 27.5 && abs1 >= 30.0 && abs1 <= 42.0) {
+    lat = -abs2;
+    lon = abs1;
+  } else {
+    // Se estiver ligeiramente fora, usa o menor módulo como latitude (Moçambique)
+    if (abs1 < abs2) {
+      lat = -abs1;
+      lon = abs2;
+    } else {
+      lat = -abs2;
+      lon = abs1;
+    }
+  }
+
+  // Se latitude ou longitude calculada estiver fora do continente austral, descarta
+  if (lat > -9.0 || lat < -28.0 || lon < 29.0 || lon > 43.0) {
+    return null;
+  }
+
+  return [lat, lon];
+}
+
+/**
  * Inicializa a instância do Leaflet.js e renderiza o mapa com enquadramento perfeito e filtros dinâmicos
  */
 async function initLeafletGISMap() {
@@ -1470,16 +1636,16 @@ async function initLeafletGISMap() {
   const markersLayer = L.layerGroup().addTo(map);
   AppState.leafletMarkersLayer = markersLayer;
 
-  // Centrais solares padrão de Moçambique para exibição instantânea sem tela vazia
+  // Centrais solares padrão de Moçambique para exibição instantânea sem tela vazia (Coordenadas Reais Onshore)
   const defaultMozGrids = [
-    { nome: 'Central Solar Fotovoltaica de Morrumbene', codigo: 'MR-INH-001', provincia: 'Inhambane', localidade: 'Morrumbene Sede', coords: [35.35, -23.72], cap: 85, bess: 210, status: 'activa' },
-    { nome: 'Mini-Rede Solar Híbrida de Dondo', codigo: 'MR-SOF-001', provincia: 'Sofala', localidade: 'Savane', coords: [34.74, -19.61], cap: 120, bess: 300, status: 'activa' },
-    { nome: 'Central Solar Comunitária de Ribáuè', codigo: 'MR-NPL-001', provincia: 'Nampula', localidade: 'Iapala', coords: [38.31, -14.96], cap: 95, bess: 240, status: 'activa' },
-    { nome: 'Mini-Rede Solar de Metuge', codigo: 'MR-CDG-001', provincia: 'Cabo Delgado', localidade: 'Mieze', coords: [40.50, -12.99], cap: 70, bess: 180, status: 'activa' },
-    { nome: 'Central Solar de Maluana', codigo: 'MR-MPT-002', provincia: 'Maputo', localidade: 'Maluana', coords: [32.75, -25.42], cap: 75, bess: 190, status: 'activa' },
-    { nome: 'Mini-Rede Solar de Mazivila', codigo: 'MR-GZA-002', provincia: 'Gaza', localidade: 'Mazivila', coords: [33.31, -24.62], cap: 60, bess: 150, status: 'activa' },
-    { nome: 'Mini-Rede Solar de Calanga', codigo: 'MR-MPT-001', provincia: 'Maputo', localidade: 'Calanga', coords: [32.88, -25.26], cap: 50, bess: 120, status: 'activa' },
-    { nome: 'Mini-Rede Comunitária de Muembene', codigo: 'MR-GZA-001', provincia: 'Gaza', localidade: 'Muembene', coords: [33.52, -24.45], cap: 45, bess: 110, status: 'activa' }
+    { nome: 'Central Solar Fotovoltaica de Morrumbene', codigo: 'MR-INH-001', provincia: 'Inhambane', localidade: 'Morrumbene Sede', coords: [35.3180, -23.6650], cap: 85, bess: 210, status: 'activa' },
+    { nome: 'Mini-Rede Solar Híbrida de Dondo', codigo: 'MR-SOF-001', provincia: 'Sofala', localidade: 'Savane', coords: [34.7430, -19.6120], cap: 120, bess: 300, status: 'activa' },
+    { nome: 'Central Solar Comunitária de Ribáuè', codigo: 'MR-NPL-001', provincia: 'Nampula', localidade: 'Iapala', coords: [38.3050, -14.9580], cap: 95, bess: 240, status: 'activa' },
+    { nome: 'Mini-Rede Solar de Metuge', codigo: 'MR-CDG-001', provincia: 'Cabo Delgado', localidade: 'Mieze', coords: [40.3250, -13.0040], cap: 70, bess: 180, status: 'activa' },
+    { nome: 'Central Solar de Maluana', codigo: 'MR-MPT-002', provincia: 'Maputo', localidade: 'Maluana Sede', coords: [32.8520, -25.4050], cap: 75, bess: 190, status: 'activa' },
+    { nome: 'Mini-Rede Solar de Mazivila', codigo: 'MR-GZA-002', provincia: 'Gaza', localidade: 'Mazivila', coords: [33.1250, -24.9520], cap: 60, bess: 150, status: 'activa' },
+    { nome: 'Mini-Rede Solar de Calanga', codigo: 'MR-MPT-001', provincia: 'Maputo', localidade: 'Calanga', coords: [32.8550, -25.4650], cap: 50, bess: 120, status: 'activa' },
+    { nome: 'Mini-Rede Comunitária de Muembene', codigo: 'MR-GZA-001', provincia: 'Gaza', localidade: 'Muembene', coords: [33.5300, -24.6850], cap: 45, bess: 110, status: 'activa' }
   ];
 
   try {
@@ -1536,8 +1702,9 @@ async function initLeafletGISMap() {
 
         const coords = f?.geometry?.coordinates;
         if (!coords || !Array.isArray(coords) || coords.length < 2) return;
-        const [lon, lat] = coords;
-        if (typeof lat !== 'number' || typeof lon !== 'number' || isNaN(lat) || isNaN(lon)) return;
+        const validPair = sanitizeMozCoordinates(coords[0], coords[1]);
+        if (!validPair) return;
+        const [lat, lon] = validPair;
         activeBounds.push([lat, lon]);
 
         const isAct = p.estado_operacional === 'activa';
@@ -1614,8 +1781,9 @@ async function initLeafletGISMap() {
 
         const coords = cf?.geometry?.coordinates;
         if (!coords || !Array.isArray(coords) || coords.length < 2) return;
-        const [cLon, cLat] = coords;
-        if (typeof cLat !== 'number' || typeof cLon !== 'number' || isNaN(cLat) || isNaN(cLon)) return;
+        const validPair = sanitizeMozCoordinates(coords[0], coords[1]);
+        if (!validPair) return;
+        const [cLat, cLon] = validPair;
         activeBounds.push([cLat, cLon]);
 
         let markerColor = '#3b82f6'; // Residencial azul
@@ -2199,12 +2367,14 @@ function showNewMiniGridModal() {
             </div>
             <div class="form-grid-2">
               <div class="form-group">
-                <label class="form-label">Latitude:</label>
-                <input type="number" step="0.00000001" name="latitude" class="form-control" placeholder="-25.123456" required>
+                <label class="form-label">Latitude GPS (Sul):</label>
+                <input type="number" step="0.00000001" name="latitude" class="form-control" placeholder="Ex: -25.4650" required>
+                <small style="color:var(--color-text-muted); font-size:0.75rem;">Moçambique: -27.5 a -10.0</small>
               </div>
               <div class="form-group">
-                <label class="form-label">Longitude:</label>
-                <input type="number" step="0.00000001" name="longitude" class="form-control" placeholder="33.123456" required>
+                <label class="form-label">Longitude GPS (Este):</label>
+                <input type="number" step="0.00000001" name="longitude" class="form-control" placeholder="Ex: 32.8550" required>
+                <small style="color:var(--color-text-muted); font-size:0.75rem;">Moçambique: 30.0 a 41.5</small>
               </div>
             </div>
             <div class="form-grid-2">
@@ -2236,6 +2406,14 @@ function showNewMiniGridModal() {
     e.preventDefault();
     const formData = new FormData(e.target);
     const payload = Object.fromEntries(formData.entries());
+
+    if (payload.latitude && payload.longitude) {
+      const norm = sanitizeMozCoordinates(payload.latitude, payload.longitude);
+      if (norm) {
+        payload.latitude = norm[0];
+        payload.longitude = norm[1];
+      }
+    }
 
     try {
       await apiFetch('/api/mini-grids', {
@@ -2351,7 +2529,7 @@ async function renderClientsView(container) {
             <button id="btn-export-clients" class="btn-outline">
               ${Icons.download(13)} Exportar CSV
             </button>
-            <button id="btn-workflow-connection" class="btn btn-primary" style="background: linear-gradient(135deg, #ff7a00, #ea580c);">
+            <button id="btn-workflow-connection" class="btn btn-primary">
               ${Icons.zap(13)} Nova Ligação (Fluxo Guiado)
             </button>
             <button id="btn-new-client" class="btn-outline">
@@ -2729,6 +2907,11 @@ function showClientDetailsModal(c) {
                 <span class="status-dot-badge active"><span class="status-dot"></span> Operacional &bull; Calibrado</span>
               </div>
             </div>
+
+            <!-- Inversor / Datalogger SolarMAN Pro Vinculado ao Cliente -->
+            <div id="client-dossier-inverter-box" style="margin-top: 1rem;">
+              <div class="alert alert-info" style="margin:0;">A verificar inversor / datalogger SolarMAN Pro associado...</div>
+            </div>
           </div>
 
           <!-- Aba 3: Contrato, Tarifa e Potência Contratada -->
@@ -3018,6 +3201,9 @@ function showClientDetailsModal(c) {
     }
   });
 
+  // Carrega dados reais do inversor / datalogger SolarMAN vinculado ao cliente
+  loadClientInverterTelemetry(c);
+
   document.getElementById('btn-modal-client-map')?.addEventListener('click', () => {
     modalContainer.innerHTML = '';
     window.location.hash = '#dashboard';
@@ -3028,6 +3214,81 @@ function showClientDetailsModal(c) {
       }
     }, 350);
   });
+}
+
+async function loadClientInverterTelemetry(c) {
+  const box = document.getElementById('client-dossier-inverter-box');
+  if (!box) return;
+
+  try {
+    const res = await apiFetch(`/api/telemetry/devices?client_id=${encodeURIComponent(c.id)}`);
+    const devices = res?.data?.devices || [];
+
+    if (devices.length === 0) {
+      box.innerHTML = `
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+          <div>
+            <div style="font-size:13px; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:6px;">
+              ${Icons.sun(14)} Inversor &amp; Telemetria SolarMAN Pro
+            </div>
+            <div style="font-size:12px; color:#64748b;">
+              Esta instalação consome energia da central <strong>${c.mini_grid_codigo}</strong> e ainda não possui um inversor próprio vinculado diretamente.
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm btn-primary" id="btn-link-client-inverter">
+            ${Icons.plus(13)} Vincular Inversor SolarMAN a este Cliente
+          </button>
+        </div>
+      `;
+    } else {
+      const dev = devices[0];
+      const isAlert = Boolean(dev.alerta_activo || dev.estado_comunicacao === 'alarme');
+      box.innerHTML = `
+        <div style="background:#fff7ed; border:1px solid #fed7aa; border-radius:8px; padding:12px 14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <strong style="font-size:13px; color:#0f172a;">${Icons.activity(14)} Inversor / Datalogger SolarMAN Vinculado</strong>
+              <span class="code-pill">${dev.device_sn}</span>
+              ${dev.logger_sn ? `<span class="tag-pill tech">Logger: ${dev.logger_sn}</span>` : ''}
+            </div>
+            <span class="status-dot-badge ${isAlert ? 'danger' : 'active'}">
+              <span class="status-dot"></span> ${dev.estado_comunicacao}
+            </span>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:8px; font-size:12px; margin-bottom:10px;">
+            <div><span style="color:#64748b; display:block;">Potência Ativa</span><strong style="color:#ea580c;">${parseFloat(dev.potencia_activa_kw || 0).toFixed(1)} kW</strong></div>
+            <div><span style="color:#64748b; display:block;">Energia Hoje</span><strong>${parseFloat(dev.energia_hoje_kwh || 0).toFixed(1)} kWh</strong></div>
+            <div><span style="color:#64748b; display:block;">Bateria BESS</span><strong style="color:#16a34a;">${Math.round(parseFloat(dev.bateria_soc_pct || 0))}% SoC</strong></div>
+            <div><span style="color:#64748b; display:block;">Modelo</span><strong>${dev.modelo_inversor || 'SolarMAN'}</strong></div>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-sm btn-primary" id="btn-open-client-scada">
+              ${Icons.activity(12)} Abrir Cockpit SCADA
+            </button>
+            <button type="button" class="btn btn-sm btn-outline" id="btn-link-client-inverter">
+              ${Icons.plus(12)} Vincular Outro Inversor
+            </button>
+          </div>
+        </div>
+      `;
+      document.getElementById('btn-open-client-scada')?.addEventListener('click', () => {
+        showInverterLiveModal({
+          id: dev.mini_grid_id,
+          nome: `${c.nome_completo} (${dev.mini_grid_codigo})`,
+          codigo: dev.mini_grid_codigo,
+          capacidade_kwp: dev.potencia_nominal_kw,
+          capacidade_bateria_kwh: dev.capacidade_bateria_kwh || 100,
+          _telemetry: dev
+        });
+      });
+    }
+
+    document.getElementById('btn-link-client-inverter')?.addEventListener('click', () => {
+      showRegisterInverterModal(c.id, c.mini_grid_id, () => loadClientInverterTelemetry(c));
+    });
+  } catch (err) {
+    box.innerHTML = `<div class="alert alert-error" style="margin:0;">Erro ao verificar telemetria do cliente: ${err.message}</div>`;
+  }
 }
 
 async function showNewClientModal() {
@@ -3094,12 +3355,14 @@ async function showNewClientModal() {
             </div>
             <div class="form-grid-2">
               <div class="form-group">
-                <label class="form-label">Latitude GPS:</label>
-                <input type="number" step="0.00000001" name="latitude" class="form-control" placeholder="-25.789123">
+                <label class="form-label">Latitude GPS (Sul):</label>
+                <input type="number" step="0.00000001" name="latitude" class="form-control" placeholder="Ex: -25.4645">
+                <small style="color:var(--color-text-muted); font-size:0.75rem;">Moçambique: -27.5 a -10.0</small>
               </div>
               <div class="form-group">
-                <label class="form-label">Longitude GPS:</label>
-                <input type="number" step="0.00000001" name="longitude" class="form-control" placeholder="32.456789">
+                <label class="form-label">Longitude GPS (Este):</label>
+                <input type="number" step="0.00000001" name="longitude" class="form-control" placeholder="Ex: 32.8545">
+                <small style="color:var(--color-text-muted); font-size:0.75rem;">Moçambique: 30.0 a 41.5</small>
               </div>
             </div>
           </div>
@@ -3117,6 +3380,14 @@ async function showNewClientModal() {
     e.preventDefault();
     const formData = new FormData(e.target);
     const payload = Object.fromEntries(formData.entries());
+
+    if (payload.latitude && payload.longitude) {
+      const norm = sanitizeMozCoordinates(payload.latitude, payload.longitude);
+      if (norm) {
+        payload.latitude = norm[0];
+        payload.longitude = norm[1];
+      }
+    }
 
     // Se estiver offline no terreno, guarda localmente via IndexedDB
     if (!navigator.onLine && window.GridOpsOffline) {
@@ -3666,7 +3937,7 @@ async function renderMetersView(container) {
             <button id="btn-import-csv" class="btn-outline">
               ${Icons.download(13)} Importar Ficheiro CSV
             </button>
-            <button id="btn-new-reading" class="btn btn-primary" style="background: linear-gradient(135deg, #ff7a00, #ea580c);">
+            <button id="btn-new-reading" class="btn btn-primary">
               ${Icons.zap(13)} Registar Leitura
             </button>
             <button id="btn-new-meter" class="btn-outline">
@@ -4014,6 +4285,14 @@ async function showNewReadingModal(preselectedMeterId = null) {
     e.preventDefault();
     const formData = new FormData(e.target);
     const payload = Object.fromEntries(formData.entries());
+
+    if (payload.latitude && payload.longitude) {
+      const norm = sanitizeMozCoordinates(payload.latitude, payload.longitude);
+      if (norm) {
+        payload.latitude = norm[0];
+        payload.longitude = norm[1];
+      }
+    }
     payload.ignorar_aviso_decrescente = document.getElementById('chk-force').checked;
 
     if (!navigator.onLine && window.GridOpsOffline) {
@@ -4193,7 +4472,7 @@ async function renderPaymentsView(container) {
             <button id="btn-export-payments" class="btn-outline">
               ${Icons.download(13)} Exportar Extrato CSV
             </button>
-            <button id="btn-workflow-reading-billing" class="btn btn-primary" style="background: linear-gradient(135deg, #059669, #047857);">
+            <button id="btn-workflow-reading-billing" class="btn btn-success">
               ${Icons.zap(13)} Leitura &amp; Cobrança (Fluxo Guiado)
             </button>
             <button id="btn-new-payment" class="btn-outline">
@@ -4565,6 +4844,14 @@ async function showNewPaymentModal() {
     e.preventDefault();
     const formData = new FormData(e.target);
     const payload = Object.fromEntries(formData.entries());
+
+    if (payload.latitude && payload.longitude) {
+      const norm = sanitizeMozCoordinates(payload.latitude, payload.longitude);
+      if (norm) {
+        payload.latitude = norm[0];
+        payload.longitude = norm[1];
+      }
+    }
     payload.auto_confirmar = document.getElementById('chk-auto-confirm').checked;
 
     try {
@@ -5209,6 +5496,14 @@ async function showAssignWorkOrderModal(id, code) {
     e.preventDefault();
     const formData = new FormData(e.target);
     const payload = Object.fromEntries(formData.entries());
+
+    if (payload.latitude && payload.longitude) {
+      const norm = sanitizeMozCoordinates(payload.latitude, payload.longitude);
+      if (norm) {
+        payload.latitude = norm[0];
+        payload.longitude = norm[1];
+      }
+    }
     payload.tecnico_id = parseInt(payload.tecnico_id, 10);
 
     try {
@@ -5363,6 +5658,14 @@ async function showNewWorkOrderModal() {
     const formData = new FormData(e.target);
     const payload = Object.fromEntries(formData.entries());
 
+    if (payload.latitude && payload.longitude) {
+      const norm = sanitizeMozCoordinates(payload.latitude, payload.longitude);
+      if (norm) {
+        payload.latitude = norm[0];
+        payload.longitude = norm[1];
+      }
+    }
+
     if (!navigator.onLine && window.GridOpsOffline) {
       await window.GridOpsOffline.saveWorkOrder(payload);
       modalContainer.innerHTML = '';
@@ -5456,18 +5759,23 @@ async function renderAuditLogsView(container) {
   }
 
   container.innerHTML = `
-    <div class="card">
-      <div class="card-header">
-        <div>
-          <h2 class="card-title">${Icons.shield(20)} Trilha de Auditoria Imutável (Audit Logs)</h2>
-          <span style="font-size:0.88rem; color: var(--color-text-muted);">
-            Registo legal e não editável de operações para conformidade regulatória (ARENE/FUNAE)
-          </span>
+    <div class="lecasu-page-workspace">
+      <div class="workspace-card card">
+        <div class="workspace-header card-header">
+          <div class="workspace-title-box">
+            <div class="workspace-title-line">
+              <h2 class="workspace-title card-title">${Icons.shield(18)} Trilha de Auditoria Imutável (Audit Logs)</h2>
+              <span class="workspace-count-badge">Conformidade ARENE / FUNAE</span>
+            </div>
+            <span class="workspace-subtitle">
+              Registo legal e não editável de operações para conformidade regulatória e rastreabilidade total
+            </span>
+          </div>
         </div>
-      </div>
-      <div class="card-body">
-        <div id="audit-table-container">
-          <p style="color: var(--color-text-muted);">A carregar registos de auditoria...</p>
+        <div class="card-body">
+          <div id="audit-table-container">
+            <p style="color: var(--color-text-muted);">A carregar registos de auditoria...</p>
+          </div>
         </div>
       </div>
     </div>
@@ -6500,7 +6808,8 @@ function showInverterLiveModal(mg) {
   }
 
   const modalContainer = document.getElementById('modal-container');
-  const cap = parseFloat(mg.capacidade_kwp || 50);
+  const realTelInitial = mg._telemetry || resolvePlantTelemetry(mg) || null;
+  const cap = parseFloat(mg.capacidade_kwp || realTelInitial?.potencia_nominal_kw || 50);
   const bess = parseFloat(mg.capacidade_bateria_kwh || 100);
 
   const inverterModels = {
@@ -6514,13 +6823,62 @@ function showInverterLiveModal(mg) {
     'PV-MALU-008': { model: 'Huawei SUN2000-50KTL-M3', sn: 'HW2026-SN55021', rated: '50 kW' }
   };
 
-  const invInfo = inverterModels[mg.codigo] || {
+  const fallbackInfo = inverterModels[mg.codigo] || {
     model: 'Huawei SUN2000 Inversor Híbrido Rural',
     sn: `SN-2026-${mg.id || '01'}9921`,
     rated: `${cap} kWp`
   };
 
+  const invInfo = realTelInitial ? {
+    model: realTelInitial.modelo_inversor || fallbackInfo.model,
+    sn: realTelInitial.device_sn || fallbackInfo.sn,
+    loggerSn: realTelInitial.logger_sn || '--',
+    provider: (realTelInitial.provider || 'solarman').toUpperCase(),
+    rated: `${realTelInitial.potencia_nominal_kw || cap} kWp`,
+    sourceLabel: `PostgreSQL • ${realTelInitial.provider ? realTelInitial.provider.toUpperCase() : 'SOLARMAN'}`
+  } : {
+    ...fallbackInfo,
+    loggerSn: '--',
+    provider: 'BASE',
+    sourceLabel: 'Modo Base (Sem Datalogger Vinculado)'
+  };
+
   function computeLiveStats() {
+    const liveTel = mg._telemetry || resolvePlantTelemetry(mg) || realTelInitial;
+    if (liveTel) {
+      const kwNum = parseFloat(liveTel.potencia_activa_kw || 0);
+      const vBase = parseFloat(liveTel.tensao_ac_v || 230.0);
+      const hzNum = parseFloat(liveTel.frequencia_hz || 50.0);
+      const vdcNum = parseFloat(liveTel.tensao_dc_v || 625.0);
+      const idcNum = vdcNum > 0 ? (kwNum * 1000) / vdcNum : 0;
+      const socNum = Math.min(100, Math.max(0, Math.round(parseFloat(liveTel.bateria_soc_pct || 0))));
+      const tempNum = parseFloat(liveTel.temperatura_c || 38.5);
+      const ampsNum = parseFloat(liveTel.corrente_ac_a || 0) || (kwNum > 0 ? (kwNum * 1000 / 400 / 1.732) : 0);
+      const dailyNum = parseFloat(liveTel.energia_hoje_kwh || 0);
+      const hasAlert = Boolean(liveTel.alerta_activo) || ['alarme', 'alerta'].includes(liveTel.estado_comunicacao);
+      const isOffline = liveTel.estado_comunicacao === 'offline';
+
+      return {
+        isReal: true,
+        hasAlert,
+        isOffline,
+        alertDesc: liveTel.alerta_descricao || liveTel.payload_bruto?.alerta_descricao || '',
+        lastComm: liveTel.ultima_leitura || liveTel.updated_at || null,
+        kw: kwNum.toFixed(1),
+        vL1: vBase.toFixed(1),
+        vL2: (vBase - 0.3).toFixed(1),
+        vL3: (vBase + 0.6).toFixed(1),
+        hz: hzNum.toFixed(2),
+        vdc: vdcNum.toFixed(1),
+        idc: idcNum.toFixed(1),
+        soc: socNum,
+        temp: tempNum.toFixed(1),
+        amps: ampsNum.toFixed(1),
+        dailyKwh: dailyNum.toFixed(1),
+        cosPhi: '0.99'
+      };
+    }
+
     const now = new Date();
     const hour = now.getHours() + now.getMinutes() / 60;
     let sunFactor = 0.82;
@@ -6541,11 +6899,15 @@ function showInverterLiveModal(mg) {
     const dailyKwh = (cap * 4.6 + (Math.random() * 4)).toFixed(1);
     const cosPhi = (0.98 + (Math.random() - 0.5) * 0.02).toFixed(2);
 
-    return { kw, vL1, vL2, vL3, hz, vdc, idc, soc, temp, amps, dailyKwh, cosPhi };
+    return { isReal: false, hasAlert: false, isOffline: false, alertDesc: '', kw, vL1, vL2, vL3, hz, vdc, idc, soc, temp, amps, dailyKwh, cosPhi };
   }
 
   const s = computeLiveStats();
   const now = new Date();
+  const initialStatusColor = s.hasAlert ? '#dc2626' : (s.isOffline ? '#64748b' : '#15803d');
+  const initialStatusText = s.hasAlert
+    ? `ALARME IOT: ${s.alertDesc || 'Verificar Inversor'}`
+    : (s.isOffline ? 'Offline / Sem Comunicação' : (s.isReal ? 'Telemetria Real Sincronizada' : 'Operação Normal (Modo Base)'));
 
   modalContainer.innerHTML = `
     <div class="modal-backdrop">
@@ -6560,7 +6922,7 @@ function showInverterLiveModal(mg) {
                 Telemetria do Inversor em Tempo Real &bull; ${mg.nome}
               </h3>
               <span style="font-size:0.82rem; color:#64748b;">
-                ${invInfo.model} &bull; S/N: ${invInfo.sn} &bull; Protocolo Modbus TCP / MQTT 4G
+                ${invInfo.model} &bull; S/N: ${invInfo.sn} &bull; Logger: ${invInfo.loggerSn} (${invInfo.sourceLabel})
               </span>
             </div>
           </div>
@@ -6638,15 +7000,15 @@ function showInverterLiveModal(mg) {
               <span style="font-size:0.78rem; color:#64748b; font-weight:700; text-transform:uppercase; display:block; margin-bottom:0.4rem;">Comunicação &amp; Telemetria</span>
               <div style="font-size:0.84rem; display:flex; justify-content:space-between; margin-bottom:3px;">
                 <span style="color:#64748b;">Canal de Transmissão:</span>
-                <strong style="color:#0f172a;">Gateway IoT 4G / MZN-01</strong>
+                <strong style="color:#0f172a;">${invInfo.provider} / API &amp; IoT</strong>
               </div>
               <div style="font-size:0.84rem; display:flex; justify-content:space-between; margin-bottom:3px;">
                 <span style="color:#64748b;">Localização Geográfica:</span>
                 <strong style="color:#0284c7;">${mg.distrito || 'Moçambique'} (${mg.provincia || 'Rural'})</strong>
               </div>
               <div style="font-size:0.84rem; display:flex; justify-content:space-between;">
-                <span style="color:#64748b;">Disponibilidade da Ligação:</span>
-                <strong style="color:#16a34a;" id="live-ping">Online (Excelente)</strong>
+                <span style="color:#64748b;">Estado da Ligação:</span>
+                <strong style="color:${initialStatusColor};" id="live-ping">${s.hasAlert ? 'Alarme Ativo' : (s.isOffline ? 'Offline' : (s.isReal ? 'Sincronizado (BD)' : 'Online (Base)'))}</strong>
               </div>
             </div>
           </div>
@@ -6660,7 +7022,7 @@ function showInverterLiveModal(mg) {
               <span style="font-size:0.76rem; color:#94a3b8;" id="live-stream-counter">Registo #14.285</span>
             </div>
             <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:0.5rem; max-height:110px; overflow-y:auto; font-size:0.82rem; color:#334155;" id="inv-live-stream-log">
-              <div style="color:#15803d; font-weight:500;">[${now.toLocaleTimeString()}] Telemetria Sincronizada: Potência Ativa = ${s.kw} kW | BESS = ${s.soc}% | Geração Diária = ${s.dailyKwh} kWh | Operação Normal</div>
+              <div style="color:${initialStatusColor}; font-weight:500;">[${now.toLocaleTimeString()}] ${initialStatusText}: Potência Ativa = ${s.kw} kW | BESS = ${s.soc}% | Geração Diária = ${s.dailyKwh} kWh</div>
             </div>
           </div>
         </div>
@@ -6692,6 +7054,50 @@ function showInverterLiveModal(mg) {
   };
   if (origClose) origClose.addEventListener('click', stopTimer);
   if (origCancel) origCancel.addEventListener('click', stopTimer);
+
+  const btnExportTelemetry = modalContainer.querySelector('#btn-export-telemetry');
+  if (btnExportTelemetry) {
+    btnExportTelemetry.onclick = () => {
+      const snap = computeLiveStats();
+      const logLines = Array.from(modalContainer.querySelectorAll('#inv-live-stream-log > div'))
+        .map(el => el.textContent.trim());
+      const esc = (val) => `"${String(val ?? '').replace(/"/g, '""')}"`;
+      const rows = [
+        ['Central', 'Codigo', 'Modelo_Inversor', 'Device_SN', 'Logger_SN', 'Provider', 'Potencia_kW', 'Energia_Hoje_kWh', 'Bateria_SoC_pct', 'Tensao_AC_V', 'Frequencia_Hz', 'Tensao_DC_V', 'Temp_C', 'Estado', 'Registo_Log'].join(',')
+      ];
+      const stateLabel = snap.hasAlert ? `Alarme: ${snap.alertDesc}` : (snap.isOffline ? 'Offline' : 'Online');
+      (logLines.length ? logLines : ['Sem linhas registadas']).forEach(line => {
+        rows.push([
+          mg.nome || '',
+          mg.codigo || '',
+          invInfo.model || '',
+          invInfo.sn || '',
+          invInfo.loggerSn || '',
+          invInfo.provider || '',
+          snap.kw,
+          snap.dailyKwh,
+          snap.soc,
+          snap.vL1,
+          snap.hz,
+          snap.vdc,
+          snap.temp,
+          stateLabel,
+          line
+        ].map(esc).join(','));
+      });
+      const csvContent = '\uFEFF' + rows.join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `telemetria-${(invInfo.sn || mg.codigo || 'inversor').replace(/[^a-zA-Z0-9_-]/g, '_')}-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      if (typeof showToast === 'function') showToast('Logs de telemetria exportados em CSV.', 'success');
+    };
+  }
 
   let frameCount = 14285;
   inverterLiveTimer = setInterval(() => {
@@ -6736,7 +7142,18 @@ function showInverterLiveModal(mg) {
     if (elIdc) elIdc.textContent = `${update.idc} A`;
 
     const elPing = document.getElementById('live-ping');
-    if (elPing) elPing.textContent = `${Math.round(24 + (Math.random() * 6))} ms (Excelente)`;
+    if (elPing) {
+      if (update.hasAlert) {
+        elPing.style.color = '#dc2626';
+        elPing.textContent = 'Alarme IoT Ativo';
+      } else if (update.isOffline) {
+        elPing.style.color = '#64748b';
+        elPing.textContent = 'Offline / Sem Sinal';
+      } else {
+        elPing.style.color = '#16a34a';
+        elPing.textContent = update.isReal ? 'Sincronizado (BD)' : `${Math.round(24 + (Math.random() * 6))} ms (Excelente)`;
+      }
+    }
 
     const elCounter = document.getElementById('live-stream-counter');
     if (elCounter) elCounter.textContent = `Frame #${frameCount.toLocaleString()}`;
@@ -6745,9 +7162,13 @@ function showInverterLiveModal(mg) {
     if (logDiv) {
       const timeStr = new Date().toLocaleTimeString();
       const newEntry = document.createElement('div');
-      newEntry.style.color = '#15803d';
+      const statusColor = update.hasAlert ? '#dc2626' : (update.isOffline ? '#64748b' : '#15803d');
+      const statusMsg = update.hasAlert
+        ? `ALARME: ${update.alertDesc || 'Verificar Inversor'}`
+        : (update.isOffline ? 'Sem Comunicação' : (update.isReal ? 'Sincronizado (BD)' : 'Operação Normal'));
+      newEntry.style.color = statusColor;
       newEntry.style.fontWeight = '500';
-      newEntry.textContent = `[${timeStr}] Telemetria Sincronizada: Potência Ativa = ${update.kw} kW | BESS = ${update.soc}% | Geração = ${update.dailyKwh} kWh | Operação Normal`;
+      newEntry.textContent = `[${timeStr}] Telemetria: Potência = ${update.kw} kW | BESS = ${update.soc}% | Geração = ${update.dailyKwh} kWh | ${statusMsg}`;
       logDiv.prepend(newEntry);
       if (logDiv.children.length > 8) logDiv.removeChild(logDiv.lastChild);
     }
@@ -7119,8 +7540,9 @@ async function initGeneralGISMap() {
       mgGis.data.features.forEach(f => {
         const coords = f?.geometry?.coordinates;
         if (!coords || !Array.isArray(coords) || coords.length < 2) return;
-        const [lon, lat] = coords;
-        if (typeof lat !== 'number' || typeof lon !== 'number' || isNaN(lat) || isNaN(lon)) return;
+        const validPair = sanitizeMozCoordinates(coords[0], coords[1]);
+        if (!validPair) return;
+        const [lat, lon] = validPair;
         bounds.push([lat, lon]);
 
         const p = f.properties || {};
@@ -7187,8 +7609,9 @@ async function initGeneralGISMap() {
       clientsGis.data.features.forEach(f => {
         const coords = f?.geometry?.coordinates;
         if (!coords || !Array.isArray(coords) || coords.length < 2) return;
-        const [lon, lat] = coords;
-        if (typeof lat !== 'number' || typeof lon !== 'number' || isNaN(lat) || isNaN(lon)) return;
+        const validPair = sanitizeMozCoordinates(coords[0], coords[1]);
+        if (!validPair) return;
+        const [lat, lon] = validPair;
         bounds.push([lat, lon]);
 
         const p = f.properties || {};
@@ -7715,6 +8138,14 @@ async function showNewContractModal() {
     const formData = new FormData(e.target);
     const payload = Object.fromEntries(formData.entries());
 
+    if (payload.latitude && payload.longitude) {
+      const norm = sanitizeMozCoordinates(payload.latitude, payload.longitude);
+      if (norm) {
+        payload.latitude = norm[0];
+        payload.longitude = norm[1];
+      }
+    }
+
     try {
       await apiFetch('/api/contracts', {
         method: 'POST',
@@ -7815,6 +8246,14 @@ async function showConnectionManagementModal(contract) {
     e.preventDefault();
     const formData = new FormData(e.target);
     const payload = Object.fromEntries(formData.entries());
+
+    if (payload.latitude && payload.longitude) {
+      const norm = sanitizeMozCoordinates(payload.latitude, payload.longitude);
+      if (norm) {
+        payload.latitude = norm[0];
+        payload.longitude = norm[1];
+      }
+    }
 
     try {
       await apiFetch(`/api/contracts/${contract.id}`, {
@@ -8381,6 +8820,14 @@ async function showNewAssetModal() {
     const formData = new FormData(e.target);
     const payload = Object.fromEntries(formData.entries());
 
+    if (payload.latitude && payload.longitude) {
+      const norm = sanitizeMozCoordinates(payload.latitude, payload.longitude);
+      if (norm) {
+        payload.latitude = norm[0];
+        payload.longitude = norm[1];
+      }
+    }
+
     try {
       await apiFetch('/api/assets', {
         method: 'POST',
@@ -8557,6 +9004,14 @@ async function showPreventativeMaintenanceModal(asset) {
     const formData = new FormData(e.target);
     const payload = Object.fromEntries(formData.entries());
 
+    if (payload.latitude && payload.longitude) {
+      const norm = sanitizeMozCoordinates(payload.latitude, payload.longitude);
+      if (norm) {
+        payload.latitude = norm[0];
+        payload.longitude = norm[1];
+      }
+    }
+
     try {
       await apiFetch('/api/work-orders', {
         method: 'POST',
@@ -8645,6 +9100,14 @@ async function showNewMeterModal() {
     e.preventDefault();
     const formData = new FormData(e.target);
     const payload = Object.fromEntries(formData.entries());
+
+    if (payload.latitude && payload.longitude) {
+      const norm = sanitizeMozCoordinates(payload.latitude, payload.longitude);
+      if (norm) {
+        payload.latitude = norm[0];
+        payload.longitude = norm[1];
+      }
+    }
     if (!payload.client_id) delete payload.client_id;
 
     try {
@@ -9099,6 +9562,14 @@ async function showNewUserModal() {
     const formData = new FormData(e.target);
     const payload = Object.fromEntries(formData.entries());
 
+    if (payload.latitude && payload.longitude) {
+      const norm = sanitizeMozCoordinates(payload.latitude, payload.longitude);
+      if (norm) {
+        payload.latitude = norm[0];
+        payload.longitude = norm[1];
+      }
+    }
+
     try {
       await apiFetch('/api/users', {
         method: 'POST',
@@ -9176,41 +9647,51 @@ async function renderSettingsView(container) {
   }
 
   container.innerHTML = `
-    <div class="card" style="display: flex; flex-direction: column; height: 100%; flex: 1; min-height: 0; overflow: hidden;">
-      <div class="card-header" style="flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;">
-        <div>
-          <h2 class="card-title">${Icons.settings(20)} Configurações de Categorias, Tarifas & Notificações</h2>
-          <span style="font-size:0.88rem; color: var(--color-text-muted);">
-            Parametrização comercial, modelo tarifário por escalões e integração de canais de comunicação
-          </span>
+    <div class="lecasu-page-workspace">
+      <div class="workspace-card card">
+        <div class="workspace-header card-header">
+          <div class="workspace-title-box">
+            <div class="workspace-title-line">
+              <h2 class="workspace-title card-title">${Icons.settings(18)} Configurações de Categorias, Tarifas &amp; Notificações</h2>
+              <span class="workspace-count-badge">Parametrização do Sistema</span>
+            </div>
+            <span class="workspace-subtitle">
+              Parametrização comercial, modelo tarifário por escalões, integrações e manutenção de dados
+            </span>
+          </div>
+          <div class="workspace-actions">
+            <button type="button" class="btn btn-sm btn-danger" id="btn-quick-reset-system" title="Restaurar dados padrão de demonstração">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+              Resetar o Sistema
+            </button>
+          </div>
         </div>
-        <button type="button" class="btn btn-sm" id="btn-quick-reset-system" style="background:#fef2f2; color:#b91c1c; border:1px solid #fca5a5; font-weight:700; display:inline-flex; align-items:center; gap:0.4rem; padding:0.4rem 0.85rem; border-radius:6px; cursor:pointer;" title="Restaurar dados padrão de demonstração">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
-          Resetar o Sistema
-        </button>
-      </div>
 
-      <div class="card-tabs-header">
-        <button class="card-tab-btn ${currentSettingsSubTab === 'tariffs' ? 'active' : ''}" id="tab-btn-tariffs">
-          ${Icons.creditCard(14)} Estrutura Tarifária
-        </button>
-        <button class="card-tab-btn ${currentSettingsSubTab === 'categories' ? 'active' : ''}" id="tab-btn-categories">
-          ${Icons.users(14)} Categorias & Usos Produtivos (PUE)
-        </button>
-        <button class="card-tab-btn ${currentSettingsSubTab === 'gateways' ? 'active' : ''}" id="tab-btn-gateways">
-          ${Icons.zap(14)} Canais & Gateways de Notificação
-        </button>
-        <button class="card-tab-btn ${currentSettingsSubTab === 'integrations' ? 'active' : ''}" id="tab-btn-integrations">
-          ${Icons.layers(14)} Matriz de Integrações Estratégicas
-        </button>
-        <button class="card-tab-btn ${currentSettingsSubTab === 'system' ? 'active' : ''}" id="tab-btn-system">
-          ${Icons.database(14)} Base de Dados & Manutenção
-        </button>
-      </div>
+        <div class="card-tabs-header">
+          <button class="card-tab-btn ${currentSettingsSubTab === 'tariffs' ? 'active' : ''}" id="tab-btn-tariffs">
+            ${Icons.creditCard(14)} Estrutura Tarifária
+          </button>
+          <button class="card-tab-btn ${currentSettingsSubTab === 'categories' ? 'active' : ''}" id="tab-btn-categories">
+            ${Icons.users(14)} Categorias &amp; Usos Produtivos (PUE)
+          </button>
+          <button class="card-tab-btn ${currentSettingsSubTab === 'gateways' ? 'active' : ''}" id="tab-btn-gateways">
+            ${Icons.zap(14)} Canais &amp; Gateways de Notificação
+          </button>
+          <button class="card-tab-btn ${currentSettingsSubTab === 'integrations' ? 'active' : ''}" id="tab-btn-integrations">
+            ${Icons.layers(14)} Matriz de Integrações Estratégicas
+          </button>
+          <button class="card-tab-btn ${currentSettingsSubTab === 'solarman' ? 'active' : ''}" id="tab-btn-solarman">
+            ${Icons.sun(14)} SolarMAN Pro &amp; Telemetria IoT
+          </button>
+          <button class="card-tab-btn ${currentSettingsSubTab === 'system' ? 'active' : ''}" id="tab-btn-system">
+            ${Icons.database(14)} Base de Dados &amp; Manutenção
+          </button>
+        </div>
 
-      <div class="card-body" style="flex: 1; min-height: 0; display: flex; flex-direction: column; overflow-y: auto; padding: 1rem;">
-        <div id="settings-subview-content" style="flex: 1; min-height: 0;">
-          <p style="color: var(--color-text-muted);">A carregar configurações...</p>
+        <div class="card-body">
+          <div id="settings-subview-content">
+            <p style="color: var(--color-text-muted);">A carregar configurações...</p>
+          </div>
         </div>
       </div>
     </div>
@@ -9218,61 +9699,30 @@ async function renderSettingsView(container) {
 
   document.getElementById('btn-quick-reset-system')?.addEventListener('click', triggerSystemResetModal);
 
-  document.getElementById('tab-btn-tariffs')?.addEventListener('click', () => {
-    currentSettingsSubTab = 'tariffs';
-    document.getElementById('tab-btn-tariffs')?.classList.add('active');
-    document.getElementById('tab-btn-categories')?.classList.remove('active');
-    document.getElementById('tab-btn-gateways')?.classList.remove('active');
-    document.getElementById('tab-btn-integrations')?.classList.remove('active');
-    document.getElementById('tab-btn-system')?.classList.remove('active');
-    loadTariffsTabContent();
+  const settingsTabLoaders = {
+    tariffs: loadTariffsTabContent,
+    categories: loadCategoriesTabContent,
+    gateways: loadGatewaysTabContent,
+    integrations: loadIntegrationsTabContent,
+    solarman: loadSolarmanTelemetryTabContent,
+    system: loadSystemMaintenanceTabContent
+  };
+
+  function activateSettingsTab(tabKey) {
+    const resolved = settingsTabLoaders[tabKey] ? tabKey : 'gateways';
+    currentSettingsSubTab = resolved;
+    Object.keys(settingsTabLoaders).forEach(key => {
+      const btn = document.getElementById(`tab-btn-${key}`);
+      if (btn) btn.classList.toggle('active', key === resolved);
+    });
+    settingsTabLoaders[resolved]();
+  }
+
+  Object.keys(settingsTabLoaders).forEach(key => {
+    document.getElementById(`tab-btn-${key}`)?.addEventListener('click', () => activateSettingsTab(key));
   });
 
-  document.getElementById('tab-btn-categories')?.addEventListener('click', () => {
-    currentSettingsSubTab = 'categories';
-    document.getElementById('tab-btn-tariffs')?.classList.remove('active');
-    document.getElementById('tab-btn-categories')?.classList.add('active');
-    document.getElementById('tab-btn-gateways')?.classList.remove('active');
-    document.getElementById('tab-btn-integrations')?.classList.remove('active');
-    document.getElementById('tab-btn-system')?.classList.remove('active');
-    loadCategoriesTabContent();
-  });
-
-  document.getElementById('tab-btn-gateways')?.addEventListener('click', () => {
-    currentSettingsSubTab = 'gateways';
-    document.getElementById('tab-btn-tariffs')?.classList.remove('active');
-    document.getElementById('tab-btn-categories')?.classList.remove('active');
-    document.getElementById('tab-btn-gateways')?.classList.add('active');
-    document.getElementById('tab-btn-integrations')?.classList.remove('active');
-    document.getElementById('tab-btn-system')?.classList.remove('active');
-    loadGatewaysTabContent();
-  });
-
-  document.getElementById('tab-btn-integrations')?.addEventListener('click', () => {
-    currentSettingsSubTab = 'integrations';
-    document.getElementById('tab-btn-tariffs')?.classList.remove('active');
-    document.getElementById('tab-btn-categories')?.classList.remove('active');
-    document.getElementById('tab-btn-gateways')?.classList.remove('active');
-    document.getElementById('tab-btn-integrations')?.classList.add('active');
-    document.getElementById('tab-btn-system')?.classList.remove('active');
-    loadIntegrationsTabContent();
-  });
-
-  document.getElementById('tab-btn-system')?.addEventListener('click', () => {
-    currentSettingsSubTab = 'system';
-    document.getElementById('tab-btn-tariffs')?.classList.remove('active');
-    document.getElementById('tab-btn-categories')?.classList.remove('active');
-    document.getElementById('tab-btn-gateways')?.classList.remove('active');
-    document.getElementById('tab-btn-integrations')?.classList.remove('active');
-    document.getElementById('tab-btn-system')?.classList.add('active');
-    loadSystemMaintenanceTabContent();
-  });
-
-  if (currentSettingsSubTab === 'tariffs') loadTariffsTabContent();
-  else if (currentSettingsSubTab === 'categories') loadCategoriesTabContent();
-  else if (currentSettingsSubTab === 'integrations') loadIntegrationsTabContent();
-  else if (currentSettingsSubTab === 'system') loadSystemMaintenanceTabContent();
-  else loadGatewaysTabContent();
+  activateSettingsTab(currentSettingsSubTab);
 }
 
 /**
@@ -9581,16 +10031,29 @@ async function loadIntegrationsTabContent() {
               </tbody>
             </table>
           </div>
-          <div style="padding:0.5rem 1rem; background:var(--color-bg-subtle); border-top:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
+          <div style="padding:0.5rem 1rem; background:var(--color-bg-subtle); border-top:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center; gap:0.5rem; flex-wrap:wrap;">
             <span style="font-size:0.7rem; color:var(--color-text-muted);">Latência média: <strong>48ms</strong></span>
-            <button class="btn btn-sm btn-secondary btn-test-ping" data-integ="${integ.id}" style="font-size:0.7rem; padding:0.2rem 0.5rem;">
-              ${Icons.activity(12)} Testar Ping
-            </button>
+            <div style="display:flex; align-items:center; gap:0.4rem;">
+              ${integ.id === 'ems_scada' ? `
+                <button class="btn btn-sm btn-primary btn-open-solarman-tab" style="font-size:0.7rem; padding:0.2rem 0.55rem;">
+                  ${Icons.sun(12)} Configurar SolarMAN Pro &amp; IoT
+                </button>
+              ` : ''}
+              <button class="btn btn-sm btn-secondary btn-test-ping" data-integ="${integ.id}" style="font-size:0.7rem; padding:0.2rem 0.5rem;">
+                ${Icons.activity(12)} Testar Ping
+              </button>
+            </div>
           </div>
         </div>
       `).join('')}
     </div>
   `;
+
+  container.querySelectorAll('.btn-open-solarman-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.getElementById('tab-btn-solarman')?.click();
+    });
+  });
 
   container.querySelectorAll('.btn-test-ping').forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -9608,6 +10071,612 @@ async function loadIntegrationsTabContent() {
         }, 2500);
       }, 400);
     });
+  });
+}
+
+function escapeTelemetryHtml(val) {
+  return String(val ?? '').replace(/[&<>"']/g, m => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[m]));
+}
+
+function openTelemetryOverlay(html) {
+  const mainModal = document.getElementById('modal-container');
+  const useSubLayer = mainModal && mainModal.innerHTML.trim() !== '';
+  let root = mainModal;
+
+  if (useSubLayer) {
+    document.getElementById('telemetry-submodal-root')?.remove();
+    root = document.createElement('div');
+    root.id = 'telemetry-submodal-root';
+    root.style.position = 'fixed';
+    root.style.inset = '0';
+    root.style.zIndex = '1150';
+    document.body.appendChild(root);
+  }
+
+  root.innerHTML = html;
+
+  const close = () => {
+    if (useSubLayer) root.remove();
+    else if (root) root.innerHTML = '';
+  };
+
+  root.querySelector('.modal-backdrop')?.addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) close();
+  });
+  root.querySelector('#modal-close-btn')?.addEventListener('click', close);
+  root.querySelector('#modal-cancel-btn')?.addEventListener('click', close);
+
+  return { root, close };
+}
+
+/**
+ * Tab SolarMAN Pro & Telemetria IoT Real nas Configurações
+ */
+async function loadSolarmanTelemetryTabContent() {
+  const container = document.getElementById('settings-subview-content');
+  if (!container) return;
+
+  container.innerHTML = '<p style="color:var(--color-text-muted);">A carregar configuração SolarMAN Pro e dispositivos de telemetria...</p>';
+
+  try {
+    const [cfgRes, devRes] = await Promise.all([
+      apiFetch('/api/telemetry/config'),
+      apiFetch('/api/telemetry/devices')
+    ]);
+
+    const cfg = cfgRes?.data?.config || {};
+    const stats = cfgRes?.data?.stats || {};
+    const devices = devRes?.data?.devices || [];
+    const summary = devRes?.data?.solarmanSummary || {};
+    const gen = summary.generationSummary || {};
+
+    AppState.telemetryDevicesCache = devices;
+    AppState.solarmanSummary = summary;
+
+    const webhookUrl = `${window.location.origin}/api/telemetry/ingest`;
+    const lastSyncText = cfg.lastSyncAt
+      ? new Date(cfg.lastSyncAt).toLocaleString('pt-MZ')
+      : 'Ainda não sincronizado';
+
+    container.innerHTML = `
+      <div style="display:flex; flex-direction:column; gap:1.25rem;">
+        <!-- Banner Organização SolarMAN Pro + Webhook IoT -->
+        <div style="background:linear-gradient(135deg, #fff7ed 0%, #ffffff 65%); border:1px solid #fed7aa; border-radius:10px; padding:1.15rem 1.25rem; display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; flex-wrap:wrap;">
+          <div style="flex:1; min-width:260px;">
+            <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.35rem; flex-wrap:wrap;">
+              <span style="display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:7px; background:#ea580c; color:#ffffff;">
+                ${Icons.sun(16)}
+              </span>
+              <h3 style="margin:0; font-size:1.02rem; font-weight:700; color:#0f172a;">
+                Organização SolarMAN Pro: ${escapeTelemetryHtml(cfg.orgName || 'Joswil')}
+              </h3>
+              <span class="code-pill">orgId: ${escapeTelemetryHtml(cfg.orgId || '10955391')}</span>
+            </div>
+            <div style="font-size:0.82rem; color:#475569; margin-bottom:0.65rem;">
+              Conta vinculada: <strong>${escapeTelemetryHtml(cfg.accountEmail || 'jossuemohamad@gmail.com')}</strong> &bull;
+              Última sincronização: <strong>${escapeTelemetryHtml(lastSyncText)}</strong>
+            </div>
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:0.55rem 0.75rem; font-size:0.78rem; color:#334155;">
+              <div><strong>Endpoint Webhook IoT (Push direto dos Dataloggers):</strong> <code>POST ${escapeTelemetryHtml(webhookUrl)}</code></div>
+              <div style="margin-top:2px;">Header de autenticação: <code>x-webhook-key: ${escapeTelemetryHtml(cfg.webhookKey || '')}</code></div>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center;">
+            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:8px; padding:0.6rem 0.9rem; min-width:110px;">
+              <span style="font-size:0.7rem; color:#64748b; text-transform:uppercase; font-weight:700; display:block;">Dispositivos</span>
+              <strong style="font-size:1.2rem; color:#0f172a;">${stats.total_devices ?? devices.length}</strong>
+              <span style="font-size:0.72rem; color:#16a34a; display:block;">${stats.online_devices ?? 0} online</span>
+            </div>
+            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:8px; padding:0.6rem 0.9rem; min-width:110px;">
+              <span style="font-size:0.7rem; color:#64748b; text-transform:uppercase; font-weight:700; display:block;">Potência Atual</span>
+              <strong style="font-size:1.2rem; color:#ea580c;">${parseFloat(gen.generationPower || 0).toFixed(1)} kW</strong>
+              <span style="font-size:0.72rem; color:#64748b; display:block;">de ${parseFloat(gen.installedCapacity || 0).toFixed(0)} kWp</span>
+            </div>
+            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:8px; padding:0.6rem 0.9rem; min-width:110px;">
+              <span style="font-size:0.7rem; color:#64748b; text-transform:uppercase; font-weight:700; display:block;">Alertas Ativos</span>
+              <strong style="font-size:1.2rem; color:${(stats.alerting_devices || 0) > 0 ? '#dc2626' : '#16a34a'};">${stats.alerting_devices ?? 0}</strong>
+              <span style="font-size:0.72rem; color:#64748b; display:block;">O&amp;M Automático</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Formulário de Credenciais SolarMAN API & Webhook -->
+        <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:1.15rem 1.25rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:0.75rem; flex-wrap:wrap; margin-bottom:0.9rem;">
+            <div>
+              <h4 style="margin:0; font-size:0.95rem; font-weight:700; color:#0f172a;">Credenciais SolarMAN OpenAPI &amp; Gateways</h4>
+              <span style="font-size:0.78rem; color:#64748b;">Configure o App ID/Secret da SolarMAN Cloud ou Bearer Token da sessão Pro para sincronização automática.</span>
+            </div>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+              <button type="button" class="btn btn-sm btn-outline" id="btn-sync-solarman-now">
+                ${Icons.activity(13)} Sincronizar Agora com SolarMAN Pro
+              </button>
+              <button type="button" class="btn btn-sm btn-primary" id="btn-register-new-inverter">
+                ${Icons.plus(13)} Vincular Inversor / Datalogger
+              </button>
+            </div>
+          </div>
+
+          <div id="solarman-sync-feedback" style="display:none; margin-bottom:0.85rem;"></div>
+
+          <form id="form-solarman-config">
+            <div class="form-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:0.85rem;">
+              <div class="form-group">
+                <label class="form-label">Organização SolarMAN</label>
+                <input type="text" class="form-control" name="orgName" value="${escapeTelemetryHtml(cfg.orgName || '')}" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">orgId SolarMAN</label>
+                <input type="text" class="form-control" name="orgId" value="${escapeTelemetryHtml(cfg.orgId || '')}" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Conta / Email Operador</label>
+                <input type="email" class="form-control" name="accountEmail" value="${escapeTelemetryHtml(cfg.accountEmail || '')}">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Intervalo Auto-Sync (min)</label>
+                <input type="number" class="form-control" name="autoSyncMinutes" min="1" max="1440" value="${Number(cfg.autoSyncMinutes || 5)}">
+              </div>
+              <div class="form-group">
+                <label class="form-label">SOLARMAN App ID (OpenAPI)</label>
+                <input type="text" class="form-control" name="appId" value="${escapeTelemetryHtml(cfg.appId || '')}" placeholder="Ex: 302109481029">
+              </div>
+              <div class="form-group">
+                <label class="form-label">SOLARMAN App Secret ${cfg.hasAppSecret ? '<span class="tag-pill tech">Guardado</span>' : ''}</label>
+                <input type="password" class="form-control" name="appSecret" value="" placeholder="${escapeTelemetryHtml(cfg.appSecretMasked || 'Introduzir novo App Secret')}">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Bearer Token (Sessão Pro) ${cfg.hasBearerToken ? '<span class="tag-pill tech">Guardado</span>' : ''}</label>
+                <input type="password" class="form-control" name="bearerToken" value="" placeholder="${escapeTelemetryHtml(cfg.bearerTokenMasked || 'Opcional — Token Bearer SolarMAN Pro')}">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Webhook Key IoT (<code>x-webhook-key</code>)</label>
+                <input type="text" class="form-control" name="webhookKey" value="${escapeTelemetryHtml(cfg.webhookKey || '')}" required>
+              </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:0.75rem; margin-top:0.85rem; flex-wrap:wrap;">
+              <div style="display:flex; gap:1rem; font-size:0.78rem; color:#64748b;">
+                ${cfg.hasAppSecret ? '<label style="display:inline-flex; align-items:center; gap:4px;"><input type="checkbox" name="clearAppSecret"> Limpar App Secret</label>' : ''}
+                ${cfg.hasBearerToken ? '<label style="display:inline-flex; align-items:center; gap:4px;"><input type="checkbox" name="clearBearerToken"> Limpar Bearer Token</label>' : ''}
+              </div>
+              <button type="submit" class="btn btn-primary" id="btn-save-solarman-config">
+                ${Icons.check(14)} Guardar Configuração SolarMAN
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Tabela de Dispositivos e Dataloggers Registrados -->
+        <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
+          <div style="padding:0.9rem 1.15rem; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+            <div>
+              <h4 style="margin:0; font-size:0.95rem; font-weight:700; color:#0f172a;">Inversores &amp; Dataloggers Monitorados (${devices.length})</h4>
+              <span style="font-size:0.78rem; color:#64748b;">Cada inversor pode estar vinculado a uma Mini-Rede central e/ou diretamente à instalação de um Cliente.</span>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Device SN / Logger</th>
+                  <th>Central / Cliente</th>
+                  <th>Modelo &amp; Provider</th>
+                  <th>Potência / Energia Hoje</th>
+                  <th>Bateria SoC</th>
+                  <th>Estado</th>
+                  <th style="text-align:right;">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${devices.length === 0 ? `
+                  <tr>
+                    <td colspan="7" style="text-align:center; padding:1.5rem; color:#64748b;">
+                      Nenhum inversor ou datalogger registado. Clique em "Vincular Inversor / Datalogger" para começar.
+                    </td>
+                  </tr>
+                ` : devices.map(dev => {
+                  const isAlert = Boolean(dev.alerta_activo) || ['alarme', 'alerta'].includes(dev.estado_comunicacao);
+                  const isOffline = dev.estado_comunicacao === 'offline';
+                  const statusClass = isAlert ? 'danger' : (isOffline ? 'warning' : 'active');
+                  const soc = Math.round(parseFloat(dev.bateria_soc_pct || 0));
+                  return `
+                    <tr>
+                      <td>
+                        <div><span class="code-pill">${escapeTelemetryHtml(dev.device_sn)}</span></div>
+                        <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">Logger: ${escapeTelemetryHtml(dev.logger_sn || '--')}</div>
+                      </td>
+                      <td>
+                        <div style="font-weight:600; color:#0f172a;">${escapeTelemetryHtml(dev.mini_grid_nome || dev.mini_grid_codigo || 'Sem Central')}</div>
+                        <div style="font-size:0.75rem; color:#64748b;">
+                          ${dev.client_nome ? `Cliente: ${escapeTelemetryHtml(dev.client_nome)}` : 'Ativo da Central'}
+                        </div>
+                      </td>
+                      <td>
+                        <div style="font-weight:600; color:#334155;">${escapeTelemetryHtml(dev.modelo_inversor || 'Inversor Solar')}</div>
+                        <span class="tag-pill tech" style="font-size:0.7rem;">${escapeTelemetryHtml((dev.provider || 'solarman').toUpperCase())}</span>
+                      </td>
+                      <td>
+                        <div style="font-weight:800; color:#ea580c; font-family:monospace;">${parseFloat(dev.potencia_activa_kw || 0).toFixed(1)} kW <span style="font-weight:400; color:#64748b;">/ ${parseFloat(dev.potencia_nominal_kw || 0).toFixed(0)} kWp</span></div>
+                        <div style="font-size:0.75rem; color:#475569;">Hoje: ${parseFloat(dev.energia_hoje_kwh || 0).toFixed(1)} kWh</div>
+                      </td>
+                      <td>
+                        <strong style="color:${soc < 20 ? '#dc2626' : '#16a34a'};">${soc}%</strong>
+                        <div style="font-size:0.73rem; color:#64748b;">${parseFloat(dev.tensao_ac_v || 230).toFixed(0)}V • ${parseFloat(dev.temperatura_c || 38).toFixed(1)}°C</div>
+                      </td>
+                      <td>
+                        <span class="status-dot-badge ${statusClass}">
+                          <span class="status-dot"></span> ${escapeTelemetryHtml(dev.estado_comunicacao || 'online')}
+                        </span>
+                      </td>
+                      <td style="text-align:right; white-space:nowrap;">
+                        <button type="button" class="btn btn-sm btn-outline btn-sim-push-telemetry" data-id="${escapeTelemetryHtml(dev.id)}" title="Enviar Leitura / Simular Push IoT">
+                          ${Icons.zap(12)} Push IoT
+                        </button>
+                        <button type="button" class="btn btn-sm btn-primary btn-view-scada-row" data-id="${escapeTelemetryHtml(dev.id)}" title="Abrir Cockpit SCADA">
+                          ${Icons.activity(12)} SCADA
+                        </button>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Guardar configurações SolarMAN
+    document.getElementById('form-solarman-config')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.currentTarget;
+      const fd = new FormData(form);
+      const payload = {
+        orgName: String(fd.get('orgName') || '').trim(),
+        orgId: String(fd.get('orgId') || '').trim(),
+        accountEmail: String(fd.get('accountEmail') || '').trim(),
+        autoSyncMinutes: parseInt(fd.get('autoSyncMinutes') || '5', 10),
+        appId: String(fd.get('appId') || '').trim(),
+        webhookKey: String(fd.get('webhookKey') || '').trim(),
+        clearAppSecret: Boolean(fd.get('clearAppSecret')),
+        clearBearerToken: Boolean(fd.get('clearBearerToken'))
+      };
+      const newSecret = String(fd.get('appSecret') || '').trim();
+      const newBearer = String(fd.get('bearerToken') || '').trim();
+      if (newSecret) payload.appSecret = newSecret;
+      if (newBearer) payload.bearerToken = newBearer;
+
+      const btn = document.getElementById('btn-save-solarman-config');
+      if (btn) btn.disabled = true;
+      try {
+        await apiFetch('/api/telemetry/config', { method: 'PUT', body: payload });
+        if (typeof showToast === 'function') showToast('Configuração SolarMAN Pro e Webhook IoT atualizada.', 'success');
+        await loadSolarmanTelemetryTabContent();
+      } catch (err) {
+        if (typeof showToast === 'function') showToast(err.message || 'Erro ao guardar configuração.', 'error');
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    });
+
+    // Sincronizar agora com SolarMAN Pro
+    document.getElementById('btn-sync-solarman-now')?.addEventListener('click', async () => {
+      const btn = document.getElementById('btn-sync-solarman-now');
+      const feedback = document.getElementById('solarman-sync-feedback');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'A sincronizar...';
+      }
+      try {
+        const res = await apiFetch('/api/telemetry/solarman/sync', { method: 'POST', body: {} });
+        const d = res?.data || {};
+        if (feedback) {
+          feedback.style.display = 'block';
+          feedback.innerHTML = d.cloudConnected
+            ? `<div class="alert alert-success" style="margin:0;">Ligação direta SolarMAN Pro ativa (${escapeTelemetryHtml(d.cloudMode)}). Estações na nuvem: <strong>${d.remoteStationsCount || 0}</strong> | Dispositivos locais atualizados: <strong>${d.localDevicesCount || 0}</strong>.</div>`
+            : `<div class="alert alert-warning" style="margin:0;">Sincronização em modo cache local (<code>${escapeTelemetryHtml(d.cloudMode || 'local_cached')}</code>)${d.cloudError ? `: ${escapeTelemetryHtml(d.cloudError)}` : '. Preencha App ID + App Secret ou Bearer Token para consulta direta à SolarMAN Cloud.'} Dispositivos locais sincronizados: <strong>${d.localDevicesCount || 0}</strong>.</div>`;
+        }
+        if (typeof showToast === 'function') showToast(res?.message || 'Sincronização SolarMAN executada.', 'success');
+        if (d.solarmanSummary) AppState.solarmanSummary = d.solarmanSummary;
+      } catch (err) {
+        if (typeof showToast === 'function') showToast(err.message || 'Falha ao sincronizar SolarMAN.', 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `${Icons.activity(13)} Sincronizar Agora com SolarMAN Pro`;
+        }
+      }
+    });
+
+    // Abrir modal de vinculação de inversor
+    document.getElementById('btn-register-new-inverter')?.addEventListener('click', () => {
+      showRegisterInverterModal(null, null, loadSolarmanTelemetryTabContent);
+    });
+
+    // Push IoT / Simulador por dispositivo
+    container.querySelectorAll('.btn-sim-push-telemetry').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id');
+        const dev = devices.find(d => String(d.id) === String(id));
+        if (dev) showSimulateTelemetryPushModal(dev, loadSolarmanTelemetryTabContent);
+      });
+    });
+
+    // Abrir cockpit SCADA a partir da linha
+    container.querySelectorAll('.btn-view-scada-row').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id');
+        const dev = devices.find(d => String(d.id) === String(id));
+        if (!dev) return;
+        showInverterLiveModal({
+          id: dev.mini_grid_id,
+          nome: dev.mini_grid_nome || dev.client_nome || dev.device_sn,
+          codigo: dev.mini_grid_codigo || dev.device_sn,
+          capacidade_kwp: dev.potencia_nominal_kw || 50,
+          capacidade_bateria_kwh: 100,
+          _telemetry: dev
+        });
+      });
+    });
+  } catch (err) {
+    container.innerHTML = `<div class="alert alert-error">Erro ao carregar módulo SolarMAN &amp; Telemetria IoT: ${escapeTelemetryHtml(err.message)}</div>`;
+  }
+}
+
+/**
+ * Modal para Vincular Inversor / Datalogger a uma Mini-Rede ou Cliente
+ */
+async function showRegisterInverterModal(preselectedClientId = null, preselectedMiniGridId = null, onSaved = null) {
+  let miniGrids = [];
+  let clients = [];
+
+  try {
+    const [mgRes, cliRes] = await Promise.all([
+      apiFetch('/api/mini-grids?limit=100'),
+      apiFetch('/api/clients?limit=100')
+    ]);
+    miniGrids = mgRes?.data?.items || mgRes?.data || [];
+    clients = cliRes?.data?.items || cliRes?.data || [];
+  } catch (err) {
+    if (typeof showToast === 'function') showToast(`Erro ao carregar centrais/clientes: ${err.message}`, 'error');
+    return;
+  }
+
+  const overlay = openTelemetryOverlay(`
+    <div class="modal-backdrop">
+      <div class="modal-dialog modal-md" style="max-width:640px;">
+        <div class="modal-header">
+          <h3 class="modal-title">${Icons.sun(18)} Vincular Inversor / Datalogger IoT</h3>
+          <button type="button" class="modal-close" id="modal-close-btn">&times;</button>
+        </div>
+        <form id="form-register-inverter">
+          <div class="modal-body">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.85rem;">
+              <div class="form-group">
+                <label class="form-label">Número de Série Inversor (Device SN) *</label>
+                <input type="text" class="form-control" name="device_sn" placeholder="Ex: INV-2026-883412" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Datalogger SN (LSW-3 / LS4G-3)</label>
+                <input type="text" class="form-control" name="logger_sn" placeholder="Ex: LSW3-30291049">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Fornecedor / Plataforma Cloud</label>
+                <select class="form-control" name="provider">
+                  <option value="solarman">SolarMAN Pro / LSW3</option>
+                  <option value="huawei_fusionsolar">Huawei FusionSolar</option>
+                  <option value="victron_vrm">Victron VRM API</option>
+                  <option value="deye_cloud">Deye Cloud</option>
+                  <option value="modbus_iot">Gateway Modbus TCP / MQTT Local</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Modelo do Inversor</label>
+                <input type="text" class="form-control" name="modelo_inversor" value="Deye SUN-12K-SG04LP3" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Potência Nominal (kWp)</label>
+                <input type="number" step="0.1" min="0.5" class="form-control" name="potencia_nominal_kw" value="12.0" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">ID Estação SolarMAN (Opcional)</label>
+                <input type="text" class="form-control" name="external_station_id" placeholder="Ex: STN-10955391">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Mini-Rede / Central *</label>
+                <select class="form-control" name="mini_grid_id" required>
+                  <option value="">Selecionar Mini-Rede...</option>
+                  ${miniGrids.map(mg => `
+                    <option value="${mg.id}" ${String(mg.id) === String(preselectedMiniGridId) ? 'selected' : ''}>
+                      ${escapeTelemetryHtml(mg.codigo)} - ${escapeTelemetryHtml(mg.nome)}
+                    </option>
+                  `).join('')}
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Cliente Associado (Opcional)</label>
+                <select class="form-control" name="client_id">
+                  <option value="">-- Ativo Global da Mini-Rede --</option>
+                  ${clients.map(cl => `
+                    <option value="${cl.id}" ${String(cl.id) === String(preselectedClientId) ? 'selected' : ''}>
+                      ${escapeTelemetryHtml(cl.codigo || cl.codigo_cliente || '')} - ${escapeTelemetryHtml(cl.nome_completo)}
+                    </option>
+                  `).join('')}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline" id="modal-cancel-btn">Cancelar</button>
+            <button type="submit" class="btn btn-primary" id="btn-submit-register-inverter">${Icons.check(14)} Vincular Dispositivo</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `);
+
+  overlay.root.querySelector('#form-register-inverter')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const payload = {
+      device_sn: String(fd.get('device_sn') || '').trim(),
+      logger_sn: String(fd.get('logger_sn') || '').trim() || null,
+      provider: String(fd.get('provider') || 'solarman'),
+      modelo_inversor: String(fd.get('modelo_inversor') || '').trim(),
+      potencia_nominal_kw: parseFloat(fd.get('potencia_nominal_kw') || '10'),
+      external_station_id: String(fd.get('external_station_id') || '').trim() || null,
+      mini_grid_id: fd.get('mini_grid_id') || null,
+      client_id: fd.get('client_id') || null
+    };
+
+    const btn = overlay.root.querySelector('#btn-submit-register-inverter');
+    if (btn) btn.disabled = true;
+    try {
+      await apiFetch('/api/telemetry/devices', { method: 'POST', body: payload });
+      try {
+        const ref = await apiFetch('/api/telemetry/devices');
+        AppState.telemetryDevicesCache = ref?.data?.devices || [];
+        AppState.solarmanSummary = ref?.data?.solarmanSummary || null;
+      } catch (_) {}
+      overlay.close();
+      if (typeof showToast === 'function') showToast(`Inversor ${payload.device_sn} vinculado com sucesso.`, 'success');
+      if (typeof onSaved === 'function') onSaved();
+    } catch (err) {
+      if (typeof showToast === 'function') showToast(err.message || 'Erro ao vincular inversor.', 'error');
+      if (btn) btn.disabled = false;
+    }
+  });
+}
+
+/**
+ * Modal de Push IoT / Simulação de Leitura Real para Inversor Vinculado
+ */
+function showSimulateTelemetryPushModal(device, onPushed = null) {
+  const overlay = openTelemetryOverlay(`
+    <div class="modal-backdrop">
+      <div class="modal-dialog modal-md" style="max-width:600px;">
+        <div class="modal-header">
+          <h3 class="modal-title">${Icons.zap(18)} Enviar Leitura Webhook IoT &bull; ${escapeTelemetryHtml(device.device_sn)}</h3>
+          <button type="button" class="modal-close" id="modal-close-btn">&times;</button>
+        </div>
+        <form id="form-simulate-push-telemetry">
+          <div class="modal-body">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:0.5rem; margin-bottom:0.85rem; flex-wrap:wrap;">
+              <span style="font-size:0.8rem; color:#475569;">Envia um pacote JSON real para <code>POST /api/telemetry/ingest</code> e persiste no PostgreSQL.</span>
+              <button type="button" class="btn btn-sm btn-danger" id="btn-prefill-critical-alarm">
+                Simular Alarme Crítico + Gerar OT O&amp;M
+              </button>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+              <div class="form-group">
+                <label class="form-label">Potência Ativa (kW)</label>
+                <input type="number" step="0.1" class="form-control" name="potencia_activa_kw" value="${parseFloat(device.potencia_activa_kw || 10).toFixed(1)}" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Energia Produzida Hoje (kWh)</label>
+                <input type="number" step="0.1" class="form-control" name="energia_hoje_kwh" value="${parseFloat(device.energia_hoje_kwh || 45).toFixed(1)}" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Bateria BESS SoC (%)</label>
+                <input type="number" step="1" min="0" max="100" class="form-control" name="bateria_soc_pct" value="${Math.round(parseFloat(device.bateria_soc_pct || 85))}" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Tensão AC (V) / Temp (°C)</label>
+                <div style="display:flex; gap:0.4rem;">
+                  <input type="number" step="0.1" class="form-control" name="tensao_ac_v" value="${parseFloat(device.tensao_ac_v || 230).toFixed(1)}" required>
+                  <input type="number" step="0.1" class="form-control" name="temperatura_c" value="${parseFloat(device.temperatura_c || 39).toFixed(1)}" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Frequência (Hz)</label>
+                <input type="number" step="0.01" class="form-control" name="frequencia_hz" value="${parseFloat(device.frequencia_hz || 50).toFixed(2)}" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Estado de Comunicação</label>
+                <select class="form-control" name="estado_comunicacao">
+                  <option value="online" ${device.estado_comunicacao === 'online' ? 'selected' : ''}>online (Normal)</option>
+                  <option value="alarme" ${device.estado_comunicacao === 'alarme' ? 'selected' : ''}>alarme (Falha / Corte)</option>
+                  <option value="offline" ${device.estado_comunicacao === 'offline' ? 'selected' : ''}>offline (Sem Sinal)</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="margin-top:0.65rem; padding:0.75rem; background:#fff1f2; border:1px solid #fecdd3; border-radius:8px;">
+              <label style="display:flex; align-items:center; gap:0.45rem; font-size:0.84rem; font-weight:700; color:#9f1239; margin-bottom:0.4rem;">
+                <input type="checkbox" name="alerta_activo" id="chk-sim-alerta-activo" ${device.alerta_activo ? 'checked' : ''}>
+                Ativar Alarme IoT (abre Ordem de Trabalho O&amp;M automática)
+              </label>
+              <input type="text" class="form-control" name="alerta_descricao" id="input-sim-alerta-desc" placeholder="Descrição técnica da anomalia (opcional)" value="${escapeTelemetryHtml(device.alerta_descricao || device.payload_bruto?.alerta_descricao || '')}">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline" id="modal-cancel-btn">Cancelar</button>
+            <button type="submit" class="btn btn-primary" id="btn-submit-sim-push">${Icons.zap(14)} Transmitir Leitura IoT</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `);
+
+  overlay.root.querySelector('#btn-prefill-critical-alarm')?.addEventListener('click', () => {
+    const form = overlay.root.querySelector('#form-simulate-push-telemetry');
+    if (!form) return;
+    form.querySelector('[name="potencia_activa_kw"]').value = '0.8';
+    form.querySelector('[name="bateria_soc_pct"]').value = '14';
+    form.querySelector('[name="temperatura_c"]').value = '58.4';
+    form.querySelector('[name="estado_comunicacao"]').value = 'alarme';
+    form.querySelector('#chk-sim-alerta-activo').checked = true;
+    form.querySelector('#input-sim-alerta-desc').value = 'Queda abrupta de tensão DC String 1 + Bateria BESS crítica (<20% SoC)';
+  });
+
+  overlay.root.querySelector('#form-simulate-push-telemetry')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+    const payload = {
+      device_sn: device.device_sn,
+      logger_sn: device.logger_sn || undefined,
+      potencia_activa_kw: parseFloat(fd.get('potencia_activa_kw') || '0'),
+      energia_hoje_kwh: parseFloat(fd.get('energia_hoje_kwh') || '0'),
+      bateria_soc_pct: parseFloat(fd.get('bateria_soc_pct') || '0'),
+      tensao_ac_v: parseFloat(fd.get('tensao_ac_v') || '230'),
+      frequencia_hz: parseFloat(fd.get('frequencia_hz') || '50'),
+      temperatura_c: parseFloat(fd.get('temperatura_c') || '39'),
+      estado_comunicacao: String(fd.get('estado_comunicacao') || 'online'),
+      alerta_activo: Boolean(form.querySelector('#chk-sim-alerta-activo')?.checked),
+      alerta_descricao: String(fd.get('alerta_descricao') || '').trim() || undefined
+    };
+
+    const btn = overlay.root.querySelector('#btn-submit-sim-push');
+    if (btn) btn.disabled = true;
+    try {
+      const res = await apiFetch('/api/telemetry/ingest', { method: 'POST', body: payload });
+      try {
+        const ref = await apiFetch('/api/telemetry/devices');
+        AppState.telemetryDevicesCache = ref?.data?.devices || [];
+        AppState.solarmanSummary = ref?.data?.solarmanSummary || null;
+      } catch (_) {}
+      overlay.close();
+      const autoWo = res?.data?.autoWorkOrder?.workOrder;
+      const msg = autoWo?.numero_ordem
+        ? `Telemetria gravada! Ordem O&M gerada automaticamente: ${autoWo.numero_ordem}`
+        : (res?.message || 'Leitura de telemetria gravada com sucesso.');
+      if (typeof showToast === 'function') showToast(msg, autoWo ? 'warning' : 'success');
+      if (typeof onPushed === 'function') onPushed();
+    } catch (err) {
+      if (typeof showToast === 'function') showToast(err.message || 'Erro ao ingerir leitura IoT.', 'error');
+      if (btn) btn.disabled = false;
+    }
   });
 }
 
@@ -9891,6 +10960,14 @@ async function showNewTariffModal() {
     e.preventDefault();
     const formData = new FormData(e.target);
     const payload = Object.fromEntries(formData.entries());
+
+    if (payload.latitude && payload.longitude) {
+      const norm = sanitizeMozCoordinates(payload.latitude, payload.longitude);
+      if (norm) {
+        payload.latitude = norm[0];
+        payload.longitude = norm[1];
+      }
+    }
 
     try {
       await apiFetch('/api/tariffs', {

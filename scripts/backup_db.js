@@ -41,7 +41,8 @@ async function performBackup() {
     'payments',
     'assets',
     'work_orders',
-    'audit_logs'
+    'audit_logs',
+    'inverter_telemetry'
   ];
 
   const backupData = {

@@ -24,17 +24,41 @@ const VALID_CATEGORIES = [
 const VALID_STATUSES = ['activo', 'suspenso', 'desligado'];
 
 /**
- * Valida se as coordenadas estão dentro dos limites geográficos aproximados de Moçambique.
- * Latitude: -27.5 a -10.0 | Longitude: 30.0 a 41.5
+ * Validação e normalização de coordenadas geográficas no território de Moçambique.
+ * Moçambique localiza-se no Hemisfério Sul (Latitude entre -27.5 e -10.0) e Hemisfério Oriental (Longitude entre 30.0 e 41.5).
+ * Esta função corrige automaticamente coordenadas invertidas [lat, lon] vs [lon, lat] ou latitudes sem sinal negativo.
  */
+function normalizeMozambiqueCoordinates(c1, c2) {
+  if (c1 === null || c1 === undefined || c1 === '' || c2 === null || c2 === undefined || c2 === '') {
+    return { lat: null, lon: null, valid: true };
+  }
+  const n1 = Number(c1);
+  const n2 = Number(c2);
+  if (isNaN(n1) || isNaN(n2)) return { lat: null, lon: null, valid: false };
+
+  const abs1 = Math.abs(n1);
+  const abs2 = Math.abs(n2);
+
+  let lat, lon;
+  if (abs1 >= 10.0 && abs1 <= 27.5 && abs2 >= 30.0 && abs2 <= 42.0) {
+    lat = -abs1;
+    lon = abs2;
+  } else if (abs2 >= 10.0 && abs2 <= 27.5 && abs1 >= 30.0 && abs1 <= 42.0) {
+    lat = -abs2;
+    lon = abs1;
+  } else {
+    return { lat: n1, lon: n2, valid: false };
+  }
+
+  return { lat, lon, valid: true };
+}
+
 function isValidMozambiqueCoordinates(lat, lon) {
-  if (lat === null || lat === undefined || lon === null || lon === undefined) {
+  if (lat === null || lat === undefined || lat === '' || lon === null || lon === undefined || lon === '') {
     return true; // Coordenadas são opcionais
   }
-  const nLat = Number(lat);
-  const nLon = Number(lon);
-  if (isNaN(nLat) || isNaN(nLon)) return false;
-  return nLat >= -27.5 && nLat <= -10.0 && nLon >= 30.0 && nLon <= 41.5;
+  const norm = normalizeMozambiqueCoordinates(lat, lon);
+  return norm.valid;
 }
 
 /**
@@ -292,9 +316,15 @@ async function createClient(req, res) {
       return error(res, `Categoria inválida. Categorias aceites: ${VALID_CATEGORIES.join(', ')}.`, 400);
     }
 
-    // Validação de coordenadas
-    if (!isValidMozambiqueCoordinates(latitude, longitude)) {
-      return error(res, 'Coordenadas geográficas fora dos limites territoriais de Moçambique.', 400);
+    let normLat = null;
+    let normLon = null;
+    if (latitude !== undefined && longitude !== undefined && latitude !== null && longitude !== null && latitude !== '' && longitude !== '') {
+      const norm = normalizeMozambiqueCoordinates(latitude, longitude);
+      if (!norm.valid) {
+        return error(res, 'Coordenadas geográficas fora dos limites territoriais de Moçambique.', 400);
+      }
+      normLat = norm.lat;
+      normLon = norm.lon;
     }
 
     await dbClient.query('BEGIN');
@@ -334,8 +364,8 @@ async function createClient(req, res) {
       documento_identificacao ? documento_identificacao.trim() : null,
       contacto_principal.trim(),
       contacto_secundario ? contacto_secundario.trim() : null,
-      latitude !== undefined && latitude !== null && latitude !== '' ? Number(latitude) : null,
-      longitude !== undefined && longitude !== null && longitude !== '' ? Number(longitude) : null,
+      normLat,
+      normLon,
       cleanCategory,
       foto_url || null
     ];
@@ -397,11 +427,18 @@ async function updateClient(req, res) {
       return error(res, `Estado inválido. Estados aceites: ${VALID_STATUSES.join(', ')}.`, 400);
     }
 
-    if (!isValidMozambiqueCoordinates(
-      latitude !== undefined ? latitude : currentData.latitude,
-      longitude !== undefined ? longitude : currentData.longitude
-    )) {
-      return error(res, 'Coordenadas geográficas fora dos limites territoriais de Moçambique.', 400);
+    let normLat = latitude !== undefined && latitude !== null && latitude !== '' ? Number(latitude) : null;
+    let normLon = longitude !== undefined && longitude !== null && longitude !== '' ? Number(longitude) : null;
+
+    if (latitude !== undefined || longitude !== undefined) {
+      const latToCheck = latitude !== undefined ? latitude : currentData.latitude;
+      const lonToCheck = longitude !== undefined ? longitude : currentData.longitude;
+      const norm = normalizeMozambiqueCoordinates(latToCheck, lonToCheck);
+      if (!norm.valid) {
+        return error(res, 'Coordenadas geográficas fora dos limites territoriais de Moçambique.', 400);
+      }
+      if (latitude !== undefined && latitude !== null && latitude !== '') normLat = norm.lat;
+      if (longitude !== undefined && longitude !== null && longitude !== '') normLon = norm.lon;
     }
 
     const updateSql = `
@@ -425,8 +462,8 @@ async function updateClient(req, res) {
       documento_identificacao !== undefined ? documento_identificacao : null,
       contacto_principal ? contacto_principal.trim() : null,
       contacto_secundario !== undefined ? contacto_secundario : null,
-      latitude !== undefined && latitude !== null && latitude !== '' ? Number(latitude) : null,
-      longitude !== undefined && longitude !== null && longitude !== '' ? Number(longitude) : null,
+      normLat,
+      normLon,
       categoria ? categoria.toLowerCase().trim() : null,
       foto_url !== undefined ? foto_url : null,
       estado ? estado.toLowerCase().trim() : null,

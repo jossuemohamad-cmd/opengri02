@@ -43,12 +43,20 @@ const UI = {
    * Indicador numérico principal: 24–28px (700), Label: 12px (500), Texto secundário: 13px (400)
    */
   statCard({ id, label, value, trend = '', trendType = 'positive', icon = '', subtext = '', gaugePct = null, color = 'blue' }) {
+    const colorMap = {
+      orange: 'var(--color-primary)',
+      blue: 'var(--color-info)',
+      green: 'var(--color-success)',
+      purple: 'var(--color-pue)'
+    };
+    const gaugeColor = colorMap[color] || 'var(--color-primary)';
+
     const trendHtml = trend
-      ? `<span class="ui-trend-badge ${trendType}">${trend}</span>`
+      ? `<span class="ui-trend-badge kpi-trend-pill ${trendType}">${trend}</span>`
       : '';
 
     const gaugeHtml = gaugePct !== null
-      ? `<div class="kpi-mini-gauge"><span class="kpi-mini-gauge-text">${gaugePct}%</span></div>`
+      ? `<div class="kpi-mini-gauge" style="--gauge-pct: ${gaugePct}%; --gauge-color: ${gaugeColor};"><span class="kpi-mini-gauge-text">${gaugePct}%</span></div>`
       : '';
 
     return `
@@ -57,10 +65,12 @@ const UI = {
           <div class="ui-stat-icon-box kpi-icon-box ${color}">
             ${icon}
           </div>
-          ${trendHtml}
+          <div class="kpi-values-box">
+            <span class="ui-stat-value kpi-number" ${id ? `id="${id}"` : ''}>${value}</span>
+            ${trendHtml}
+          </div>
         </div>
         <div class="ui-stat-card-body">
-          <div class="ui-stat-value kpi-number" ${id ? `id="${id}"` : ''}>${value}</div>
           <div class="ui-stat-label kpi-label">${label}</div>
         </div>
         ${(subtext || gaugeHtml) ? `
@@ -242,8 +252,29 @@ const UI = {
         <p class="ui-loading-text">${message}</p>
       </div>
     `;
+  },
+
+  /**
+   * Notificação Discreta (Toast)
+   */
+  toast(message, type = 'info') {
+    let container = document.getElementById('ui-toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'ui-toast-container';
+      container.className = 'ui-toast-container';
+      document.body.appendChild(container);
+    }
+    const toast = document.createElement('div');
+    toast.className = `ui-toast ${type}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.remove();
+    }, 3500);
   }
 };
 
 window.UI = UI;
+window.showToast = (message, type = 'info') => UI.toast(message, type);
 

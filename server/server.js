@@ -13,6 +13,7 @@ const express = require('express');
 const { closePool } = require('./config/db');
 const apiRoutes = require('./routes/api');
 const { notFoundHandler, globalErrorHandler } = require('./middleware/errorHandler');
+const { startTelemetryAutoSyncScheduler, stopTelemetryAutoSyncScheduler } = require('./controllers/telemetryController');
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '3000', 10);
@@ -28,7 +29,7 @@ app.use((req, res, next) => {
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-webhook-key');
 
   if (req.method === 'OPTIONS') {
     return res.sendStatus(204);
@@ -77,6 +78,9 @@ const server = app.listen(PORT, () => {
   console.log(`🩺 Healthcheck: http://localhost:${PORT}/api/health`);
   console.log(`🛠️ Ambiente:    ${process.env.NODE_ENV || 'development'}`);
   console.log('====================================================');
+  if (process.env.NODE_ENV !== 'test') {
+    startTelemetryAutoSyncScheduler();
+  }
 });
 
 // Tratamento de erros no arranque do servidor (ex.: porta ocupada)
@@ -98,6 +102,7 @@ async function handleGracefulShutdown(signal) {
   isShuttingDown = true;
 
   console.log(`\n[SISTEMA] Sinal ${signal} recebido. A iniciar encerramento gracioso...`);
+  stopTelemetryAutoSyncScheduler();
 
   // Pára de aceitar novas requisições HTTP
   server.close(async () => {

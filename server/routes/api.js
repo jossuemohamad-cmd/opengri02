@@ -19,11 +19,13 @@ const workOrderRoutes = require('./workOrderRoutes');
 const reportRoutes = require('./reportRoutes');
 const auditRoutes = require('./auditRoutes');
 const systemRoutes = require('./systemRoutes');
+const telemetryRoutes = require('./telemetryRoutes');
 
 // Módulos da API REST
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
 router.use('/system', systemRoutes);
+router.use('/telemetry', telemetryRoutes);
 router.use('/mini-grids', miniGridRoutes);
 router.use('/assets', assetRoutes);
 router.use('/clients', clientRoutes);
@@ -124,6 +126,12 @@ router.get('/', (req, res) => {
         dashboard: 'GET /api/reports/dashboard',
         executive: 'GET /api/reports/executive',
         export_csv: 'GET /api/reports/export/csv'
+      },
+      telemetry: {
+        config: 'GET / PUT /api/telemetry/config',
+        devices: 'GET / POST /api/telemetry/devices',
+        ingest: 'POST /api/telemetry/ingest',
+        solarman_sync: 'POST /api/telemetry/solarman/sync'
       }
     }
   });

@@ -24,8 +24,8 @@ async function seedData() {
         provincia: 'Inhambane',
         distrito: 'Morrumbene',
         localidade: 'Morrumbene Sede',
-        latitude: -23.72000000,
-        longitude: 35.35000000,
+        latitude: -23.66500000,
+        longitude: 35.31800000,
         capacidade_kwp: 85.00,
         capacidade_bateria_kwh: 210.00,
         estado_operacional: 'activa',
@@ -38,8 +38,8 @@ async function seedData() {
         provincia: 'Sofala',
         distrito: 'Dondo',
         localidade: 'Savane',
-        latitude: -19.61000000,
-        longitude: 34.74000000,
+        latitude: -19.61200000,
+        longitude: 34.74300000,
         capacidade_kwp: 120.00,
         capacidade_bateria_kwh: 300.00,
         estado_operacional: 'activa',
@@ -52,8 +52,8 @@ async function seedData() {
         provincia: 'Nampula',
         distrito: 'Ribáuè',
         localidade: 'Iapala',
-        latitude: -14.96000000,
-        longitude: 38.31000000,
+        latitude: -14.95800000,
+        longitude: 38.30500000,
         capacidade_kwp: 95.00,
         capacidade_bateria_kwh: 240.00,
         estado_operacional: 'activa',
@@ -66,8 +66,8 @@ async function seedData() {
         provincia: 'Cabo Delgado',
         distrito: 'Metuge',
         localidade: 'Mieze',
-        latitude: -12.99000000,
-        longitude: 40.50000000,
+        latitude: -13.00400000,
+        longitude: 40.32500000,
         capacidade_kwp: 70.00,
         capacidade_bateria_kwh: 180.00,
         estado_operacional: 'activa',
@@ -120,27 +120,27 @@ async function seedData() {
     // 3. Clientes Diversificados (PUEs, Comerciais, Residenciais, Serviços Públicos)
     const clients = [
       // Morrumbene
-      { id: '30000000-0000-0000-0000-000000000016', codigo: 'MR005-PUE-0001', mini_grid_id: '10000000-0000-0000-0000-000000000005', nome_completo: 'Câmara Frigorífica de Pesca Morrumbene', doc: '400582910482P', tel: '+258 84 999 5501', lat: -23.7205, lon: 35.3510, cat: 'uso_produtivo', estado: 'activo' },
-      { id: '30000000-0000-0000-0000-000000000017', codigo: 'MR005-PUB-0001', mini_grid_id: '10000000-0000-0000-0000-000000000005', nome_completo: 'Centro de Saúde Rural com Vacinas', doc: '900582910482S', tel: '+258 82 999 5502', lat: -23.7195, lon: 35.3490, cat: 'servico_publico', estado: 'activo' },
-      { id: '30000000-0000-0000-0000-000000000018', codigo: 'MR005-COM-0001', mini_grid_id: '10000000-0000-0000-0000-000000000005', nome_completo: 'Padaria Solar Pão Quente', doc: '110682910482M', tel: '+258 84 999 5503', lat: -23.7210, lon: 35.3520, cat: 'comercial', estado: 'activo' },
-      { id: '30000000-0000-0000-0000-000000000019', codigo: 'MR005-RES-0001', mini_grid_id: '10000000-0000-0000-0000-000000000005', nome_completo: 'Anabela Lourenço Matsinhe', doc: '110782910482F', tel: '+258 84 999 5504', lat: -23.7215, lon: 35.3485, cat: 'residencial', estado: 'activo' },
+      { id: '30000000-0000-0000-0000-000000000016', codigo: 'MR005-PUE-0001', mini_grid_id: '10000000-0000-0000-0000-000000000005', nome_completo: 'Câmara Frigorífica de Pesca Morrumbene', doc: '400582910482P', tel: '+258 84 999 5501', lat: -23.6645, lon: 35.3175, cat: 'uso_produtivo', estado: 'activo' },
+      { id: '30000000-0000-0000-0000-000000000017', codigo: 'MR005-PUB-0001', mini_grid_id: '10000000-0000-0000-0000-000000000005', nome_completo: 'Centro de Saúde Rural com Vacinas', doc: '900582910482S', tel: '+258 82 999 5502', lat: -23.6655, lon: 35.3185, cat: 'servico_publico', estado: 'activo' },
+      { id: '30000000-0000-0000-0000-000000000018', codigo: 'MR005-COM-0001', mini_grid_id: '10000000-0000-0000-0000-000000000005', nome_completo: 'Padaria Solar Pão Quente', doc: '110682910482M', tel: '+258 84 999 5503', lat: -23.6640, lon: 35.3190, cat: 'comercial', estado: 'activo' },
+      { id: '30000000-0000-0000-0000-000000000019', codigo: 'MR005-RES-0001', mini_grid_id: '10000000-0000-0000-0000-000000000005', nome_completo: 'Anabela Lourenço Matsinhe', doc: '110782910482F', tel: '+258 84 999 5504', lat: -23.6660, lon: 35.3170, cat: 'residencial', estado: 'activo' },
 
       // Dondo
-      { id: '30000000-0000-0000-0000-000000000020', codigo: 'MR006-PUE-0001', mini_grid_id: '10000000-0000-0000-0000-000000000006', nome_completo: 'Oficina de Carpintaria e Soldadura Savane', doc: '400682910482C', tel: '+258 84 111 6601', lat: -19.6105, lon: 34.7410, cat: 'uso_produtivo', estado: 'activo' },
-      { id: '30000000-0000-0000-0000-000000000021', codigo: 'MR006-PUE-0002', mini_grid_id: '10000000-0000-0000-0000-000000000006', nome_completo: 'Moagem e Descasque de Arroz Dondo', doc: '400782910482A', tel: '+258 84 111 6602', lat: -19.6095, lon: 34.7395, cat: 'uso_produtivo', estado: 'activo' },
-      { id: '30000000-0000-0000-0000-000000000022', codigo: 'MR006-PUB-0001', mini_grid_id: '10000000-0000-0000-0000-000000000006', nome_completo: 'Escola Secundária Geral de Dondo', doc: '900682910482E', tel: '+258 82 111 6603', lat: -19.6090, lon: 34.7415, cat: 'servico_publico', estado: 'activo' },
-      { id: '30000000-0000-0000-0000-000000000023', codigo: 'MR006-RES-0001', mini_grid_id: '10000000-0000-0000-0000-000000000006', nome_completo: 'Joaquim Alberto Chissano', doc: '110882910482J', tel: '+258 84 111 6604', lat: -19.6110, lon: 34.7390, cat: 'residencial', estado: 'activo' },
+      { id: '30000000-0000-0000-0000-000000000020', codigo: 'MR006-PUE-0001', mini_grid_id: '10000000-0000-0000-0000-000000000006', nome_completo: 'Oficina de Carpintaria e Soldadura Savane', doc: '400682910482C', tel: '+258 84 111 6601', lat: -19.6115, lon: 34.7425, cat: 'uso_produtivo', estado: 'activo' },
+      { id: '30000000-0000-0000-0000-000000000021', codigo: 'MR006-PUE-0002', mini_grid_id: '10000000-0000-0000-0000-000000000006', nome_completo: 'Moagem e Descasque de Arroz Dondo', doc: '400782910482A', tel: '+258 84 111 6602', lat: -19.6125, lon: 34.7435, cat: 'uso_produtivo', estado: 'activo' },
+      { id: '30000000-0000-0000-0000-000000000022', codigo: 'MR006-PUB-0001', mini_grid_id: '10000000-0000-0000-0000-000000000006', nome_completo: 'Escola Secundária Geral de Dondo', doc: '900682910482E', tel: '+258 82 111 6603', lat: -19.6110, lon: 34.7440, cat: 'servico_publico', estado: 'activo' },
+      { id: '30000000-0000-0000-0000-000000000023', codigo: 'MR006-RES-0001', mini_grid_id: '10000000-0000-0000-0000-000000000006', nome_completo: 'Joaquim Alberto Chissano', doc: '110882910482J', tel: '+258 84 111 6604', lat: -19.6130, lon: 34.7420, cat: 'residencial', estado: 'activo' },
 
       // Ribáuè
-      { id: '30000000-0000-0000-0000-000000000024', codigo: 'MR007-PUE-0001', mini_grid_id: '10000000-0000-0000-0000-000000000007', nome_completo: 'Moageira Estrela do Norte - Iapala', doc: '400882910482M', tel: '+258 84 222 7701', lat: -14.9605, lon: 38.3110, cat: 'uso_produtivo', estado: 'activo' },
-      { id: '30000000-0000-0000-0000-000000000025', codigo: 'MR007-COM-0001', mini_grid_id: '10000000-0000-0000-0000-000000000007', nome_completo: 'Barbearia e Salão de Beleza Moderno', doc: '110982910482S', tel: '+258 84 222 7702', lat: -14.9595, lon: 38.3090, cat: 'comercial', estado: 'activo' },
-      { id: '30000000-0000-0000-0000-000000000026', codigo: 'MR007-PUB-0001', mini_grid_id: '10000000-0000-0000-0000-000000000007', nome_completo: 'Posto de Saúde Comunitário de Iapala', doc: '900782910482P', tel: '+258 82 222 7703', lat: -14.9590, lon: 38.3115, cat: 'servico_publico', estado: 'activo' },
-      { id: '30000000-0000-0000-0000-000000000027', codigo: 'MR007-RES-0001', mini_grid_id: '10000000-0000-0000-0000-000000000007', nome_completo: 'Faustino Muendane Nhaduate', doc: '111082910482N', tel: '+258 84 222 7704', lat: -14.9610, lon: 38.3085, cat: 'residencial', estado: 'activo' },
+      { id: '30000000-0000-0000-0000-000000000024', codigo: 'MR007-PUE-0001', mini_grid_id: '10000000-0000-0000-0000-000000000007', nome_completo: 'Moageira Estrela do Norte - Iapala', doc: '400882910482M', tel: '+258 84 222 7701', lat: -14.9575, lon: 38.3045, cat: 'uso_produtivo', estado: 'activo' },
+      { id: '30000000-0000-0000-0000-000000000025', codigo: 'MR007-COM-0001', mini_grid_id: '10000000-0000-0000-0000-000000000007', nome_completo: 'Barbearia e Salão de Beleza Moderno', doc: '110982910482S', tel: '+258 84 222 7702', lat: -14.9585, lon: 38.3055, cat: 'comercial', estado: 'activo' },
+      { id: '30000000-0000-0000-0000-000000000026', codigo: 'MR007-PUB-0001', mini_grid_id: '10000000-0000-0000-0000-000000000007', nome_completo: 'Posto de Saúde Comunitário de Iapala', doc: '900782910482P', tel: '+258 82 222 7703', lat: -14.9570, lon: 38.3060, cat: 'servico_publico', estado: 'activo' },
+      { id: '30000000-0000-0000-0000-000000000027', codigo: 'MR007-RES-0001', mini_grid_id: '10000000-0000-0000-0000-000000000007', nome_completo: 'Faustino Muendane Nhaduate', doc: '111082910482N', tel: '+258 84 222 7704', lat: -14.9590, lon: 38.3040, cat: 'residencial', estado: 'activo' },
 
       // Metuge
-      { id: '30000000-0000-0000-0000-000000000028', codigo: 'MR008-PUE-0001', mini_grid_id: '10000000-0000-0000-0000-000000000008', nome_completo: 'Bomba Solar de Captação e Irrigação Mieze', doc: '400982910482B', tel: '+258 84 333 8801', lat: -12.9905, lon: 40.5010, cat: 'uso_produtivo', estado: 'activo' },
-      { id: '30000000-0000-0000-0000-000000000029', codigo: 'MR008-PUB-0001', mini_grid_id: '10000000-0000-0000-0000-000000000008', nome_completo: 'Posto Policial e Iluminação Pública Mieze', doc: '900882910482L', tel: '+258 82 333 8802', lat: -12.9895, lon: 40.4990, cat: 'servico_publico', estado: 'activo' },
-      { id: '30000000-0000-0000-0000-000000000030', codigo: 'MR008-RES-0001', mini_grid_id: '10000000-0000-0000-0000-000000000008', nome_completo: 'Zainabo Abdul Bachir', doc: '111182910482Z', tel: '+258 84 333 8803', lat: -12.9910, lon: 40.4985, cat: 'residencial', estado: 'activo' }
+      { id: '30000000-0000-0000-0000-000000000028', codigo: 'MR008-PUE-0001', mini_grid_id: '10000000-0000-0000-0000-000000000008', nome_completo: 'Bomba Solar de Captação e Irrigação Mieze', doc: '400982910482B', tel: '+258 84 333 8801', lat: -13.0035, lon: 40.3255, cat: 'uso_produtivo', estado: 'activo' },
+      { id: '30000000-0000-0000-0000-000000000029', codigo: 'MR008-PUB-0001', mini_grid_id: '10000000-0000-0000-0000-000000000008', nome_completo: 'Posto Policial e Iluminação Pública Mieze', doc: '900882910482L', tel: '+258 82 333 8802', lat: -13.0045, lon: 40.3245, cat: 'servico_publico', estado: 'activo' },
+      { id: '30000000-0000-0000-0000-000000000030', codigo: 'MR008-RES-0001', mini_grid_id: '10000000-0000-0000-0000-000000000008', nome_completo: 'Zainabo Abdul Bachir', doc: '111182910482Z', tel: '+258 84 333 8803', lat: -13.0042, lon: 40.3260, cat: 'residencial', estado: 'activo' }
     ];
 
     for (const c of clients) {

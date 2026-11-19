@@ -13,18 +13,41 @@ const { generateNextMiniGridCode } = require('../utils/codeGenerator');
 const ESTADOS_OPERACIONAIS = ['planeada', 'instalacao', 'activa', 'indisponivel', 'suspensa'];
 
 /**
- * Validação de coordenadas geográficas no território de Moçambique
- * Latitude aproximada: entre -27.0 e -10.0
- * Longitude aproximada: entre 30.0 e 41.0
+ * Validação e normalização de coordenadas geográficas no território de Moçambique.
+ * Moçambique localiza-se no Hemisfério Sul (Latitude entre -27.5 e -10.0) e Hemisfério Oriental (Longitude entre 30.0 e 41.5).
+ * Esta função corrige automaticamente coordenadas invertidas [lat, lon] vs [lon, lat] ou latitudes sem sinal negativo.
  */
+function normalizeMozambiqueCoordinates(c1, c2) {
+  if (c1 === null || c1 === undefined || c1 === '' || c2 === null || c2 === undefined || c2 === '') {
+    return { lat: null, lon: null, valid: true };
+  }
+  const n1 = Number(c1);
+  const n2 = Number(c2);
+  if (isNaN(n1) || isNaN(n2)) return { lat: null, lon: null, valid: false };
+
+  const abs1 = Math.abs(n1);
+  const abs2 = Math.abs(n2);
+
+  let lat, lon;
+  if (abs1 >= 10.0 && abs1 <= 27.5 && abs2 >= 30.0 && abs2 <= 42.0) {
+    lat = -abs1;
+    lon = abs2;
+  } else if (abs2 >= 10.0 && abs2 <= 27.5 && abs1 >= 30.0 && abs1 <= 42.0) {
+    lat = -abs2;
+    lon = abs1;
+  } else {
+    return { lat: n1, lon: n2, valid: false };
+  }
+
+  return { lat, lon, valid: true };
+}
+
 function isValidMozambiqueCoordinates(lat, lon) {
-  if (lat === null || lat === undefined || lon === null || lon === undefined) {
+  if (lat === null || lat === undefined || lat === '' || lon === null || lon === undefined || lon === '') {
     return true; // Coordenadas são opcionais na fase de planeamento
   }
-  const nLat = Number(lat);
-  const nLon = Number(lon);
-  if (isNaN(nLat) || isNaN(nLon)) return false;
-  return nLat >= -27.5 && nLat <= -10.0 && nLon >= 30.0 && nLon <= 41.5;
+  const norm = normalizeMozambiqueCoordinates(lat, lon);
+  return norm.valid;
 }
 
 /**
@@ -308,15 +331,18 @@ async function createMiniGrid(req, res) {
       }
     }
 
-    // 3. Validação de coordenadas em Moçambique
-    if (latitude !== undefined && longitude !== undefined) {
-      if (!isValidMozambiqueCoordinates(latitude, longitude)) {
+    // 3. Validação e normalização de coordenadas em Moçambique
+    if (latitude !== undefined && longitude !== undefined && latitude !== null && longitude !== null && latitude !== '' && longitude !== '') {
+      const norm = normalizeMozambiqueCoordinates(latitude, longitude);
+      if (!norm.valid) {
         return error(
           res,
           'As coordenadas geográficas fornecidas estão fora dos limites territoriais de Moçambique (Latitude: -27 a -10, Longitude: 30 a 41).',
           400
         );
       }
+      latitude = norm.lat;
+      longitude = norm.lon;
     }
 
     // 4. Validação do estado operacional
@@ -419,9 +445,12 @@ async function updateMiniGrid(req, res) {
     if (latitude !== undefined || longitude !== undefined) {
       const latToCheck = latitude !== undefined ? latitude : oldMiniGrid.latitude;
       const lonToCheck = longitude !== undefined ? longitude : oldMiniGrid.longitude;
-      if (!isValidMozambiqueCoordinates(latToCheck, lonToCheck)) {
+      const norm = normalizeMozambiqueCoordinates(latToCheck, lonToCheck);
+      if (!norm.valid) {
         return error(res, 'Coordenadas geográficas inválidas para o território moçambicano.', 400);
       }
+      if (latitude !== undefined && latitude !== null && latitude !== '') latitude = norm.lat;
+      if (longitude !== undefined && longitude !== null && longitude !== '') longitude = norm.lon;
     }
 
     // 3. Montagem dinâmica dos campos de atualização
