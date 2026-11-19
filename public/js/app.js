@@ -5,13 +5,24 @@
  * Especificação Funcional da LECASU, Lda.
  */
 
+const defaultDemoUser = {
+  id: '00000000-0000-0000-0000-000000000001',
+  nome: 'Jossue Mohamad (Administrador LECASU)',
+  email: 'jossuemohamad@gmail.com',
+  role: 'administrador',
+  status: 'ativo',
+  telefone: '+258 84 000 0001'
+};
+
 // Estado Global da Aplicação
 const AppState = {
   currentView: 'dashboard',
-  authToken: localStorage.getItem('lecasu_jwt_token') || null,
-  currentUser: JSON.parse(localStorage.getItem('lecasu_user') || 'null'),
+  authToken: localStorage.getItem('lecasu_jwt_token') || 'demo_pilot_token_lecasu_gridops',
+  currentUser: JSON.parse(localStorage.getItem('lecasu_user') || 'null') || defaultDemoUser,
   leafletMap: null,
   miniGridsCache: [],
+  clientsCache: [],
+  metersCache: [],
   telemetryDevicesCache: [],
   solarmanSummary: null,
   systemHealth: null
@@ -103,7 +114,9 @@ async function apiFetch(endpoint, options = {}) {
 
     if (res.status === 401) {
       console.warn('[GridOps API] Sessão expirada ou não autenticado.');
-      logoutUser();
+      if (AppState.authToken && AppState.authToken !== 'demo_pilot_token_lecasu_gridops') {
+        logoutUser();
+      }
       throw new Error(data?.error || 'Sessão expirada. Por favor autentique-se.');
     }
 
@@ -113,6 +126,13 @@ async function apiFetch(endpoint, options = {}) {
 
     return data;
   } catch (err) {
+    // Interceção graciosa para modo offline / demonstração na Vercel (onde não há backend PostgreSQL local)
+    if (window.DemoData && typeof window.DemoData.getFallbackResponse === 'function') {
+      const fallback = window.DemoData.getFallbackResponse(endpoint, options);
+      if (fallback !== null) {
+        return fallback;
+      }
+    }
     console.error(`[GridOps API Error] ${endpoint}:`, err);
     throw err;
   }
@@ -10985,18 +11005,50 @@ async function showNewTariffModal() {
 }
 
 /**
- * Vista de contingência solicitando login para acessar áreas restritas
+ * Ativa uma sessão de operador demonstrativo autorizado (para modo Vercel, teste ou offline)
+ */
+function activateDemoSession() {
+  const demoUser = defaultDemoUser;
+  setAuthenticatedUser('demo_pilot_token_lecasu_gridops', demoUser);
+}
+
+/**
+ * Vista de contingência solicitando login ou ativação de acesso demonstrativo
  */
 function renderAuthRequiredView(container) {
   container.innerHTML = `
-    <div class="card" style="text-align: center; padding: 2rem 1rem;">
-      <h2 style="margin-bottom: 0.5rem;">Autenticação Necessária</h2>
-      <p style="color: var(--color-text-secondary); margin-bottom: 1.5rem; font-size: 0.9rem;">
-        Esta secção requer autenticação com um perfil de operador autorizado da LECASU.
+    <div class="workspace-card" style="text-align: center; padding: 3rem 1.5rem; max-width: 680px; margin: 2rem auto;">
+      <div style="width: 56px; height: 56px; border-radius: 50%; background: #fff7ed; color: #ea580c; display: inline-flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem;">
+        ${Icons.shield(28)}
+      </div>
+      <h2 style="font-size: 1.35rem; font-weight: 700; color: var(--color-text-main); margin-bottom: 0.5rem;">Autenticação Necessária</h2>
+      <p style="color: var(--color-text-muted); margin-bottom: 1.5rem; font-size: 0.92rem; line-height: 1.5;">
+        Esta secção requer autenticação com um perfil de operador autorizado da LECASU. Pode aceder imediatamente em modo piloto/demonstração ou iniciar sessão com a sua conta.
       </p>
-      <button onclick="window.location.hash='#dashboard'" class="btn btn-primary">Ir para a Tela de Início</button>
+      <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+        <button id="btn-auth-demo-mode" class="btn btn-primary" style="padding: 0 1.25rem; height: 38px;">
+          ${Icons.zap(14)} Aceder como Administrador (1-Clique)
+        </button>
+        <button id="btn-auth-login-modal" class="btn-outline" style="padding: 0 1.25rem; height: 38px;">
+          ${Icons.shieldCheck(14)} Iniciar Sessão com Palavra-Passe
+        </button>
+        <button onclick="window.location.hash='#dashboard'" class="btn-outline" style="padding: 0 1.25rem; height: 38px;">
+          ${Icons.dashboard(14)} Ver Dashboard
+        </button>
+      </div>
     </div>
   `;
+
+  document.getElementById('btn-auth-demo-mode')?.addEventListener('click', () => {
+    activateDemoSession();
+    updateUserSessionUI();
+    const hash = window.location.hash.replace('#', '') || 'dashboard';
+    navigateToView(hash);
+  });
+
+  document.getElementById('btn-auth-login-modal')?.addEventListener('click', () => {
+    showLoginAndRecoveryModal();
+  });
 }
 
 // ==============================================================================
@@ -11014,20 +11066,23 @@ window.addEventListener('DOMContentLoaded', async () => {
     AppState.currentUser = null;
     localStorage.removeItem('lecasu_jwt_token');
     localStorage.removeItem('lecasu_user');
-  } else if (!AppState.authToken) {
-    // Autenticação automática inicial como administrador principal da LECASU
+  } else if (!AppState.authToken || AppState.authToken === 'demo_pilot_token_lecasu_gridops') {
+    // Tenta autenticar na API real se disponível; se falhar (ex: Vercel estático sem BD), mantém a sessão demo
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: 'jossuemohamad@gmail.com', password: 'Joswil@8464' })
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => null);
       if (res.ok && data?.data) {
         setAuthenticatedUser(data.data.token, data.data.user);
+      } else {
+        activateDemoSession();
       }
     } catch (err) {
-      console.warn('[GridOps] Início automático de sessão:', err);
+      console.warn('[GridOps] Início automático de sessão (ativação modo demo/Vercel):', err);
+      activateDemoSession();
     }
   }
 
