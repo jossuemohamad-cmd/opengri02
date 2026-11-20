@@ -32,7 +32,7 @@ function request(path, options = {}) {
 
     const req = http.request(
       {
-        hostname: 'localhost',
+        hostname: '127.0.0.1',
         port: TEST_PORT,
         path,
         method: options.method || 'GET',
@@ -629,5 +629,9 @@ async function runTests() {
   }
 }
 
-// Aguarda 100ms para o socket estar pronto
-setTimeout(runTests, 100);
+// Executa os testes assim que o servidor HTTP estiver a escutar na porta
+if (server.listening) {
+  runTests();
+} else {
+  server.once('listening', runTests);
+}
