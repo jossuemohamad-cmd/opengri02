@@ -3,9 +3,35 @@
 -- Plataforma de Gestão de Mini-Redes de Eletrificação Rural em Moçambique
 -- ==============================================================================
 
--- 1. Extensões do PostgreSQL
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+-- 1. Suporte universal a UUID v4 com fallback em PL/pgSQL
+DO $$
+BEGIN
+    BEGIN
+        CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
+    BEGIN
+        CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
+END $$;
+
+-- Função universal para geração de UUID v4 caso extensões binárias não existam
+CREATE OR REPLACE FUNCTION gen_random_uuid()
+RETURNS UUID AS $$
+DECLARE
+    h VARCHAR;
+BEGIN
+    h := md5(random()::text || clock_timestamp()::text || random()::text);
+    RETURN (
+        substr(h, 1, 8) || '-' ||
+        substr(h, 9, 4) || '-4' ||
+        substr(h, 14, 3) || '-a' ||
+        substr(h, 18, 3) || '-' ||
+        substr(h, 21, 12)
+    )::uuid;
+END;
+$$ LANGUAGE plpgsql;
 
 -- 2. Tabela de controlo de migrações
 CREATE TABLE IF NOT EXISTS _migrations (
