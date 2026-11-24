@@ -246,11 +246,12 @@
     }
   ];
 
-  // 6. Ativos Técnicos (Com históricos e detalhes individuais completos para showAssetDetailsModal)
+  // 6. Ativos Técnicos (Com históricos e mini_grid_id para todas as rotas e modais)
   const assets = [
     {
       id: 'a-01',
       codigo: 'AST-MR005-INV-01',
+      mini_grid_id: '10000000-0000-0000-0000-000000000005',
       mini_grid_codigo: 'MR-INH-001',
       mini_grid_nome: 'Morrumbene Sede',
       classe: 'inversor',
@@ -274,6 +275,7 @@
     {
       id: 'a-02',
       codigo: 'AST-MR005-BAT-01',
+      mini_grid_id: '10000000-0000-0000-0000-000000000005',
       mini_grid_codigo: 'MR-INH-001',
       mini_grid_nome: 'Morrumbene Sede',
       classe: 'bateria',
@@ -297,6 +299,7 @@
     {
       id: 'a-03',
       codigo: 'AST-MR006-INV-01',
+      mini_grid_id: '10000000-0000-0000-0000-000000000006',
       mini_grid_codigo: 'MR-SOF-001',
       mini_grid_nome: 'Savane Dondo',
       classe: 'inversor',
@@ -311,6 +314,7 @@
     {
       id: 'a-04',
       codigo: 'AST-MR007-BAT-01',
+      mini_grid_id: '10000000-0000-0000-0000-000000000007',
       mini_grid_codigo: 'MR-NPL-001',
       mini_grid_nome: 'Iapala Ribáuè',
       classe: 'bateria',
@@ -394,38 +398,57 @@
   ];
 
   // 10. Construtores Dinâmicos de Relatórios Estruturados (Dashboard e Executivo)
-  function getDashboardReport() {
+  function getDashboardReport(queryParams = {}) {
+    let targetGrids = [...miniGrids];
+    let targetClients = [...clients];
+    let targetOrders = [...workOrders];
+
+    if (queryParams.mini_grid_id) {
+      targetGrids = targetGrids.filter(m => m.id === queryParams.mini_grid_id || m.codigo === queryParams.mini_grid_id);
+      const mgCodes = targetGrids.map(m => m.codigo);
+      const mgIds = targetGrids.map(m => m.id);
+      targetClients = targetClients.filter(c => mgIds.includes(c.mini_grid_id) || mgCodes.includes(c.mini_grid_codigo));
+      targetOrders = targetOrders.filter(w => mgIds.includes(w.mini_grid_id) || mgCodes.includes(w.mini_grid_codigo));
+    }
+
+    const totalKwp = targetGrids.reduce((acc, m) => acc + (m.capacidade_kwp || 0), 0);
+    const totalBat = targetGrids.reduce((acc, m) => acc + (m.capacidade_bateria_kwh || 0), 0);
+    // Coeficientes unificados e partilhados com o relatório executivo (125 kWh/kWp e 105 MT/kWp)
+    const totalKwh = (totalKwp * 125.0).toFixed(1);
+    const totalReceita = (totalKwp * 105.0).toFixed(2);
+    const beneficiados = Math.round(targetClients.length * 61.6);
+
     return {
-      total_mini_grids: miniGrids.length,
-      total_clientes: clients.length,
-      capacidade_instalada_kwp: miniGrids.reduce((acc, m) => acc + (m.capacidade_kwp || 0), 0),
-      capacidade_bateria_kwh: miniGrids.reduce((acc, m) => acc + (m.capacidade_bateria_kwh || 0), 0),
-      energia_gerada_mes_kwh: 74500.0,
+      total_mini_grids: targetGrids.length,
+      total_clientes: targetClients.length,
+      capacidade_instalada_kwp: totalKwp,
+      capacidade_bateria_kwh: totalBat,
+      energia_gerada_mes_kwh: parseFloat(totalKwh),
       taxa_disponibilidade_media: 98.8,
-      ordens_trabalho_abertas: workOrders.filter(w => w.estado !== 'resolvida').length,
+      ordens_trabalho_abertas: targetOrders.filter(w => w.estado !== 'resolvida').length,
       clientes_por_categoria: {
-        uso_produtivo: clients.filter(c => c.categoria === 'uso_produtivo').length,
-        residencial: clients.filter(c => c.categoria === 'residencial').length,
-        comercial: clients.filter(c => c.categoria === 'comercial').length,
-        servico_publico: clients.filter(c => c.categoria === 'servico_publico').length
+        uso_produtivo: targetClients.filter(c => c.categoria === 'uso_produtivo').length,
+        residencial: targetClients.filter(c => c.categoria === 'residencial').length,
+        comercial: targetClients.filter(c => c.categoria === 'comercial').length,
+        servico_publico: targetClients.filter(c => c.categoria === 'servico_publico').length
       },
       tecnico: {
         energia: {
-          total_kwh_consumido: 74500.0,
-          geracao_solar_kwh: 81200.0,
+          total_kwh_consumido: parseFloat(totalKwh),
+          geracao_solar_kwh: (totalKwp * 135.3).toFixed(1),
           perdas_tecnicas_pct: 6.8
         }
       },
       comercial: {
         financeiro: {
-          receita_total_mzn: 62250.0,
+          receita_total_mzn: parseFloat(totalReceita),
           tarifa_media_kwh: 16.5,
           inadimplencia_pct: 3.2
         }
       },
       impacto_social_ambiental: {
-        pessoas_beneficiadas: 1850,
-        co2_evitado_toneladas: '184.2'
+        pessoas_beneficiadas: beneficiados,
+        co2_evitado_toneladas: (totalKwp * 0.307).toFixed(1)
       }
     };
   }
@@ -445,8 +468,9 @@
       periodo: periodoStr,
       mini_redes: targetGrids.map(mg => {
         const mgClients = clients.filter(c => c.mini_grid_id === mg.id || c.mini_grid_codigo === mg.codigo);
-        const activos = mgClients.filter(c => c.estado === 'activo').length || 4;
-        const pueCount = mgClients.filter(c => c.categoria === 'uso_produtivo').length || 2;
+        // Preserva a contagem real mesmo quando vazia (evita reportar clientes inexistentes em mini-redes recém-criadas)
+        const activos = mgClients.filter(c => c.estado === 'activo').length;
+        const pueCount = mgClients.filter(c => c.categoria === 'uso_produtivo').length;
         return {
           id: mg.id,
           codigo: mg.codigo,
@@ -472,7 +496,7 @@
     features: miniGrids.map(mg => ({
       type: 'Feature',
       geometry: { type: 'Point', coordinates: [mg.longitude, mg.latitude] },
-      properties: { ...mg }
+      properties: { ...mg, nome: mg.nome }
     }))
   };
 
@@ -481,7 +505,7 @@
     features: clients.map(c => ({
       type: 'Feature',
       geometry: { type: 'Point', coordinates: [c.longitude, c.latitude] },
-      properties: { ...c }
+      properties: { ...c, nome: c.nome_completo }
     }))
   };
 
@@ -538,12 +562,12 @@
         miniGridsGIS.features.unshift({
           type: 'Feature',
           geometry: { type: 'Point', coordinates: [createdMg.longitude, createdMg.latitude] },
-          properties: { ...createdMg }
+          properties: { ...createdMg, nome: createdMg.nome }
         });
         return { success: true, data: createdMg, message: 'Mini-rede cadastrada com sucesso no ambiente demonstrativo.' };
       }
 
-      // b) Criar Cliente (showNewClientModal - resolve mini-rede selecionada com precisão)
+      // b) Criar Cliente (showNewClientModal - resolve mini-rede selecionada com precisão e fornece nome ao GIS)
       if (cleanUrl === '/api/clients' && method === 'POST') {
         const selectedMg = miniGrids.find(m => m.id === bodyData?.mini_grid_id) || miniGrids[0];
         const newId = '30000000-0000-0000-0000-' + String(Date.now()).slice(-12);
@@ -567,25 +591,45 @@
         clientsGIS.features.unshift({
           type: 'Feature',
           geometry: { type: 'Point', coordinates: [createdClient.longitude, createdClient.latitude] },
-          properties: { ...createdClient }
+          properties: { ...createdClient, nome: createdClient.nome_completo }
         });
         return { success: true, data: createdClient, message: 'Cliente cadastrado com sucesso no ambiente demonstrativo.' };
       }
 
-      // c) Nova Leitura (Resolve contador selecionado de forma consistente)
+      // c) Nova Leitura (Resolve contador e valida leituras decrescentes)
       if (cleanUrl === '/api/readings' && method === 'POST') {
         const selectedMeter = meters.find(m => m.id === bodyData?.meter_id || m.numero_serie === bodyData?.meter_numero_serie) || meters[0];
+        const submittedKwh = parseFloat(bodyData?.valor_kwh || 0);
+
+        // Valida se a leitura é decrescente em relação ao último valor aceite (respeitando substituições de contador)
+        const previousReadings = readings.filter(r => r.meter_id === selectedMeter.id || r.meter_numero_serie === selectedMeter.numero_serie);
+        const latestKwh = previousReadings.length > 0
+          ? previousReadings[0].valor_kwh
+          : (selectedMeter.ultima_leitura || 0);
+
+        const allowDecrease = bodyData?.ignorar_aviso_decrescente === true ||
+          bodyData?.ignorar_aviso_decrescente === 'true' ||
+          bodyData?.motivo_substituicao === 'troca_contador';
+
+        if (submittedKwh < latestKwh && !allowDecrease) {
+          return {
+            success: false,
+            error: `A leitura informada (${submittedKwh} kWh) é inferior à leitura acumulada anterior (${latestKwh} kWh). Habilite o controlo de leitura decrescente ou informe a substituição física do contador.`
+          };
+        }
+
         const createdReading = {
           id: 'r-' + String(readings.length + 1).padStart(2, '0'),
           meter_id: selectedMeter.id,
           meter_numero_serie: selectedMeter.numero_serie,
           client_nome: bodyData?.client_nome || selectedMeter.cliente_nome || 'Cliente Operacional',
-          valor_kwh: parseFloat(bodyData?.valor_kwh || 0),
+          valor_kwh: submittedKwh,
           data_leitura: new Date().toISOString().split('T')[0],
           fonte: 'manual',
           validado: true
         };
         readings.unshift(createdReading);
+        selectedMeter.ultima_leitura = submittedKwh;
         return { success: true, data: createdReading, message: 'Leitura registada com sucesso no ambiente demonstrativo.' };
       }
 
@@ -720,7 +764,7 @@
     if (mgAssetsMatch) {
       const mgId = mgAssetsMatch[1];
       const targetMg = miniGrids.find(m => m.id === mgId || m.codigo === mgId);
-      const filteredAssets = targetMg ? assets.filter(a => a.mini_grid_codigo === targetMg.codigo) : assets;
+      const filteredAssets = targetMg ? assets.filter(a => a.mini_grid_codigo === targetMg.codigo || a.mini_grid_id === targetMg.id) : assets;
       return { success: true, data: filteredAssets };
     }
 
@@ -765,7 +809,7 @@
     }
 
     // 4. Relatórios Oficiais (Dashboard e Executivo dinâmicos com suporte a filtros)
-    if (cleanUrl === '/api/reports/dashboard') return { success: true, data: getDashboardReport() };
+    if (cleanUrl === '/api/reports/dashboard') return { success: true, data: getDashboardReport(queryParams) };
     if (cleanUrl === '/api/reports/executive') return { success: true, data: getExecutiveReport(queryParams) };
 
     // 5. Camadas GeoJSON para Leaflet Maps

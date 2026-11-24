@@ -20,6 +20,7 @@ const AppState = {
   authToken: localStorage.getItem('lecasu_jwt_token') || 'demo_pilot_token_lecasu_gridops',
   currentUser: JSON.parse(localStorage.getItem('lecasu_user') || 'null') || defaultDemoUser,
   isDemoSession: !localStorage.getItem('lecasu_jwt_token') || localStorage.getItem('lecasu_jwt_token') === 'demo_pilot_token_lecasu_gridops',
+  sessionGeneration: 1,
   leafletMap: null,
   miniGridsCache: [],
   clientsCache: [],
@@ -109,9 +110,10 @@ async function apiFetch(endpoint, options = {}) {
 
   options.headers = headers;
 
-  // Vincula a elegibilidade de fallback à sessão activa no momento do disparo do pedido
+  // Vincula a elegibilidade de fallback à sessão activa no momento do disparo do pedido via token e geração de sessão
   const requestToken = AppState.authToken;
   const requestIsDemo = AppState.isDemoSession === true || requestToken === 'demo_pilot_token_lecasu_gridops';
+  const requestGeneration = AppState.sessionGeneration || 1;
 
   try {
     const res = await fetch(endpoint, options);
@@ -131,8 +133,9 @@ async function apiFetch(endpoint, options = {}) {
 
     return data;
   } catch (err) {
-    // Interceção graciosa estritamente se a sessão iniciada for demonstrativa e não tiver sido alterada
+    // Interceção graciosa estritamente se a sessão iniciada for demonstrativa e a geração da sessão não tiver mudado
     const sessionMatchesRequest = AppState.authToken === requestToken &&
+      AppState.sessionGeneration === requestGeneration &&
       (AppState.isDemoSession === true || AppState.authToken === 'demo_pilot_token_lecasu_gridops') === requestIsDemo;
 
     if (requestIsDemo && sessionMatchesRequest && window.DemoData && typeof window.DemoData.getFallbackResponse === 'function') {
@@ -156,6 +159,7 @@ function setAuthenticatedUser(token, user) {
   AppState.authToken = token;
   AppState.currentUser = user;
   AppState.isDemoSession = (token === 'demo_pilot_token_lecasu_gridops');
+  AppState.sessionGeneration = (AppState.sessionGeneration || 1) + 1;
   localStorage.setItem('lecasu_jwt_token', token);
   localStorage.setItem('lecasu_user', JSON.stringify(user));
   updateUserSessionUI();
@@ -168,6 +172,7 @@ function logoutUser() {
   AppState.authToken = null;
   AppState.currentUser = null;
   AppState.isDemoSession = false;
+  AppState.sessionGeneration = (AppState.sessionGeneration || 1) + 1;
   localStorage.removeItem('lecasu_jwt_token');
   localStorage.removeItem('lecasu_user');
   updateUserSessionUI();
