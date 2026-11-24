@@ -5,7 +5,8 @@
  * verificação de integridade (health check) e encerramento gracioso (graceful shutdown).
  */
 
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '..', '..', '.env') });
 const { Pool } = require('pg');
 
 // Deteção inteligente de SSL (obrigatório para Neon e instâncias cloud com sslmode=require)

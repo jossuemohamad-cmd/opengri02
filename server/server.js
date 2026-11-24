@@ -7,8 +7,8 @@
  * LECASU, Lda.
  */
 
-require('dotenv').config();
 const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 const express = require('express');
 const { closePool } = require('./config/db');
 const apiRoutes = require('./routes/api');
