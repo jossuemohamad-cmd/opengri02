@@ -18,7 +18,7 @@ const poolConfig = process.env.DATABASE_URL
   ? {
       connectionString: process.env.DATABASE_URL,
       ssl: isSsl ? { rejectUnauthorized: false } : false,
-      max: parseInt(process.env.PGMAX_POOL || '20', 10),
+      max: parseInt(process.env.PGMAX_POOL || '5', 10),
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 10000
     }
@@ -29,7 +29,7 @@ const poolConfig = process.env.DATABASE_URL
       user: process.env.PGUSER || 'postgres',
       password: process.env.PGPASSWORD || 'postgres',
       ssl: isSsl ? { rejectUnauthorized: false } : false,
-      max: parseInt(process.env.PGMAX_POOL || '20', 10),
+      max: parseInt(process.env.PGMAX_POOL || '5', 10),
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 10000
     };
