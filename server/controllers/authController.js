@@ -29,9 +29,9 @@ async function login(req, res) {
 
     // 2. Consulta do utilizador na base de dados por email ou nome de utilizador
     const sql = `
-      SELECT id, nome, email, username, password_hash, role, status, telefone
+      SELECT id, nome, email, password_hash, role, status, telefone
       FROM users
-      WHERE LOWER(email) = $1 OR LOWER(COALESCE(username, '')) = $1;
+      WHERE LOWER(email) = $1;
     `;
     const userRes = await query(sql, [identifier]);
 
