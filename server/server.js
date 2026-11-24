@@ -16,7 +16,7 @@ const { notFoundHandler, globalErrorHandler } = require('./middleware/errorHandl
 const { startTelemetryAutoSyncScheduler, stopTelemetryAutoSyncScheduler } = require('./controllers/telemetryController');
 
 const app = express();
-const PORT = parseInt(process.env.PORT || '3000', 10);
+const PORT = process.env.PORT || 3000;
 
 // Middlewares essenciais para parsing do corpo das requisições
 app.use(express.json({ limit: '10mb' }));
