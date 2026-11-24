@@ -66,7 +66,7 @@ async function query(text, params = []) {
     return res;
   } catch (error) {
     console.error(`[DB ERROR] Falha ao executar consulta: ${text}`);
-    console.error(`[DB ERROR Detalhe]: ${error.message}`);
+    console.error(`[DB ERROR Detalhe]:`, error.message || error.code || error);
     throw error;
   }
 }
@@ -100,7 +100,7 @@ async function checkConnection() {
   } catch (err) {
     return {
       ok: false,
-      error: err.message
+      error: err.message || err.code || String(err)
     };
   }
 }
