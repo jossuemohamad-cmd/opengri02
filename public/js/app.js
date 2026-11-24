@@ -468,12 +468,12 @@ function renderSolarmanLoginView(container) {
       <div class="solarman-login-card shadow-sm" style="width: 100%; max-width: 420px; border-radius: 12px; padding: 2.25rem 2rem; background: #ffffff; border: 1px solid #e2e8f0;">
         
         <!-- Logo Institucional -->
-        <div class="text-center mb-3">
+        <div class="text-center mb-3" style="text-align: center; margin-bottom: 1rem;">
           <img src="/images/lecasu-logo.png" alt="LECASU" style="max-height: 48px; width: auto; object-fit: contain;">
         </div>
 
         <!-- Título e Subtítulo -->
-        <div class="text-center mb-4">
+        <div class="text-center mb-4" style="text-align: center; margin-bottom: 1.5rem;">
           <h2 style="font-size: 1.35rem; font-weight: 700; color: #0f172a; margin-bottom: 0.25rem; font-family: 'Poppins', sans-serif;">LECASU GridOps</h2>
           <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 0;">Gestão Operacional de Mini-Redes</p>
         </div>
@@ -485,49 +485,49 @@ function renderSolarmanLoginView(container) {
         <div id="login-view-section">
           <form id="form-login-direct" novalidate>
             <!-- Campo de Email -->
-            <div class="mb-3 text-start">
-              <label for="login-email-input" class="form-label" style="font-weight: 500; font-size: 0.85rem; color: #334155;">E-mail</label>
-              <div class="input-group">
-                <span class="input-group-text bg-light border-end-0 text-muted" style="border-radius: 6px 0 0 6px;">
+            <div class="mb-3 text-start" style="margin-bottom: 1rem; text-align: left;">
+              <label for="login-email-input" class="form-label" style="font-weight: 500; font-size: 0.85rem; color: #334155; display: block; margin-bottom: 0.35rem;">E-mail</label>
+              <div class="input-group" style="display: flex;">
+                <span class="input-group-text bg-light text-muted" style="border: 1px solid #cbd5e1; border-right: none; border-radius: 6px 0 0 6px; padding: 0.5rem 0.75rem; background: #f8fafc; display: flex; align-items: center;">
                   ${Icons.mail(16)}
                 </span>
                 <input 
                   type="email" 
                   id="login-email-input" 
-                  class="form-control border-start-0" 
+                  class="form-control" 
                   placeholder="info@lecasu.co.mz" 
                   value="info@lecasu.co.mz"
                   required 
                   autocomplete="email"
-                  style="border-radius: 0 6px 6px 0; font-size: 0.90rem; height: 42px;"
+                  style="flex: 1; border: 1px solid #cbd5e1; border-radius: 0 6px 6px 0; font-size: 0.90rem; height: 42px; padding: 0.5rem 0.75rem;"
                 >
               </div>
             </div>
 
             <!-- Campo de Senha com Olho -->
-            <div class="mb-3 text-start">
-              <label for="login-password-input" class="form-label" style="font-weight: 500; font-size: 0.85rem; color: #334155;">Senha</label>
-              <div class="input-group">
-                <span class="input-group-text bg-light border-end-0 text-muted" style="border-radius: 6px 0 0 6px;">
+            <div class="mb-3 text-start" style="margin-bottom: 1rem; text-align: left;">
+              <label for="login-password-input" class="form-label" style="font-weight: 500; font-size: 0.85rem; color: #334155; display: block; margin-bottom: 0.35rem;">Senha</label>
+              <div class="input-group" style="display: flex;">
+                <span class="input-group-text bg-light text-muted" style="border: 1px solid #cbd5e1; border-right: none; border-radius: 6px 0 0 6px; padding: 0.5rem 0.75rem; background: #f8fafc; display: flex; align-items: center;">
                   ${Icons.lock(16)}
                 </span>
                 <input 
                   type="password" 
                   id="login-password-input" 
-                  class="form-control border-start-0 border-end-0" 
+                  class="form-control" 
                   placeholder="Insira a sua senha" 
                   value="Lecasu@2026"
                   required 
                   autocomplete="current-password"
-                  style="font-size: 0.90rem; height: 42px;"
+                  style="flex: 1; border: 1px solid #cbd5e1; border-left: none; border-right: none; font-size: 0.90rem; height: 42px; padding: 0.5rem 0.75rem;"
                 >
                 <button 
                   type="button" 
                   id="btn-toggle-pwd" 
-                  class="btn btn-outline-secondary border-start-0 bg-white" 
+                  class="btn btn-outline-secondary" 
                   title="Mostrar/Ocultar Senha" 
                   tabindex="-1"
-                  style="border-color: #dee2e6; border-radius: 0 6px 6px 0; color: #64748b;"
+                  style="border: 1px solid #cbd5e1; border-left: none; border-radius: 0 6px 6px 0; background: #ffffff; color: #64748b; padding: 0.5rem 0.75rem; cursor: pointer; display: flex; align-items: center;"
                 >
                   ${Icons.eye(16)}
                 </button>
@@ -535,13 +535,11 @@ function renderSolarmanLoginView(container) {
             </div>
 
             <!-- Checkbox Lembrar-me e Link Recuperar Senha -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-              <div class="form-check" style="margin-bottom: 0;">
-                <input class="form-check-input" type="checkbox" id="login-remember-me" checked style="cursor: pointer;">
-                <label class="form-check-label" for="login-remember-me" style="font-size: 0.85rem; color: #475569; cursor: pointer;">
-                  Lembrar-me
-                </label>
-              </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+              <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; color: #475569; cursor: pointer; margin: 0;">
+                <input type="checkbox" id="login-remember-me" checked style="cursor: pointer;">
+                <span>Lembrar-me</span>
+              </label>
               <a href="javascript:void(0)" id="link-goto-forgot" style="font-size: 0.85rem; color: #ff7a00; font-weight: 500; text-decoration: none;">
                 Recuperar senha
               </a>
@@ -551,8 +549,8 @@ function renderSolarmanLoginView(container) {
             <button 
               type="submit" 
               id="btn-login-submit" 
-              class="btn w-100 text-white" 
-              style="background-color: #ff7a00; border: none; font-weight: 600; font-size: 0.95rem; height: 44px; border-radius: 6px;"
+              class="btn w-100" 
+              style="width: 100%; background-color: #ff7a00; color: #ffffff; border: none; font-weight: 600; font-size: 0.95rem; height: 44px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem;"
             >
               Iniciar Sessão
             </button>
@@ -561,78 +559,77 @@ function renderSolarmanLoginView(container) {
 
         <!-- Vista 2: Painel de Recuperação de Senha -->
         <div id="recovery-view-section" style="display: none;">
-          <div class="text-start mb-3">
+          <div class="text-start mb-3" style="text-align: left; margin-bottom: 1rem;">
             <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 0.25rem;">Recuperação de Acesso</h3>
             <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 1rem;">Introduza o e-mail da sua conta para receber o código de validação.</p>
           </div>
 
           <form id="form-recovery" novalidate>
             <!-- Passo 1: Solicitar Código -->
-            <div id="recovery-step-1" class="text-start">
-              <div class="mb-3">
-                <label for="recovery-email-input" class="form-label" style="font-weight: 500; font-size: 0.85rem; color: #334155;">E-mail Cadastrado</label>
-                <div class="input-group">
-                  <span class="input-group-text bg-light border-end-0 text-muted" style="border-radius: 6px 0 0 6px;">
+            <div id="recovery-step-1" class="text-start" style="text-align: left;">
+              <div class="mb-3" style="margin-bottom: 1rem;">
+                <label for="recovery-email-input" class="form-label" style="font-weight: 500; font-size: 0.85rem; color: #334155; display: block; margin-bottom: 0.35rem;">E-mail Cadastrado</label>
+                <div class="input-group" style="display: flex;">
+                  <span class="input-group-text bg-light text-muted" style="border: 1px solid #cbd5e1; border-right: none; border-radius: 6px 0 0 6px; padding: 0.5rem 0.75rem; background: #f8fafc; display: flex; align-items: center;">
                     ${Icons.mail(16)}
                   </span>
                   <input 
                     type="email" 
                     id="recovery-email-input" 
-                    class="form-control border-start-0" 
+                    class="form-control" 
                     placeholder="info@lecasu.co.mz" 
                     value="info@lecasu.co.mz"
-                    required
-                    style="border-radius: 0 6px 6px 0; font-size: 0.90rem; height: 42px;"
+                    required 
+                    style="flex: 1; border: 1px solid #cbd5e1; border-radius: 0 6px 6px 0; font-size: 0.90rem; height: 42px; padding: 0.5rem 0.75rem;"
                   >
                 </div>
               </div>
+
               <button 
                 type="button" 
                 id="btn-send-recovery-code" 
-                class="btn w-100 text-white mb-3" 
-                style="background-color: #ff7a00; border: none; font-weight: 600; font-size: 0.90rem; height: 42px; border-radius: 6px;"
+                class="btn w-100" 
+                style="width: 100%; background-color: #0f172a; color: #ffffff; border: none; font-weight: 600; font-size: 0.90rem; height: 42px; border-radius: 6px; cursor: pointer; margin-bottom: 1rem;"
               >
                 Gerar Código de Recuperação
               </button>
             </div>
 
-            <!-- Passo 2: Código e Nova Senha (Aparece após o passo 1) -->
-            <div id="recovery-step-2" style="display: none;" class="text-start">
-              <div id="recovery-notice-box" class="alert alert-info py-2 px-3 mb-3" style="font-size: 0.82rem; border-radius: 6px;"></div>
+            <!-- Passo 2: Inserir Código e Nova Senha -->
+            <div id="recovery-step-2" class="text-start" style="display: none; text-align: left;">
+              <div id="recovery-notice-box" style="background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; padding: 0.75rem; border-radius: 6px; font-size: 0.85rem; margin-bottom: 1rem;"></div>
 
-              <div class="mb-3">
-                <label for="recovery-code-input" class="form-label" style="font-weight: 500; font-size: 0.85rem; color: #334155;">Código de Verificação (6 dígitos)</label>
+              <div class="mb-3" style="margin-bottom: 1rem;">
+                <label for="recovery-code-input" class="form-label" style="font-weight: 500; font-size: 0.85rem; color: #334155; display: block; margin-bottom: 0.35rem;">Código de Verificação (6 Dígitos)</label>
                 <input 
                   type="text" 
                   id="recovery-code-input" 
-                  class="form-control text-center fw-bold" 
-                  placeholder="Ex: 123456" 
-                  maxlength="6"
-                  style="font-size: 1.15rem; letter-spacing: 2px; height: 44px; border-radius: 6px;"
+                  class="form-control text-center" 
+                  maxlength="6" 
+                  placeholder="000000" 
+                  style="border: 1px solid #cbd5e1; border-radius: 6px; font-size: 1.1rem; letter-spacing: 4px; text-align: center; height: 42px; width: 100%;"
                 >
               </div>
 
-              <div class="mb-3">
-                <label for="recovery-new-pwd-input" class="form-label" style="font-weight: 500; font-size: 0.85rem; color: #334155;">Nova Senha</label>
-                <div class="input-group">
-                  <span class="input-group-text bg-light border-end-0 text-muted" style="border-radius: 6px 0 0 6px;">
+              <div class="mb-3" style="margin-bottom: 1rem;">
+                <label for="recovery-new-pwd-input" class="form-label" style="font-weight: 500; font-size: 0.85rem; color: #334155; display: block; margin-bottom: 0.35rem;">Nova Senha</label>
+                <div class="input-group" style="display: flex;">
+                  <span class="input-group-text bg-light text-muted" style="border: 1px solid #cbd5e1; border-right: none; border-radius: 6px 0 0 6px; padding: 0.5rem 0.75rem; background: #f8fafc; display: flex; align-items: center;">
                     ${Icons.lock(16)}
                   </span>
                   <input 
                     type="password" 
                     id="recovery-new-pwd-input" 
-                    class="form-control border-start-0 border-end-0" 
-                    placeholder="Mínimo de 6 caracteres" 
-                    required
-                    style="font-size: 0.90rem; height: 42px;"
+                    class="form-control" 
+                    placeholder="Mínimo 6 caracteres" 
+                    style="flex: 1; border: 1px solid #cbd5e1; border-left: none; border-right: none; font-size: 0.90rem; height: 42px; padding: 0.5rem 0.75rem;"
                   >
                   <button 
                     type="button" 
                     id="btn-toggle-new-pwd" 
-                    class="btn btn-outline-secondary border-start-0 bg-white" 
-                    title="Mostrar/Ocultar Nova Senha" 
+                    class="btn btn-outline-secondary" 
                     tabindex="-1"
-                    style="border-color: #dee2e6; border-radius: 0 6px 6px 0; color: #64748b;"
+                    style="border: 1px solid #cbd5e1; border-left: none; border-radius: 0 6px 6px 0; background: #ffffff; color: #64748b; padding: 0.5rem 0.75rem; cursor: pointer; display: flex; align-items: center;"
                   >
                     ${Icons.eye(16)}
                   </button>
@@ -642,15 +639,15 @@ function renderSolarmanLoginView(container) {
               <button 
                 type="button" 
                 id="btn-execute-reset" 
-                class="btn btn-success w-100 text-white mb-3" 
-                style="font-weight: 600; font-size: 0.90rem; height: 42px; border-radius: 6px;"
+                class="btn btn-success w-100" 
+                style="width: 100%; background-color: #16a34a; color: #ffffff; border: none; font-weight: 600; font-size: 0.90rem; height: 42px; border-radius: 6px; cursor: pointer; margin-bottom: 1rem;"
               >
                 Salvar Nova Senha
               </button>
             </div>
 
             <!-- Voltar ao Início de Sessão -->
-            <div class="text-center">
+            <div class="text-center" style="text-align: center;">
               <a href="javascript:void(0)" id="link-back-to-login" style="font-size: 0.85rem; color: #64748b; text-decoration: none; font-weight: 500;">
                 &larr; Voltar ao Início de Sessão
               </a>
@@ -659,7 +656,7 @@ function renderSolarmanLoginView(container) {
         </div>
 
         <!-- Rodapé do Card -->
-        <div class="text-center mt-4 pt-3 border-top" style="font-size: 0.75rem; color: #94a3b8;">
+        <div class="text-center mt-4 pt-3" style="text-align: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #f1f5f9; font-size: 0.75rem; color: #94a3b8;">
           LECASU, Lda. &bull; GridOps 2026
         </div>
       </div>
@@ -693,199 +690,220 @@ function renderSolarmanLoginView(container) {
 
   // Alternar visibilidade da senha (Olho)
   let showPwd = false;
-  btnTogglePwd.onclick = () => {
-    showPwd = !showPwd;
-    passwordInput.type = showPwd ? 'text' : 'password';
-    btnTogglePwd.innerHTML = showPwd ? Icons.eyeOff(16) : Icons.eye(16);
-  };
+  if (btnTogglePwd && passwordInput) {
+    btnTogglePwd.onclick = () => {
+      showPwd = !showPwd;
+      passwordInput.type = showPwd ? 'text' : 'password';
+      btnTogglePwd.innerHTML = showPwd ? Icons.eyeOff(16) : Icons.eye(16);
+    };
+  }
 
   let showNewPwd = false;
-  btnToggleNewPwd.onclick = () => {
-    showNewPwd = !showNewPwd;
-    recoveryNewPwdInput.type = showNewPwd ? 'text' : 'password';
-    btnToggleNewPwd.innerHTML = showNewPwd ? Icons.eyeOff(16) : Icons.eye(16);
-  };
+  if (btnToggleNewPwd && recoveryNewPwdInput) {
+    btnToggleNewPwd.onclick = () => {
+      showNewPwd = !showNewPwd;
+      recoveryNewPwdInput.type = showNewPwd ? 'text' : 'password';
+      btnToggleNewPwd.innerHTML = showNewPwd ? Icons.eyeOff(16) : Icons.eye(16);
+    };
+  }
 
   // Alternar entre Login e Recuperação de Senha
-  linkGotoForgot.onclick = () => {
-    alertBox.innerHTML = '';
-    loginViewSection.style.display = 'none';
-    recoveryViewSection.style.display = 'block';
-    recoveryStep1.style.display = 'block';
-    recoveryStep2.style.display = 'none';
-  };
+  if (linkGotoForgot) {
+    linkGotoForgot.onclick = () => {
+      if (alertBox) alertBox.innerHTML = '';
+      if (loginViewSection) loginViewSection.style.display = 'none';
+      if (recoveryViewSection) recoveryViewSection.style.display = 'block';
+      if (recoveryStep1) recoveryStep1.style.display = 'block';
+      if (recoveryStep2) recoveryStep2.style.display = 'none';
+    };
+  }
 
-  linkBackToLogin.onclick = () => {
-    alertBox.innerHTML = '';
-    recoveryViewSection.style.display = 'none';
-    loginViewSection.style.display = 'block';
-  };
+  if (linkBackToLogin) {
+    linkBackToLogin.onclick = () => {
+      if (alertBox) alertBox.innerHTML = '';
+      if (recoveryViewSection) recoveryViewSection.style.display = 'none';
+      if (loginViewSection) loginViewSection.style.display = 'block';
+    };
+  }
 
   // 1. Submissão do Formulário de Login com Validação Real
-  formLogin.onsubmit = async (e) => {
-    e.preventDefault();
-    alertBox.innerHTML = '';
+  if (formLogin) {
+    formLogin.onsubmit = async (e) => {
+      e.preventDefault();
+      if (alertBox) alertBox.innerHTML = '';
 
-    const email = emailInput.value.trim().toLowerCase();
-    const password = passwordInput.value;
+      const email = emailInput ? emailInput.value.trim().toLowerCase() : '';
+      const password = passwordInput ? passwordInput.value : '';
 
-    // Validação real de e-mail no frontend
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email) {
-      alertBox.innerHTML = `<div class="alert alert-danger py-2 px-3 mb-3 text-start" style="font-size:0.85rem;">Por favor, preencha o campo de e-mail.</div>`;
-      emailInput.focus();
-      return;
-    }
-    if (!emailRegex.test(email)) {
-      alertBox.innerHTML = `<div class="alert alert-danger py-2 px-3 mb-3 text-start" style="font-size:0.85rem;">Insira um endereço de e-mail válido (ex: info@lecasu.co.mz).</div>`;
-      emailInput.focus();
-      return;
-    }
-    if (!password) {
-      alertBox.innerHTML = `<div class="alert alert-danger py-2 px-3 mb-3 text-start" style="font-size:0.85rem;">Por favor, insira a sua palavra-passe.</div>`;
-      passwordInput.focus();
-      return;
-    }
-
-    btnLoginSubmit.disabled = true;
-    btnLoginSubmit.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status"></span>A autenticar...`;
-
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      const data = await res.json();
-
-      if (!res.ok || !data?.data?.token) {
-        throw new Error(data?.error || data?.message || 'Credenciais inválidas.');
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email) {
+        if (alertBox) alertBox.innerHTML = `<div class="alert alert-danger" style="background:#fee2e2; border:1px solid #fca5a5; color:#991b1b; padding:0.6rem 0.8rem; border-radius:6px; font-size:0.85rem; margin-bottom:1rem; text-align:left;">Por favor, preencha o campo de e-mail.</div>`;
+        if (emailInput) emailInput.focus();
+        return;
+      }
+      if (!emailRegex.test(email)) {
+        if (alertBox) alertBox.innerHTML = `<div class="alert alert-danger" style="background:#fee2e2; border:1px solid #fca5a5; color:#991b1b; padding:0.6rem 0.8rem; border-radius:6px; font-size:0.85rem; margin-bottom:1rem; text-align:left;">Insira um endereço de e-mail válido (ex: info@lecasu.co.mz).</div>`;
+        if (emailInput) emailInput.focus();
+        return;
+      }
+      if (!password) {
+        if (alertBox) alertBox.innerHTML = `<div class="alert alert-danger" style="background:#fee2e2; border:1px solid #fca5a5; color:#991b1b; padding:0.6rem 0.8rem; border-radius:6px; font-size:0.85rem; margin-bottom:1rem; text-align:left;">Por favor, insira a sua palavra-passe.</div>`;
+        if (passwordInput) passwordInput.focus();
+        return;
       }
 
-      // Se "Lembrar-me" estiver desmarcado, remove do localStorage permanente
-      const remember = rememberMeCheck.checked;
-      setAuthenticatedUser(data.data.token, data.data.user);
-      if (!remember) {
-        sessionStorage.setItem('lecasu_auth_token', data.data.token);
-        sessionStorage.setItem('lecasu_current_user', JSON.stringify(data.data.user));
+      if (btnLoginSubmit) {
+        btnLoginSubmit.disabled = true;
+        btnLoginSubmit.innerHTML = `A autenticar...`;
       }
 
-      document.body.classList.remove('is-login-page');
-      window.location.hash = '#dashboard';
-      navigateToView('dashboard');
-    } catch (err) {
-      alertBox.innerHTML = `
-        <div class="alert alert-danger py-2 px-3 mb-3 text-start" style="font-size:0.85rem;">
-          ${err.message || 'Erro ao autenticar. Verifique o e-mail e a senha.'}
-        </div>
-      `;
-    } finally {
-      btnLoginSubmit.disabled = false;
-      btnLoginSubmit.innerHTML = `Iniciar Sessão`;
-    }
-  };
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data?.data?.token) {
+          throw new Error(data?.error || data?.message || 'Credenciais inválidas.');
+        }
+
+        const remember = rememberMeCheck ? rememberMeCheck.checked : true;
+        setAuthenticatedUser(data.data.token, data.data.user);
+        if (!remember) {
+          sessionStorage.setItem('lecasu_auth_token', data.data.token);
+          sessionStorage.setItem('lecasu_current_user', JSON.stringify(data.data.user));
+        }
+
+        document.body.classList.remove('is-login-page');
+        window.location.hash = '#dashboard';
+        navigateToView('dashboard');
+      } catch (err) {
+        if (alertBox) {
+          alertBox.innerHTML = `
+            <div class="alert alert-danger" style="background:#fee2e2; border:1px solid #fca5a5; color:#991b1b; padding:0.6rem 0.8rem; border-radius:6px; font-size:0.85rem; margin-bottom:1rem; text-align:left;">
+              ${err.message || 'Erro ao autenticar. Verifique o e-mail e a senha.'}
+            </div>
+          `;
+        }
+      } finally {
+        if (btnLoginSubmit) {
+          btnLoginSubmit.disabled = false;
+          btnLoginSubmit.innerHTML = `Iniciar Sessão`;
+        }
+      }
+    };
+  }
 
   // 2. Passo 1 da Recuperação de Senha: Gerar Código
-  btnSendRecoveryCode.onclick = async () => {
-    alertBox.innerHTML = '';
-    const email = recoveryEmailInput.value.trim().toLowerCase();
+  if (btnSendRecoveryCode) {
+    btnSendRecoveryCode.onclick = async () => {
+      if (alertBox) alertBox.innerHTML = '';
+      const email = recoveryEmailInput ? recoveryEmailInput.value.trim().toLowerCase() : '';
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email || !emailRegex.test(email)) {
-      alertBox.innerHTML = `<div class="alert alert-danger py-2 px-3 mb-3 text-start" style="font-size:0.85rem;">Insira um endereço de e-mail corporativo válido.</div>`;
-      recoveryEmailInput.focus();
-      return;
-    }
-
-    btnSendRecoveryCode.disabled = true;
-    btnSendRecoveryCode.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>A gerar código...`;
-
-    try {
-      const res = await fetch('/api/auth/forgot-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data?.error || data?.message || 'Falha ao processar pedido de recuperação.');
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email || !emailRegex.test(email)) {
+        if (alertBox) alertBox.innerHTML = `<div class="alert alert-danger" style="background:#fee2e2; border:1px solid #fca5a5; color:#991b1b; padding:0.6rem 0.8rem; border-radius:6px; font-size:0.85rem; margin-bottom:1rem; text-align:left;">Insira um endereço de e-mail corporativo válido.</div>`;
+        if (recoveryEmailInput) recoveryEmailInput.focus();
+        return;
       }
 
-      recoveryStep1.style.display = 'none';
-      recoveryStep2.style.display = 'block';
+      btnSendRecoveryCode.disabled = true;
+      btnSendRecoveryCode.innerHTML = `A gerar código...`;
 
-      const code = data?.data?.code || '';
-      recoveryNoticeBox.innerHTML = `
-        <strong>Código gerado com sucesso!</strong><br>
-        O seu código de verificação é: <span class="badge bg-primary fs-6 px-2 py-1 mt-1">${code}</span><br>
-        <small class="text-muted">Válido por 15 minutos para a conta <strong>${email}</strong>.</small>
-      `;
+      try {
+        const res = await fetch('/api/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
 
-      if (code) {
-        recoveryCodeInput.value = code;
+        if (!res.ok) {
+          throw new Error(data?.error || data?.message || 'Falha ao processar pedido de recuperação.');
+        }
+
+        if (recoveryStep1) recoveryStep1.style.display = 'none';
+        if (recoveryStep2) recoveryStep2.style.display = 'block';
+
+        const code = data?.data?.code || '';
+        if (recoveryNoticeBox) {
+          recoveryNoticeBox.innerHTML = `
+            <strong>Código gerado com sucesso!</strong><br>
+            O seu código de verificação é: <span style="display:inline-block; background:#2563eb; color:#ffffff; font-weight:700; padding:2px 8px; border-radius:4px; margin-top:4px;">${code}</span><br>
+            <small style="color:#64748b;">Válido por 15 minutos para a conta <strong>${email}</strong>.</small>
+          `;
+        }
+
+        if (code && recoveryCodeInput) {
+          recoveryCodeInput.value = code;
+        }
+        if (recoveryNewPwdInput) recoveryNewPwdInput.focus();
+      } catch (err) {
+        if (alertBox) alertBox.innerHTML = `<div class="alert alert-danger" style="background:#fee2e2; border:1px solid #fca5a5; color:#991b1b; padding:0.6rem 0.8rem; border-radius:6px; font-size:0.85rem; margin-bottom:1rem; text-align:left;">${err.message}</div>`;
+      } finally {
+        btnSendRecoveryCode.disabled = false;
+        btnSendRecoveryCode.innerHTML = `Gerar Código de Recuperação`;
       }
-      recoveryNewPwdInput.focus();
-    } catch (err) {
-      alertBox.innerHTML = `<div class="alert alert-danger py-2 px-3 mb-3 text-start" style="font-size:0.85rem;">${err.message}</div>`;
-    } finally {
-      btnSendRecoveryCode.disabled = false;
-      btnSendRecoveryCode.innerHTML = `Gerar Código de Recuperação`;
-    }
-  };
+    };
+  }
 
   // 3. Passo 2 da Recuperação de Senha: Salvar Nova Senha
-  btnExecuteReset.onclick = async () => {
-    alertBox.innerHTML = '';
-    const email = recoveryEmailInput.value.trim().toLowerCase();
-    const code = recoveryCodeInput.value.trim();
-    const newPassword = recoveryNewPwdInput.value;
+  if (btnExecuteReset) {
+    btnExecuteReset.onclick = async () => {
+      if (alertBox) alertBox.innerHTML = '';
+      const email = recoveryEmailInput ? recoveryEmailInput.value.trim().toLowerCase() : '';
+      const code = recoveryCodeInput ? recoveryCodeInput.value.trim() : '';
+      const newPassword = recoveryNewPwdInput ? recoveryNewPwdInput.value : '';
 
-    if (!code || code.length < 6) {
-      alertBox.innerHTML = `<div class="alert alert-danger py-2 px-3 mb-3 text-start" style="font-size:0.85rem;">Insira o código de verificação completo de 6 dígitos.</div>`;
-      recoveryCodeInput.focus();
-      return;
-    }
-
-    if (!newPassword || newPassword.length < 6) {
-      alertBox.innerHTML = `<div class="alert alert-danger py-2 px-3 mb-3 text-start" style="font-size:0.85rem;">A nova palavra-passe deve conter pelo menos 6 caracteres.</div>`;
-      recoveryNewPwdInput.focus();
-      return;
-    }
-
-    btnExecuteReset.disabled = true;
-    btnExecuteReset.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>A salvar...`;
-
-    try {
-      const res = await fetch('/api/auth/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code, newPassword })
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data?.error || data?.message || 'Falha ao redefinir a palavra-passe.');
+      if (!code || code.length < 6) {
+        if (alertBox) alertBox.innerHTML = `<div class="alert alert-danger" style="background:#fee2e2; border:1px solid #fca5a5; color:#991b1b; padding:0.6rem 0.8rem; border-radius:6px; font-size:0.85rem; margin-bottom:1rem; text-align:left;">Insira o código de verificação completo de 6 dígitos.</div>`;
+        if (recoveryCodeInput) recoveryCodeInput.focus();
+        return;
       }
 
-      // Redefinição com sucesso: volta ao painel de login
-      recoveryViewSection.style.display = 'none';
-      loginViewSection.style.display = 'block';
-      emailInput.value = email;
-      passwordInput.value = newPassword;
+      if (!newPassword || newPassword.length < 6) {
+        if (alertBox) alertBox.innerHTML = `<div class="alert alert-danger" style="background:#fee2e2; border:1px solid #fca5a5; color:#991b1b; padding:0.6rem 0.8rem; border-radius:6px; font-size:0.85rem; margin-bottom:1rem; text-align:left;">A nova palavra-passe deve conter pelo menos 6 caracteres.</div>`;
+        if (recoveryNewPwdInput) recoveryNewPwdInput.focus();
+        return;
+      }
 
-      alertBox.innerHTML = `
-        <div class="alert alert-success py-2 px-3 mb-3 text-start" style="font-size:0.85rem;">
-          <i class="bi bi-check-circle-fill me-1"></i> Palavra-passe redefinida com sucesso! Inicie sessão com a sua nova senha.
-        </div>
-      `;
-    } catch (err) {
-      alertBox.innerHTML = `<div class="alert alert-danger py-2 px-3 mb-3 text-start" style="font-size:0.85rem;">${err.message}</div>`;
-    } finally {
-      btnExecuteReset.disabled = false;
-      btnExecuteReset.innerHTML = `Salvar Nova Senha`;
-    }
-  };
+      btnExecuteReset.disabled = true;
+      btnExecuteReset.innerHTML = `A salvar...`;
+
+      try {
+        const res = await fetch('/api/auth/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, code, newPassword })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data?.error || data?.message || 'Falha ao redefinir a palavra-passe.');
+        }
+
+        if (recoveryViewSection) recoveryViewSection.style.display = 'none';
+        if (loginViewSection) loginViewSection.style.display = 'block';
+        if (emailInput) emailInput.value = email;
+        if (passwordInput) passwordInput.value = newPassword;
+
+        if (alertBox) {
+          alertBox.innerHTML = `
+            <div class="alert alert-success" style="background:#dcfce7; border:1px solid #86efac; color:#166534; padding:0.6rem 0.8rem; border-radius:6px; font-size:0.85rem; margin-bottom:1rem; text-align:left;">
+              ✓ Palavra-passe redefinida com sucesso! Inicie sessão com a sua nova senha.
+            </div>
+          `;
+        }
+      } catch (err) {
+        if (alertBox) alertBox.innerHTML = `<div class="alert alert-danger" style="background:#fee2e2; border:1px solid #fca5a5; color:#991b1b; padding:0.6rem 0.8rem; border-radius:6px; font-size:0.85rem; margin-bottom:1rem; text-align:left;">${err.message}</div>`;
+      } finally {
+        btnExecuteReset.disabled = false;
+        btnExecuteReset.innerHTML = `Salvar Nova Senha`;
+      }
+    };
+  }
 }
 
 // ==============================================================================
@@ -6274,13 +6292,6 @@ function showLoginAndRecoveryModal() {
       </div>
     </div>
   `;
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn" id="modal-cancel-btn">Fechar</button>
-        </div>
-      </div>
-    </div>
-  `;
   attachModalCloseHandlers(modalContainer);
 
   const tabLogin = document.getElementById('modal-tab-login');
@@ -6290,66 +6301,39 @@ function showLoginAndRecoveryModal() {
   const panelRecover = document.getElementById('auth-panel-recover');
   const panelRoles = document.getElementById('auth-panel-roles');
 
-  tabLogin.onclick = () => {
-    tabLogin.classList.add('active');
-    tabRecover.classList.remove('active');
-    tabRoles.classList.remove('active');
-    panelLogin.style.display = 'block';
-    panelRecover.style.display = 'none';
-    panelRoles.style.display = 'none';
-  };
+  if (tabLogin && tabRecover && tabRoles) {
+    tabLogin.onclick = () => {
+      tabLogin.classList.add('active');
+      tabRecover.classList.remove('active');
+      tabRoles.classList.remove('active');
+      if (panelLogin) panelLogin.style.display = 'block';
+      if (panelRecover) panelRecover.style.display = 'none';
+      if (panelRoles) panelRoles.style.display = 'none';
+    };
 
-  tabRecover.onclick = () => {
-    tabLogin.classList.remove('active');
-    tabRecover.classList.add('active');
-    tabRoles.classList.remove('active');
-    panelLogin.style.display = 'none';
-    panelRecover.style.display = 'block';
-    panelRoles.style.display = 'none';
-  };
+    tabRecover.onclick = () => {
+      tabLogin.classList.remove('active');
+      tabRecover.classList.add('active');
+      tabRoles.classList.remove('active');
+      if (panelLogin) panelLogin.style.display = 'none';
+      if (panelRecover) panelRecover.style.display = 'block';
+      if (panelRoles) panelRoles.style.display = 'none';
+    };
 
-  tabRoles.onclick = () => {
-    tabLogin.classList.remove('active');
-    tabRecover.classList.remove('active');
-    tabRoles.classList.add('active');
-    panelLogin.style.display = 'none';
-    panelRecover.style.display = 'none';
-    panelRoles.style.display = 'block';
-  };
+    tabRoles.onclick = () => {
+      tabLogin.classList.remove('active');
+      tabRecover.classList.remove('active');
+      tabRoles.classList.add('active');
+      if (panelLogin) panelLogin.style.display = 'none';
+      if (panelRecover) panelRecover.style.display = 'none';
+      if (panelRoles) panelRoles.style.display = 'block';
+    };
+  }
 
-  // Seletor de método de login no modal (E-mail vs Usuário)
-  const modalMethodEmail = document.getElementById('modal-method-email');
-  const modalMethodUser = document.getElementById('modal-method-user');
-  const modalLoginIcon = document.getElementById('modal-login-icon');
   const modalLoginCredential = document.getElementById('modal-login-credential');
   const modalLoginPassword = document.getElementById('modal-login-password');
   const modalBtnTogglePwd = document.getElementById('modal-btn-toggle-pwd');
   const modalLinkForgot = document.getElementById('modal-link-forgot');
-
-  let modalMethod = 'email';
-  if (modalMethodEmail && modalMethodUser) {
-    modalMethodEmail.onclick = () => {
-      modalMethod = 'email';
-      modalMethodEmail.classList.add('active');
-      modalMethodUser.classList.remove('active');
-      if (modalLoginIcon) modalLoginIcon.innerHTML = Icons.mail(18);
-      if (modalLoginCredential) {
-        modalLoginCredential.placeholder = 'jossuemohamad@gmail.com';
-        if (modalLoginCredential.value === 'admin') modalLoginCredential.value = 'admin@lecasu.co.mz';
-      }
-    };
-
-    modalMethodUser.onclick = () => {
-      modalMethod = 'user';
-      modalMethodUser.classList.add('active');
-      modalMethodEmail.classList.remove('active');
-      if (modalLoginIcon) modalLoginIcon.innerHTML = Icons.user(18);
-      if (modalLoginCredential) {
-        modalLoginCredential.placeholder = 'Insira o seu nome de usuário';
-        if (modalLoginCredential.value === 'admin@lecasu.co.mz') modalLoginCredential.value = 'admin';
-      }
-    };
-  }
 
   let modalShowPwd = false;
   if (modalBtnTogglePwd && modalLoginPassword) {
@@ -6360,52 +6344,75 @@ function showLoginAndRecoveryModal() {
     };
   }
 
-  if (modalLinkForgot) {
+  if (modalLinkForgot && tabRecover) {
     modalLinkForgot.onclick = () => {
       tabRecover.click();
     };
   }
 
-  document.getElementById('form-auth-login').onsubmit = async (e) => {
-    e.preventDefault();
-    let email = modalLoginCredential ? modalLoginCredential.value.trim() : '';
-    const password = modalLoginPassword ? modalLoginPassword.value : '';
-    if (modalMethod === 'user' && !email.includes('@')) {
-      email = `${email}@lecasu.co.mz`;
-    }
-    const body = { email, password };
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-      if (res.ok && data?.data) {
-        setAuthenticatedUser(data.data.token, data.data.user);
-        modalContainer.innerHTML = '';
-        renderCurrentView();
-      } else {
-        document.getElementById('modal-login-alert').innerHTML = `
-          <div class="alert alert-error">${data?.error || 'Credenciais inválidas.'}</div>
-        `;
+  const formAuthLogin = document.getElementById('form-auth-login');
+  if (formAuthLogin) {
+    formAuthLogin.onsubmit = async (e) => {
+      e.preventDefault();
+      const email = modalLoginCredential ? modalLoginCredential.value.trim() : '';
+      const password = modalLoginPassword ? modalLoginPassword.value : '';
+      const body = { email, password };
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (res.ok && data?.data) {
+          setAuthenticatedUser(data.data.token, data.data.user);
+          modalContainer.innerHTML = '';
+          renderCurrentView();
+        } else {
+          const alertEl = document.getElementById('modal-login-alert');
+          if (alertEl) {
+            alertEl.innerHTML = `<div class="alert alert-error">${data?.error || 'Credenciais inválidas.'}</div>`;
+          }
+        }
+      } catch (err) {
+        const alertEl = document.getElementById('modal-login-alert');
+        if (alertEl) {
+          alertEl.innerHTML = `<div class="alert alert-error">Erro na autenticação: ${err.message}</div>`;
+        }
       }
-    } catch (err) {
-      document.getElementById('modal-login-alert').innerHTML = `
-        <div class="alert alert-error">Erro na autenticação: ${err.message}</div>
-      `;
-    }
-  };
+    };
+  }
 
-  document.getElementById('form-auth-recover').onsubmit = (e) => {
-    e.preventDefault();
-    const email = document.getElementById('recover-email').value;
-    document.getElementById('modal-recover-alert').innerHTML = `
-      <div class="alert alert-success">
-        ${Icons.check(14)} Instruções de recuperação enviadas com sucesso para <strong>${email}</strong>. Verifique a sua caixa de entrada institucional.
-      </div>
-    `;
-  };
+  const formAuthRecover = document.getElementById('form-auth-recover');
+  if (formAuthRecover) {
+    formAuthRecover.onsubmit = async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('recover-email')?.value?.trim();
+      try {
+        const res = await fetch('/api/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        const alertEl = document.getElementById('modal-recover-alert');
+        if (alertEl) {
+          if (res.ok) {
+            alertEl.innerHTML = `
+              <div class="alert alert-success">
+                ${Icons.check(14)} Código de recuperação gerado para <strong>${email}</strong>: <strong>${data?.data?.code || ''}</strong>.
+              </div>
+            `;
+          } else {
+            alertEl.innerHTML = `<div class="alert alert-error">${data?.error || 'Erro ao gerar recuperação.'}</div>`;
+          }
+        }
+      } catch (err) {
+        const alertEl = document.getElementById('modal-recover-alert');
+        if (alertEl) alertEl.innerHTML = `<div class="alert alert-error">${err.message}</div>`;
+      }
+    };
+  }
 
   modalContainer.querySelectorAll('.user-switch-item').forEach(item => {
     item.addEventListener('click', async () => {
@@ -6414,7 +6421,7 @@ function showLoginAndRecoveryModal() {
         const res = await fetch('/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password: 'Admin@LECASU2026' })
+          body: JSON.stringify({ email, password: 'Lecasu@2026' })
         });
         const data = await res.json();
         if (res.ok && data?.data) {
