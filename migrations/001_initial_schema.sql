@@ -52,7 +52,7 @@ DROP TRIGGER IF EXISTS set_timestamp_users ON users;
 CREATE TRIGGER set_timestamp_users
 BEFORE UPDATE ON users
 FOR EACH ROW
-EXECUTE FUNCTION trigger_set_timestamp();
+EXECUTE PROCEDURE trigger_set_timestamp();
 
 -- ------------------------------------------------------------------------------
 -- 5. Tabela: mini_grids (Mini-Redes e Centrais de Geração)
@@ -80,7 +80,7 @@ DROP TRIGGER IF EXISTS set_timestamp_mini_grids ON mini_grids;
 CREATE TRIGGER set_timestamp_mini_grids
 BEFORE UPDATE ON mini_grids
 FOR EACH ROW
-EXECUTE FUNCTION trigger_set_timestamp();
+EXECUTE PROCEDURE trigger_set_timestamp();
 
 -- ------------------------------------------------------------------------------
 -- 6. Tabela: tariffs (Planos e Categorias Tarifárias)
@@ -130,7 +130,7 @@ DROP TRIGGER IF EXISTS set_timestamp_clients ON clients;
 CREATE TRIGGER set_timestamp_clients
 BEFORE UPDATE ON clients
 FOR EACH ROW
-EXECUTE FUNCTION trigger_set_timestamp();
+EXECUTE PROCEDURE trigger_set_timestamp();
 
 -- ------------------------------------------------------------------------------
 -- 8. Tabela: contracts (Contratos de Fornecimento de Energia)

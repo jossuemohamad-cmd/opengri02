@@ -37,7 +37,7 @@ DROP TRIGGER IF EXISTS set_timestamp_inverter_telemetry ON inverter_telemetry;
 CREATE TRIGGER set_timestamp_inverter_telemetry
 BEFORE UPDATE ON inverter_telemetry
 FOR EACH ROW
-EXECUTE FUNCTION trigger_set_timestamp();
+EXECUTE PROCEDURE trigger_set_timestamp();
 
 CREATE INDEX IF NOT EXISTS idx_inverter_telemetry_mini_grid ON inverter_telemetry(mini_grid_id);
 CREATE INDEX IF NOT EXISTS idx_inverter_telemetry_client ON inverter_telemetry(client_id);
