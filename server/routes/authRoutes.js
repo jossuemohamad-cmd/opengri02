@@ -7,8 +7,10 @@ const router = express.Router();
 const authController = require('../controllers/authController');
 const { authenticateToken } = require('../middleware/authMiddleware');
 
-// Rota pública de login
+// Rota pública de login e recuperação de palavra-passe
 router.post('/login', authController.login);
+router.post('/forgot-password', authController.forgotPassword);
+router.post('/reset-password', authController.resetPassword);
 
 // Rotas protegidas por token JWT
 router.get('/me', authenticateToken, authController.me);

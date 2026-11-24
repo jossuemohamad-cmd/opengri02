@@ -458,191 +458,298 @@ function renderCurrentView() {
 }
 
 /**
- * Portal Oficial de Autenticação Estilo SolarMAN Pro (globalpro.solarmanpv.com/login)
+ * Painel Oficial de Autenticação e Recuperação de Senha - LECASU GridOps
  */
 function renderSolarmanLoginView(container) {
   document.body.classList.add('is-login-page');
-  let currentMethod = 'email'; // 'email' ou 'user'
-
-  const demoAccounts = [
-    { label: '👑 Jossue (Admin)', email: 'jossuemohamad@gmail.com', user: 'jossue', desc: 'Administrador Geral' },
-    { label: '⚡ Operações', email: 'operacoes@lecasu.co.mz', user: 'operacoes', desc: 'Gestor de Operações' },
-    { label: '💼 Comercial', email: 'comercial@lecasu.co.mz', user: 'comercial', desc: 'Gestora Comercial' },
-    { label: '🔧 Técnico', email: 'tecnico@lecasu.co.mz', user: 'tecnico', desc: 'Técnico de Campo' },
-    { label: '🤝 Agente', email: 'agente@lecasu.co.mz', user: 'agente', desc: 'Agente Comunitário' },
-    { label: '💰 Financeiro', email: 'financeiro@lecasu.co.mz', user: 'financeiro', desc: 'Responsável Financeira' },
-    { label: '📋 Auditor', email: 'auditor@lecasu.co.mz', user: 'auditor', desc: 'Auditor / Parceiro' }
-  ];
 
   container.innerHTML = `
-    <div class="solarman-login-wrapper">
-      <div class="solarman-login-card">
-        <!-- Logo e Cabeçalho Institucional -->
-        <div class="solarman-login-header">
-          <div class="solarman-login-logo-box">
-            <img src="/images/lecasu-logo.png" alt="LECASU Energy and Engineering Solutions" class="solarman-login-logo">
-          </div>
-          <h2 class="solarman-login-title">LECASU GridOps</h2>
-          <p class="solarman-login-subtitle">Plataforma de Gestão de Mini-Redes Fotovoltaicas</p>
+    <div class="solarman-login-wrapper" style="min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem;">
+      <div class="solarman-login-card shadow-sm" style="width: 100%; max-width: 420px; border-radius: 12px; padding: 2.25rem 2rem; background: #ffffff; border: 1px solid #e2e8f0;">
+        
+        <!-- Logo Institucional -->
+        <div class="text-center mb-3">
+          <img src="/images/lecasu-logo.png" alt="LECASU" style="max-height: 48px; width: auto; object-fit: contain;">
         </div>
 
-        <!-- Seletor do Método de Login (Exato como no modelo globalpro.solarmanpv.com/login) -->
-        <div class="solarman-method-row">
-          <span class="solarman-method-label">Método de login</span>
-          <div class="solarman-segmented-control">
-            <button type="button" class="solarman-seg-btn active" id="btn-method-email">E-mail</button>
-            <button type="button" class="solarman-seg-btn" id="btn-method-user">Usuário</button>
-          </div>
+        <!-- Título e Subtítulo -->
+        <div class="text-center mb-4">
+          <h2 style="font-size: 1.35rem; font-weight: 700; color: #0f172a; margin-bottom: 0.25rem; font-family: 'Poppins', sans-serif;">LECASU GridOps</h2>
+          <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 0;">Gestão Operacional de Mini-Redes</p>
         </div>
 
-        <!-- Alerta de Erro / Sucesso -->
-        <div id="solarman-login-alert"></div>
+        <!-- Caixa de Alertas Dinâmicos -->
+        <div id="login-alert-box"></div>
 
-        <!-- Formulário de Autenticação -->
-        <form id="solarman-login-form">
-          <!-- Campo 1: E-mail ou Usuário -->
-          <div class="solarman-field-group">
-            <div class="solarman-input-box">
-              <span class="solarman-input-icon" id="login-icon-slot">
-                ${Icons.mail(18)}
-              </span>
-              <input 
-                type="text" 
-                id="login-credential-input" 
-                name="credential" 
-                class="solarman-input" 
-                placeholder="jossuemohamad@gmail.com" 
-                value="jossuemohamad@gmail.com" 
-                required
-              >
+        <!-- Vista 1: Formulário de Iniciar Sessão -->
+        <div id="login-view-section">
+          <form id="form-login-direct" novalidate>
+            <!-- Campo de Email -->
+            <div class="mb-3 text-start">
+              <label for="login-email-input" class="form-label" style="font-weight: 500; font-size: 0.85rem; color: #334155;">E-mail</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0 text-muted" style="border-radius: 6px 0 0 6px;">
+                  ${Icons.mail(16)}
+                </span>
+                <input 
+                  type="email" 
+                  id="login-email-input" 
+                  class="form-control border-start-0" 
+                  placeholder="info@lecasu.co.mz" 
+                  value="info@lecasu.co.mz"
+                  required 
+                  autocomplete="email"
+                  style="border-radius: 0 6px 6px 0; font-size: 0.90rem; height: 42px;"
+                >
+              </div>
             </div>
+
+            <!-- Campo de Senha com Olho -->
+            <div class="mb-3 text-start">
+              <label for="login-password-input" class="form-label" style="font-weight: 500; font-size: 0.85rem; color: #334155;">Senha</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0 text-muted" style="border-radius: 6px 0 0 6px;">
+                  ${Icons.lock(16)}
+                </span>
+                <input 
+                  type="password" 
+                  id="login-password-input" 
+                  class="form-control border-start-0 border-end-0" 
+                  placeholder="Insira a sua senha" 
+                  value="Lecasu@2026"
+                  required 
+                  autocomplete="current-password"
+                  style="font-size: 0.90rem; height: 42px;"
+                >
+                <button 
+                  type="button" 
+                  id="btn-toggle-pwd" 
+                  class="btn btn-outline-secondary border-start-0 bg-white" 
+                  title="Mostrar/Ocultar Senha" 
+                  tabindex="-1"
+                  style="border-color: #dee2e6; border-radius: 0 6px 6px 0; color: #64748b;"
+                >
+                  ${Icons.eye(16)}
+                </button>
+              </div>
+            </div>
+
+            <!-- Checkbox Lembrar-me e Link Recuperar Senha -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div class="form-check" style="margin-bottom: 0;">
+                <input class="form-check-input" type="checkbox" id="login-remember-me" checked style="cursor: pointer;">
+                <label class="form-check-label" for="login-remember-me" style="font-size: 0.85rem; color: #475569; cursor: pointer;">
+                  Lembrar-me
+                </label>
+              </div>
+              <a href="javascript:void(0)" id="link-goto-forgot" style="font-size: 0.85rem; color: #ff7a00; font-weight: 500; text-decoration: none;">
+                Recuperar senha
+              </a>
+            </div>
+
+            <!-- Botão Entrar -->
+            <button 
+              type="submit" 
+              id="btn-login-submit" 
+              class="btn w-100 text-white" 
+              style="background-color: #ff7a00; border: none; font-weight: 600; font-size: 0.95rem; height: 44px; border-radius: 6px;"
+            >
+              Iniciar Sessão
+            </button>
+          </form>
+        </div>
+
+        <!-- Vista 2: Painel de Recuperação de Senha -->
+        <div id="recovery-view-section" style="display: none;">
+          <div class="text-start mb-3">
+            <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 0.25rem;">Recuperação de Acesso</h3>
+            <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 1rem;">Introduza o e-mail da sua conta para receber o código de validação.</p>
           </div>
 
-          <!-- Campo 2: Palavra-passe com visualizador de senha (olho) -->
-          <div class="solarman-field-group">
-            <div class="solarman-input-box">
-              <span class="solarman-input-icon">
-                ${Icons.lock(18)}
-              </span>
-              <input 
-                type="password" 
-                id="login-password-input" 
-                name="password" 
-                class="solarman-input" 
-                placeholder="Insira a sua senha" 
-                value="Joswil@8464" 
-                required
+          <form id="form-recovery" novalidate>
+            <!-- Passo 1: Solicitar Código -->
+            <div id="recovery-step-1" class="text-start">
+              <div class="mb-3">
+                <label for="recovery-email-input" class="form-label" style="font-weight: 500; font-size: 0.85rem; color: #334155;">E-mail Cadastrado</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0 text-muted" style="border-radius: 6px 0 0 6px;">
+                    ${Icons.mail(16)}
+                  </span>
+                  <input 
+                    type="email" 
+                    id="recovery-email-input" 
+                    class="form-control border-start-0" 
+                    placeholder="info@lecasu.co.mz" 
+                    value="info@lecasu.co.mz"
+                    required
+                    style="border-radius: 0 6px 6px 0; font-size: 0.90rem; height: 42px;"
+                  >
+                </div>
+              </div>
+              <button 
+                type="button" 
+                id="btn-send-recovery-code" 
+                class="btn w-100 text-white mb-3" 
+                style="background-color: #ff7a00; border: none; font-weight: 600; font-size: 0.90rem; height: 42px; border-radius: 6px;"
               >
-              <button type="button" id="btn-toggle-password" class="solarman-eye-btn" title="Mostrar/Ocultar Palavra-passe" tabindex="-1">
-                ${Icons.eye(18)}
+                Gerar Código de Recuperação
               </button>
             </div>
-          </div>
 
-          <!-- Opções Auxiliares: Lembrar de mim e Esqueci a Senha -->
-          <div class="solarman-options-row">
-            <label class="solarman-checkbox-label">
-              <input type="checkbox" id="login-remember-me" checked>
-              <span>Lembrar de mim</span>
-            </label>
-            <a href="javascript:void(0)" id="btn-login-forgot-pwd" class="solarman-forgot-link">Esqueceu a senha?</a>
-          </div>
+            <!-- Passo 2: Código e Nova Senha (Aparece após o passo 1) -->
+            <div id="recovery-step-2" style="display: none;" class="text-start">
+              <div id="recovery-notice-box" class="alert alert-info py-2 px-3 mb-3" style="font-size: 0.82rem; border-radius: 6px;"></div>
 
-          <!-- Botão Principal de Login SolarMAN Blue -->
-          <button type="submit" id="btn-submit-login" class="btn-solarman-primary">
-            Iniciar Sessão
-          </button>
-        </form>
+              <div class="mb-3">
+                <label for="recovery-code-input" class="form-label" style="font-weight: 500; font-size: 0.85rem; color: #334155;">Código de Verificação (6 dígitos)</label>
+                <input 
+                  type="text" 
+                  id="recovery-code-input" 
+                  class="form-control text-center fw-bold" 
+                  placeholder="Ex: 123456" 
+                  maxlength="6"
+                  style="font-size: 1.15rem; letter-spacing: 2px; height: 44px; border-radius: 6px;"
+                >
+              </div>
 
-        <!-- Acesso Rápido para Perfis de Teste da LECASU (RBAC) -->
-        <div class="solarman-quick-roles">
-          <div class="solarman-quick-title">Perfis para Demonstração Rápida:</div>
-          <div class="solarman-roles-grid">
-            ${demoAccounts.map(acc => `
-              <button type="button" class="role-pill-btn" data-email="${acc.email}" data-user="${acc.user}" title="${acc.desc}">
-                ${acc.label}
+              <div class="mb-3">
+                <label for="recovery-new-pwd-input" class="form-label" style="font-weight: 500; font-size: 0.85rem; color: #334155;">Nova Senha</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0 text-muted" style="border-radius: 6px 0 0 6px;">
+                    ${Icons.lock(16)}
+                  </span>
+                  <input 
+                    type="password" 
+                    id="recovery-new-pwd-input" 
+                    class="form-control border-start-0 border-end-0" 
+                    placeholder="Mínimo de 6 caracteres" 
+                    required
+                    style="font-size: 0.90rem; height: 42px;"
+                  >
+                  <button 
+                    type="button" 
+                    id="btn-toggle-new-pwd" 
+                    class="btn btn-outline-secondary border-start-0 bg-white" 
+                    title="Mostrar/Ocultar Nova Senha" 
+                    tabindex="-1"
+                    style="border-color: #dee2e6; border-radius: 0 6px 6px 0; color: #64748b;"
+                  >
+                    ${Icons.eye(16)}
+                  </button>
+                </div>
+              </div>
+
+              <button 
+                type="button" 
+                id="btn-execute-reset" 
+                class="btn btn-success w-100 text-white mb-3" 
+                style="font-weight: 600; font-size: 0.90rem; height: 42px; border-radius: 6px;"
+              >
+                Salvar Nova Senha
               </button>
-            `).join('')}
-          </div>
+            </div>
+
+            <!-- Voltar ao Início de Sessão -->
+            <div class="text-center">
+              <a href="javascript:void(0)" id="link-back-to-login" style="font-size: 0.85rem; color: #64748b; text-decoration: none; font-weight: 500;">
+                &larr; Voltar ao Início de Sessão
+              </a>
+            </div>
+          </form>
         </div>
 
-        <!-- Rodapé do Card de Login -->
-        <div class="solarman-login-footer">
-          <span>LECASU, Lda. &bull; GridOps Versão 1.0</span>
-          <span>Operação de Mini-Redes Fotovoltaicas em Moçambique</span>
+        <!-- Rodapé do Card -->
+        <div class="text-center mt-4 pt-3 border-top" style="font-size: 0.75rem; color: #94a3b8;">
+          LECASU, Lda. &bull; GridOps 2026
         </div>
       </div>
     </div>
   `;
 
-  const btnMethodEmail = document.getElementById('btn-method-email');
-  const btnMethodUser = document.getElementById('btn-method-user');
-  const iconSlot = document.getElementById('login-icon-slot');
-  const credentialInput = document.getElementById('login-credential-input');
+  // Elementos do DOM
+  const loginViewSection = document.getElementById('login-view-section');
+  const recoveryViewSection = document.getElementById('recovery-view-section');
+  const alertBox = document.getElementById('login-alert-box');
+
+  const formLogin = document.getElementById('form-login-direct');
+  const emailInput = document.getElementById('login-email-input');
   const passwordInput = document.getElementById('login-password-input');
-  const btnTogglePwd = document.getElementById('btn-toggle-password');
-  const form = document.getElementById('solarman-login-form');
-  const alertBox = document.getElementById('solarman-login-alert');
+  const btnTogglePwd = document.getElementById('btn-toggle-pwd');
+  const rememberMeCheck = document.getElementById('login-remember-me');
+  const btnLoginSubmit = document.getElementById('btn-login-submit');
 
-  btnMethodEmail.onclick = () => {
-    currentMethod = 'email';
-    btnMethodEmail.classList.add('active');
-    btnMethodUser.classList.remove('active');
-    iconSlot.innerHTML = Icons.mail(18);
-    credentialInput.placeholder = 'jossuemohamad@gmail.com';
-    if (!credentialInput.value || credentialInput.value === 'admin' || credentialInput.value === 'jossue') {
-      credentialInput.value = 'jossuemohamad@gmail.com';
-    }
-  };
+  const linkGotoForgot = document.getElementById('link-goto-forgot');
+  const linkBackToLogin = document.getElementById('link-back-to-login');
 
-  btnMethodUser.onclick = () => {
-    currentMethod = 'user';
-    btnMethodUser.classList.add('active');
-    btnMethodEmail.classList.remove('active');
-    iconSlot.innerHTML = Icons.user(18);
-    credentialInput.placeholder = 'Insira o seu nome de usuário (ex: jossue)';
-    if (credentialInput.value === 'admin@lecasu.co.mz' || credentialInput.value === 'jossuemohamad@gmail.com') {
-      credentialInput.value = 'jossue';
-    }
-  };
+  const recoveryStep1 = document.getElementById('recovery-step-1');
+  const recoveryStep2 = document.getElementById('recovery-step-2');
+  const recoveryEmailInput = document.getElementById('recovery-email-input');
+  const btnSendRecoveryCode = document.getElementById('btn-send-recovery-code');
+  const recoveryCodeInput = document.getElementById('recovery-code-input');
+  const recoveryNewPwdInput = document.getElementById('recovery-new-pwd-input');
+  const btnToggleNewPwd = document.getElementById('btn-toggle-new-pwd');
+  const btnExecuteReset = document.getElementById('btn-execute-reset');
+  const recoveryNoticeBox = document.getElementById('recovery-notice-box');
 
+  // Alternar visibilidade da senha (Olho)
   let showPwd = false;
   btnTogglePwd.onclick = () => {
     showPwd = !showPwd;
     passwordInput.type = showPwd ? 'text' : 'password';
-    btnTogglePwd.innerHTML = showPwd ? Icons.eyeOff(18) : Icons.eye(18);
+    btnTogglePwd.innerHTML = showPwd ? Icons.eyeOff(16) : Icons.eye(16);
   };
 
-  document.querySelectorAll('.role-pill-btn').forEach(btn => {
-    btn.onclick = async () => {
-      const email = btn.getAttribute('data-email');
-      const user = btn.getAttribute('data-user');
-      const defaultPwd = (email === 'jossuemohamad@gmail.com') ? 'Joswil@8464' : 'Admin@LECASU2026';
-      credentialInput.value = (currentMethod === 'user') ? user : email;
-      passwordInput.value = defaultPwd;
-      await performLogin(email, defaultPwd);
-    };
-  });
+  let showNewPwd = false;
+  btnToggleNewPwd.onclick = () => {
+    showNewPwd = !showNewPwd;
+    recoveryNewPwdInput.type = showNewPwd ? 'text' : 'password';
+    btnToggleNewPwd.innerHTML = showNewPwd ? Icons.eyeOff(16) : Icons.eye(16);
+  };
 
-  const forgotBtn = document.getElementById('btn-login-forgot-pwd');
-  if (forgotBtn) {
-    forgotBtn.onclick = () => {
-      showLoginAndRecoveryModal();
-    };
-  }
+  // Alternar entre Login e Recuperação de Senha
+  linkGotoForgot.onclick = () => {
+    alertBox.innerHTML = '';
+    loginViewSection.style.display = 'none';
+    recoveryViewSection.style.display = 'block';
+    recoveryStep1.style.display = 'block';
+    recoveryStep2.style.display = 'none';
+  };
 
-  form.onsubmit = async (e) => {
+  linkBackToLogin.onclick = () => {
+    alertBox.innerHTML = '';
+    recoveryViewSection.style.display = 'none';
+    loginViewSection.style.display = 'block';
+  };
+
+  // 1. Submissão do Formulário de Login com Validação Real
+  formLogin.onsubmit = async (e) => {
     e.preventDefault();
-    const cred = credentialInput.value.trim();
-    await performLogin(cred, passwordInput.value);
-  };
+    alertBox.innerHTML = '';
 
-  async function performLogin(email, password) {
-    alertBox.innerHTML = `
-      <div style="background:#e6f7ff; border:1px solid #91d5ff; color:#0050b3; padding:0.4rem 0.65rem; border-radius:4px; font-size:0.90rem; margin-bottom:0.75rem;">
-        A autenticar credenciais no servidor...
-      </div>
-    `;
+    const email = emailInput.value.trim().toLowerCase();
+    const password = passwordInput.value;
+
+    // Validação real de e-mail no frontend
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      alertBox.innerHTML = `<div class="alert alert-danger py-2 px-3 mb-3 text-start" style="font-size:0.85rem;">Por favor, preencha o campo de e-mail.</div>`;
+      emailInput.focus();
+      return;
+    }
+    if (!emailRegex.test(email)) {
+      alertBox.innerHTML = `<div class="alert alert-danger py-2 px-3 mb-3 text-start" style="font-size:0.85rem;">Insira um endereço de e-mail válido (ex: info@lecasu.co.mz).</div>`;
+      emailInput.focus();
+      return;
+    }
+    if (!password) {
+      alertBox.innerHTML = `<div class="alert alert-danger py-2 px-3 mb-3 text-start" style="font-size:0.85rem;">Por favor, insira a sua palavra-passe.</div>`;
+      passwordInput.focus();
+      return;
+    }
+
+    btnLoginSubmit.disabled = true;
+    btnLoginSubmit.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status"></span>A autenticar...`;
+
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
@@ -650,21 +757,135 @@ function renderSolarmanLoginView(container) {
         body: JSON.stringify({ email, password })
       });
       const data = await res.json();
+
       if (!res.ok || !data?.data?.token) {
-        throw new Error(data?.error || data?.message || 'Falha na autenticação.');
+        throw new Error(data?.error || data?.message || 'Credenciais inválidas.');
       }
+
+      // Se "Lembrar-me" estiver desmarcado, remove do localStorage permanente
+      const remember = rememberMeCheck.checked;
       setAuthenticatedUser(data.data.token, data.data.user);
+      if (!remember) {
+        sessionStorage.setItem('lecasu_auth_token', data.data.token);
+        sessionStorage.setItem('lecasu_current_user', JSON.stringify(data.data.user));
+      }
+
       document.body.classList.remove('is-login-page');
       window.location.hash = '#dashboard';
       navigateToView('dashboard');
     } catch (err) {
       alertBox.innerHTML = `
-        <div style="background:#fff1f0; border:1px solid #ffa39e; color:#cf1322; padding:0.4rem 0.65rem; border-radius:4px; font-size:0.90rem; margin-bottom:0.75rem;">
-          ${err.message || 'Erro ao iniciar sessão.'}
+        <div class="alert alert-danger py-2 px-3 mb-3 text-start" style="font-size:0.85rem;">
+          ${err.message || 'Erro ao autenticar. Verifique o e-mail e a senha.'}
         </div>
       `;
+    } finally {
+      btnLoginSubmit.disabled = false;
+      btnLoginSubmit.innerHTML = `Iniciar Sessão`;
     }
-  }
+  };
+
+  // 2. Passo 1 da Recuperação de Senha: Gerar Código
+  btnSendRecoveryCode.onclick = async () => {
+    alertBox.innerHTML = '';
+    const email = recoveryEmailInput.value.trim().toLowerCase();
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      alertBox.innerHTML = `<div class="alert alert-danger py-2 px-3 mb-3 text-start" style="font-size:0.85rem;">Insira um endereço de e-mail corporativo válido.</div>`;
+      recoveryEmailInput.focus();
+      return;
+    }
+
+    btnSendRecoveryCode.disabled = true;
+    btnSendRecoveryCode.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>A gerar código...`;
+
+    try {
+      const res = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.error || data?.message || 'Falha ao processar pedido de recuperação.');
+      }
+
+      recoveryStep1.style.display = 'none';
+      recoveryStep2.style.display = 'block';
+
+      const code = data?.data?.code || '';
+      recoveryNoticeBox.innerHTML = `
+        <strong>Código gerado com sucesso!</strong><br>
+        O seu código de verificação é: <span class="badge bg-primary fs-6 px-2 py-1 mt-1">${code}</span><br>
+        <small class="text-muted">Válido por 15 minutos para a conta <strong>${email}</strong>.</small>
+      `;
+
+      if (code) {
+        recoveryCodeInput.value = code;
+      }
+      recoveryNewPwdInput.focus();
+    } catch (err) {
+      alertBox.innerHTML = `<div class="alert alert-danger py-2 px-3 mb-3 text-start" style="font-size:0.85rem;">${err.message}</div>`;
+    } finally {
+      btnSendRecoveryCode.disabled = false;
+      btnSendRecoveryCode.innerHTML = `Gerar Código de Recuperação`;
+    }
+  };
+
+  // 3. Passo 2 da Recuperação de Senha: Salvar Nova Senha
+  btnExecuteReset.onclick = async () => {
+    alertBox.innerHTML = '';
+    const email = recoveryEmailInput.value.trim().toLowerCase();
+    const code = recoveryCodeInput.value.trim();
+    const newPassword = recoveryNewPwdInput.value;
+
+    if (!code || code.length < 6) {
+      alertBox.innerHTML = `<div class="alert alert-danger py-2 px-3 mb-3 text-start" style="font-size:0.85rem;">Insira o código de verificação completo de 6 dígitos.</div>`;
+      recoveryCodeInput.focus();
+      return;
+    }
+
+    if (!newPassword || newPassword.length < 6) {
+      alertBox.innerHTML = `<div class="alert alert-danger py-2 px-3 mb-3 text-start" style="font-size:0.85rem;">A nova palavra-passe deve conter pelo menos 6 caracteres.</div>`;
+      recoveryNewPwdInput.focus();
+      return;
+    }
+
+    btnExecuteReset.disabled = true;
+    btnExecuteReset.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>A salvar...`;
+
+    try {
+      const res = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code, newPassword })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.error || data?.message || 'Falha ao redefinir a palavra-passe.');
+      }
+
+      // Redefinição com sucesso: volta ao painel de login
+      recoveryViewSection.style.display = 'none';
+      loginViewSection.style.display = 'block';
+      emailInput.value = email;
+      passwordInput.value = newPassword;
+
+      alertBox.innerHTML = `
+        <div class="alert alert-success py-2 px-3 mb-3 text-start" style="font-size:0.85rem;">
+          <i class="bi bi-check-circle-fill me-1"></i> Palavra-passe redefinida com sucesso! Inicie sessão com a sua nova senha.
+        </div>
+      `;
+    } catch (err) {
+      alertBox.innerHTML = `<div class="alert alert-danger py-2 px-3 mb-3 text-start" style="font-size:0.85rem;">${err.message}</div>`;
+    } finally {
+      btnExecuteReset.disabled = false;
+      btnExecuteReset.innerHTML = `Salvar Nova Senha`;
+    }
+  };
 }
 
 // ==============================================================================
@@ -955,7 +1176,7 @@ async function loadDashboardKPIs() {
       const authRes = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'jossuemohamad@gmail.com', password: 'Joswil@8464' })
+        body: JSON.stringify({ email: 'info@lecasu.co.mz', password: 'Lecasu@2026' })
       });
       const authJson = await authRes.json();
       if (authRes.ok && authJson?.data?.token) {
@@ -5931,14 +6152,7 @@ function showAuditDetailsModal(log) {
 function showLoginAndRecoveryModal() {
   const modalContainer = document.getElementById('modal-container');
   const users = [
-    { nome: 'Jossue Mohamad (Administrador Geral)', email: 'jossuemohamad@gmail.com', user: 'jossue', role: 'administrador', canonical: 'ADMIN', desc: 'Acesso total: configurações globais, utilizadores, mini-redes e auditoria' },
-    { nome: 'Administrador de Sistemas LECASU', email: 'admin@lecasu.co.mz', user: 'admin', role: 'administrador', canonical: 'ADMIN', desc: 'Acesso total: configurações globais, utilizadores, mini-redes e trilha de auditoria' },
-    { nome: 'Délcio Cossa (Gestor de Operações)', email: 'operacoes@lecasu.co.mz', user: 'operacoes', role: 'gestor_operacoes', canonical: 'OPERATIONS_MANAGER', desc: 'Desempenho técnico, activos, centrais solares e despacho de ordens de trabalho' },
-    { nome: 'Sofia Sitoe (Gestora Comercial)', email: 'comercial@lecasu.co.mz', user: 'comercial', role: 'gestor_comercial', canonical: 'COMMERCIAL_MANAGER', desc: 'Cadastro de clientes, contratos, tarifas, contadores e histórico de vendas' },
-    { nome: 'Mateus Macuácua (Técnico de Campo)', email: 'tecnico@lecasu.co.mz', user: 'tecnico', role: 'tecnico_campo', canonical: 'FIELD_TECHNICIAN', desc: 'Offline-First: OTs atribuídas, execução de vistorias e registo de leituras' },
-    { nome: 'Carlos Nhantumbo (Agente Comunitário)', email: 'agente@lecasu.co.mz', user: 'agente', role: 'agente_comunitario', canonical: 'COMMUNITY_AGENT', desc: 'Apoio local: cadastro de clientes e ocorrências restritas à sua comunidade' },
-    { nome: 'Fátima Guambe (Responsável Financeira)', email: 'financeiro@lecasu.co.mz', user: 'financeiro', role: 'financeiro', canonical: 'FINANCE', desc: 'Reconciliação contabilística, validação de pagamentos e relatórios de receita' },
-    { nome: 'Dr. Paulo Mondlane (Auditor / Parceiro)', email: 'auditor@lecasu.co.mz', user: 'auditor', role: 'parceiro_auditor', canonical: 'AUDITOR_PARTNER', desc: 'Somente leitura (Read-Only): auditoria, métricas de impacto e relatórios' }
+    { nome: 'LECASU Operações (Administrador)', email: 'info@lecasu.co.mz', user: 'admin', role: 'administrador', canonical: 'ADMIN', desc: 'Acesso total: configurações globais, utilizadores, mini-redes e auditoria' }
   ];
 
   modalContainer.innerHTML = `
@@ -5951,35 +6165,26 @@ function showLoginAndRecoveryModal() {
         <div class="card-tabs-header" style="margin-bottom: 0;">
           <button class="card-tab-btn active" id="modal-tab-login">Iniciar Sessão</button>
           <button class="card-tab-btn" id="modal-tab-recover">Recuperar Acesso</button>
-          <button class="card-tab-btn" id="modal-tab-roles">Perfis RBAC</button>
+          <button class="card-tab-btn" id="modal-tab-roles">Conta Operacional</button>
         </div>
         <div class="modal-body" id="modal-auth-body" style="padding-top: 1.25rem;">
-          <!-- Painel Iniciar Sessão (Modelo SolarMAN Pro Oficial) -->
+          <!-- Painel Iniciar Sessão -->
           <div id="auth-panel-login">
-            <!-- Seletor do Método de Login -->
-            <div class="solarman-method-row" style="margin-bottom:0.85rem;">
-              <span class="solarman-method-label" style="font-size:0.80rem;">Método de login</span>
-              <div class="solarman-segmented-control">
-                <button type="button" class="solarman-seg-btn active" id="modal-method-email">E-mail</button>
-                <button type="button" class="solarman-seg-btn" id="modal-method-user">Usuário</button>
-              </div>
-            </div>
-
             <div id="modal-login-alert"></div>
             <form id="form-auth-login">
-              <!-- Campo 1: E-mail ou Nome de Usuário -->
+              <!-- Campo 1: E-mail -->
               <div class="solarman-field-group">
                 <div class="solarman-input-box">
                   <span class="solarman-input-icon" id="modal-login-icon">
                     ${Icons.mail(18)}
                   </span>
                   <input 
-                    type="text" 
+                    type="email" 
                     id="modal-login-credential" 
                     name="email" 
                     class="solarman-input" 
-                    placeholder="jossuemohamad@gmail.com" 
-                    value="jossuemohamad@gmail.com" 
+                    placeholder="info@lecasu.co.mz" 
+                    value="info@lecasu.co.mz" 
                     required
                   >
                 </div>
@@ -5996,8 +6201,8 @@ function showLoginAndRecoveryModal() {
                     id="modal-login-password" 
                     name="password" 
                     class="solarman-input" 
-                    placeholder="Joswil@8464" 
-                    value="Joswil@8464" 
+                    placeholder="Lecasu@2026" 
+                    value="Lecasu@2026" 
                     required
                   >
                   <button type="button" id="modal-btn-toggle-pwd" class="solarman-eye-btn" title="Mostrar/Ocultar Senha" tabindex="-1">
@@ -6029,7 +6234,7 @@ function showLoginAndRecoveryModal() {
             <form id="form-auth-recover">
               <div class="form-group">
                 <label class="form-label">Email do Utilizador:</label>
-                <input type="email" id="recover-email" class="form-control" placeholder="nome@lecasu.co.mz" required>
+                <input type="email" id="recover-email" class="form-control" placeholder="info@lecasu.co.mz" value="info@lecasu.co.mz" required>
               </div>
               <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
                 Enviar Instruções de Recuperação
@@ -6037,10 +6242,10 @@ function showLoginAndRecoveryModal() {
             </form>
           </div>
 
-          <!-- Painel Perfis RBAC (Simulação Rápida) -->
+          <!-- Painel Perfis RBAC -->
           <div id="auth-panel-roles" style="display: none;">
             <p style="font-size:0.90rem; color: var(--color-text-secondary); margin-bottom: 0.75rem;">
-              Alterne instantaneamente para testar o sistema com qualquer um dos 7 perfis operacionais da LECASU:
+              Conta operacional ativa:
             </p>
             <div style="display: flex; flex-direction: column; gap: 0.4rem; max-height: 280px; overflow-y: auto;">
               ${users.map(u => {
@@ -6062,6 +6267,13 @@ function showLoginAndRecoveryModal() {
               }).join('')}
             </div>
           </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn" id="modal-cancel-btn">Fechar</button>
+        </div>
+      </div>
+    </div>
+  `;
         </div>
         <div class="modal-footer">
           <button type="button" class="btn" id="modal-cancel-btn">Fechar</button>
@@ -11091,7 +11303,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'jossuemohamad@gmail.com', password: 'Joswil@8464' })
+        body: JSON.stringify({ email: 'info@lecasu.co.mz', password: 'Lecasu@2026' })
       });
       const data = await res.json().catch(() => null);
       if (res.ok && data?.data) {

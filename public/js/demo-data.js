@@ -386,15 +386,9 @@
     { id: 't-05', codigo: 'TAR-TEL-01', nome: 'Tarifa Telecomunicações', categoria: 'telecomunicacoes', preco_kwh: 24.0, moeda: 'MZN', ativo: true }
   ];
 
-  // 9. Utilizadores do Sistema (7 Perfis RBAC)
+  // 9. Utilizador Oficial do Sistema
   const users = [
-    { id: 'u-01', nome: 'Jossue Mohamad', email: 'jossuemohamad@gmail.com', role: 'administrador', status: 'ativo' },
-    { id: 'u-02', nome: 'Eng. Américo Muchanga', email: 'operacoes@lecasu.co.mz', role: 'gestor_operacoes', status: 'ativo' },
-    { id: 'u-03', nome: 'Sofia Sitoe', email: 'comercial@lecasu.co.mz', role: 'gestor_comercial', status: 'ativo' },
-    { id: 'u-04', nome: 'Tomas Manhique', email: 'tecnico@lecasu.co.mz', role: 'tecnico_campo', status: 'ativo' },
-    { id: 'u-05', nome: 'Carlos Nhantumbo', email: 'agente@lecasu.co.mz', role: 'agente_comunitario', status: 'ativo' },
-    { id: 'u-06', nome: 'Fátima Guambe', email: 'financeiro@lecasu.co.mz', role: 'financeiro', status: 'ativo' },
-    { id: 'u-07', nome: 'Dr. Paulo Mondlane', email: 'auditor@lecasu.co.mz', role: 'parceiro_auditor', status: 'ativo' }
+    { id: '00000000-0000-0000-0000-000000000001', nome: 'LECASU Operações', email: 'info@lecasu.co.mz', role: 'administrador', status: 'ativo' }
   ];
 
   // 10. Construtores Dinâmicos de Relatórios Estruturados (Dashboard e Executivo)
