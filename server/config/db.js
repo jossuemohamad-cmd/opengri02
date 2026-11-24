@@ -8,14 +8,18 @@
 require('dotenv').config();
 const { Pool } = require('pg');
 
+// Deteção inteligente de SSL (obrigatório para Neon e instâncias cloud com sslmode=require)
+const isSsl = process.env.PGSSL === 'true' ||
+  (process.env.DATABASE_URL && (process.env.DATABASE_URL.includes('sslmode=require') || process.env.DATABASE_URL.includes('neon.tech')));
+
 // Configuração da Pool com suporte a DATABASE_URL ou variáveis discretas
 const poolConfig = process.env.DATABASE_URL
   ? {
       connectionString: process.env.DATABASE_URL,
-      ssl: process.env.PGSSL === 'true' ? { rejectUnauthorized: false } : false,
+      ssl: isSsl ? { rejectUnauthorized: false } : false,
       max: parseInt(process.env.PGMAX_POOL || '20', 10),
       idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 5000
+      connectionTimeoutMillis: 10000
     }
   : {
       host: process.env.PGHOST || 'localhost',
@@ -23,10 +27,10 @@ const poolConfig = process.env.DATABASE_URL
       database: process.env.PGDATABASE || 'lecasu_gridops',
       user: process.env.PGUSER || 'postgres',
       password: process.env.PGPASSWORD || 'postgres',
-      ssl: process.env.PGSSL === 'true' ? { rejectUnauthorized: false } : false,
+      ssl: isSsl ? { rejectUnauthorized: false } : false,
       max: parseInt(process.env.PGMAX_POOL || '20', 10),
       idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 5000
+      connectionTimeoutMillis: 10000
     };
 
 const pool = new Pool(poolConfig);

@@ -4,10 +4,7 @@
  * Popula todas as tabelas: mini_grids, assets, clients, contracts, meters, readings, payments, work_orders, audit_logs.
  */
 
-const { Pool } = require('pg');
-require('dotenv').config();
-
-const pool = new Pool();
+const { pool } = require('../server/config/db');
 
 async function seedData() {
   const client = await pool.connect();
